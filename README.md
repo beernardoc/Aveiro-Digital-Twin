@@ -11,3 +11,25 @@ Project for the Project in Informatics class
 | José Mendes    | mendes.j@ua.pt       | 107188
 | Rafaela Dias   | rafaelasdias@ua.pt   | 108782
 
+## How to run
+
+- Install requirements
+```bash
+pip install -r requirements.txt
+```
+
+- Run carla server
+```bash
+./CarlaUE4.sh
+```
+
+- Load map
+```bash
+python3 config.py -x ~/Desktop/PI_Digital_Twin/Adapters/co_simulation/sumo_configuration/output.xodr
+```
+
+- Run co-simulation
+```bash
+ python3 main.py sumo_configuration/ruadapega.sumocfg --tls-manager carla --sumo-gui
+```
+
