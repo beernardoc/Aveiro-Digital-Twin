@@ -1,0 +1,5 @@
+carla==0.9.15
+lxml==5.2.1
+paho-mqtt==2.0.0
+sumolib==1.19.0
+traci==1.19.0
