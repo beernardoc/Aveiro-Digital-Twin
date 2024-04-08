@@ -18,7 +18,7 @@ import numpy as np
 from pyproj import CRS, Transformer
 import xml.etree.ElementTree as ET
 
-osmPath = '/home/pi-digitaltwin/Desktop/PI_Digital_Twin/Adapters/co_simulation/testUA/ua.osm'
+osmPath = '/home/pi/Desktop/PI_Digital_Twin/map-clean.osm'
 regionSpecificScaleFactor = 1.0
 
 
