@@ -33,3 +33,17 @@ python3 config.py -x ~/Desktop/PI_Digital_Twin/Adapters/co_simulation/sumo_confi
  python3 main.py sumo_configuration/ruadapega.sumocfg --tls-manager carla --sumo-gui
 ```
 
+
+## Export map
+
+- Gera o .osm
+
+- utiliza netconvert --osm-files simple-map.osm -o simple-map.net.xml para gerar o .net.xml para o sumo
+
+- com Adapters/co_simulation/map_adjustor/converter.py crio o xodr para o carla
+
+- com Adapters/co_simulation/map_adjustor/main.py crio um novo header para o xodr e altero manualmente
+
+
+
+
