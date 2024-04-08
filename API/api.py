@@ -1,10 +1,12 @@
+import os
 import subprocess
 from flask import Flask, request, jsonify, Response
 from flask_pymongo import PyMongo
 from bson import json_util
 from bson.objectid import ObjectId
-
+import paho.mqtt.publish as publish
 from werkzeug.security import generate_password_hash, check_password_hash
+
 
 app = Flask(__name__)
 
@@ -13,9 +15,11 @@ app.secret_key = 'myawesomesecretkey'
 app.config['MONGO_URI'] = 'mongodb://localhost:27017/digitaltwin'
 mongo = PyMongo(app)
 
+
 @app.route('/api')
 def api():
     return jsonify({'data': 'Hello, World!'})
+
 
 @app.route('/users', methods=['POST'])
 def create_user():
@@ -71,12 +75,13 @@ def update_user(_id):
     if username and email and password and _id:
         hashed_password = generate_password_hash(password)
         mongo.db.users.update_one(
-            {'_id': ObjectId(_id['$oid']) if '$oid' in _id else ObjectId(_id)}, {'$set': {'username': username, 'email': email, 'password': hashed_password}})
+            {'_id': ObjectId(_id['$oid']) if '$oid' in _id else ObjectId(_id)},
+            {'$set': {'username': username, 'email': email, 'password': hashed_password}})
         response = jsonify({'message': 'User' + _id + 'Updated Successfuly'})
         response.status_code = 200
         return response
     else:
-      return not_found()
+        return not_found()
 
 
 @app.errorhandler(404)
@@ -90,13 +95,38 @@ def not_found(error=None):
     return response
 
 
-@app.route('/api/run', methods=['POST'])
-def run_sync():
+@app.route('/api/run3D', methods=['POST'])
+def run_3D():
     try:
-        subprocess.run(["python3", "Adapters/co_simulation/main.py", "Adapters/co_simulation/sumo_configuration/ruadapega.sumocfg", "--tls-manager", "carla", "--sumo-gui"], check=True)
+        subprocess.run(["python3", "../Adapters/co_simulation/simulation_3D.py",
+                        "Adapters/co_simulation/sumo_configuration/ruadapega.sumocfg", "--tls-manager", "carla",
+                        "--sumo-gui"], check=True)
         return jsonify({'message': 'Comando executado com sucesso'}), 200
     except subprocess.CalledProcessError as e:
-        return jsonify({'error': 'Erro ao executar o comando'}), 500
+        return jsonify({'error': e}), 500
+
+
+@app.route('/api/run2D', methods=['POST'])
+def run_2D():
+    try:
+        subprocess.Popen(["python3", "../Adapters/co_simulation/simulation_2D.py"])
+        return jsonify({'message': 'Comando iniciado com sucesso'}), 200
+    except subprocess.CalledProcessError as e:
+        return jsonify({'error': e}), 500
+
+
+@app.route('/api/addRandomTraffic', methods=['POST'])
+def add_random_traffic():
+    qtd = request.args.get('qtd')
+    if qtd is None:
+        return jsonify({'error': 'Parâmetro "qtd" é obrigatório na URL'}), 400
+
+    try:
+        publish.single("/addRandomTraffic", payload=f'{qtd}', hostname="localhost", port=1883)
+        return jsonify({'message': f'Tráfego aleatório adicionado para {qtd} veículos'}), 200
+    except Exception as e:
+        return jsonify({'error': e}), 500
+
 
 if __name__ == '__main__':
     app.run(debug=True)
