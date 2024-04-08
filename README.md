@@ -30,7 +30,7 @@ python3 config.py -x ~/Desktop/PI_Digital_Twin/Adapters/co_simulation/sumo_confi
 
 - Run co-simulation
 ```bash
- python3 main.py sumo_configuration/ruadapega.sumocfg --tls-manager carla --sumo-gui
+ python3 simulation_3D.py sumo_configuration/ruadapega.sumocfg --tls-manager carla --sumo-gui
 ```
 
 

@@ -6,7 +6,7 @@ os.environ['GDAL_DATA'] = '/us/share/gdal'
 
 
 # Read the .osm data
-f = open("../../../map-clean.osm", 'r') # change file, this one does not exist anymore
+f = open("../sumo_configuration/simple-map/map-clean.osm", 'r') # change file, this one does not exist anymore
 osm_data = f.read()
 f.close()
 
