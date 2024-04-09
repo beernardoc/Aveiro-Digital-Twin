@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<!--generated on 2024-03-13 14:47:04 by create_sumo_vtypes.py-->
+<!--generated on 2024-04-09 13:12:30 by create_sumo_vtypes.py-->
 <routes>
   <vType id="vehicle.audi.a2" length="3.705369472503662" width="1.788678526878357" height="1.549050211906433" vClass="passenger"/>
   <vType id="vehicle.citroen.c3" length="3.987684965133667" width="1.8508483171463013" height="1.6171095371246338" vClass="passenger"/>

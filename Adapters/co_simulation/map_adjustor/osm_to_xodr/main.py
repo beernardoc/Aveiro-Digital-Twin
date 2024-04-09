@@ -18,7 +18,7 @@ import numpy as np
 from pyproj import CRS, Transformer
 import xml.etree.ElementTree as ET
 
-osmPath = '/home/pi/Desktop/PI_Digital_Twin/Adapters/co_simulation/sumo_configuration/simple-map/map-clean.osm'
+osmPath = 'predios.osm'
 regionSpecificScaleFactor = 1.0
 
 
