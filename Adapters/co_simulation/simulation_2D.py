@@ -26,48 +26,18 @@ lista = {}
 
 
 def run():
-
-
     step = 0
     while True:
-
-        if len(lista) > 0:
-            for key in lista.keys():
-                addOrUpdateCar({"vehicle": key, "data": lista[
-                    key]})  # para nao desregular os steps do sumo, a função addOrUpdateCar é chamada aqui
+        #if len(lista) > 0:
+        #    for key in lista.keys():
+        #        addOrUpdateCar({"vehicle": key, "data": lista[
+        #           key]})  # para nao desregular os steps do sumo, a função addOrUpdateCar é chamada aqui
 
         traci.simulationStep()
 
-        # # get cars list in the simulation
-        # vehicle_list = traci.vehicle.getIDList()
-
-        # for vehicle in vehicle_list:
-        #     x, y = traci.vehicle.getPosition(vehicle)
-        #     log, lat = traci.simulation.convertGeo(x, y)
-        #     print(f'{{"lat": {lat}, "lng": {log}}},')
 
         step += 1
 
-    #   pos = traci.vehicle.getPosition(vehicle_list[0])
-    #   routeID = traci.vehicle.getRouteID(vehicle_list[0])
-    #   typeID = traci.vehicle.getTypeID(vehicle_list[0])
-    #   rout = traci.vehicle.getRoute(vehicle_list[0])
-    #
-    #
-    #
-    #   if step == 10:
-    #       traci.vehicle.add("teste", routeID, typeID, depart="now", departSpeed=0, departLane="best",
-    #                        personCapacity=0, line="")
-
-    # x,y = traci.vehicle.getPosition(vehicle_list[0]) #sumo vehicle position
-
-    # log,lat = traci.simulation.convertGeo(x,y) #sumo position to lat,log
-
-    # print(f'Vehicle: {vehicle_list[0]}, Position: {x},{y}, Lat: {lat}, Log: {log}')
-
-    # x1,y1 = traci.simulation.convertGeo(log,lat, True ) #lat,log to sumo position
-
-    # print(x1,y1)
 
     traci.close()
     sys.stdout.flush()
@@ -105,28 +75,18 @@ def addOrUpdateCar(received):
 
 
 def addRandomTraffic(QtdCars):
+    allowedEdges = [i.getID() for i in net.getEdges() for j in i.getLanes() if "passenger" in j.getPermissions()]
 
-    for i in range(QtdCars):
-        vclass = "passenger"
-        allowed_edges = [e for e in traci.edge.getIDList() if not e.startswith(":") or not "_" in e]
+    if len(allowedEdges) != 0:
 
-        if allowed_edges:
-            first = random.choice(allowed_edges)
-            end = random.choice(allowed_edges)
+        for count in range(QtdCars):
             routeID = "route_{}".format(time.time_ns())
             vehicle_id = "sumo_{}".format(time.time_ns())
-
-            route = traci.simulation.findRoute(first, end, vType="vehicle.audi.a2")
+            route = traci.simulation.findRoute(random.choice(allowedEdges), random.choice(allowedEdges), vType="vehicle.audi.a2")
             if route.edges:
                 traci.route.add(routeID, route.edges)
                 traci.vehicle.add(vehicle_id, routeID, typeID="vehicle.audi.a2", depart="now", departSpeed=0,
-                                  departLane="best", )
-
-
-
-        else:
-            logging.error("No edges available for vehicle class %s", vclass)
-
+                              departLane="best", )
 
 
 def on_connect(client, userdata, flags, rc):
@@ -173,15 +133,24 @@ if __name__ == "__main__":
 
     # Aveiro sumo network
     sumo_thread = threading.Thread(target=traci.start, args=[
-        [sumoBinary, "-c", "../Adapters/co_simulation/sumo_configuration/ruadapega.sumocfg", "--tripinfo-output",
+        [sumoBinary, "-c", "../Adapters/co_simulation/sumo_configuration/simple-map/simple-map.sumocfg",
+         "--tripinfo-output",
          "tripinfo.xml"]])
 
     # Simple sumo network
     # sumo_thread = threading.Thread(target=traci.start, args=[
     #     [sumoBinary, "-c", "../simple_sumo_network/osm.sumocfg", "--tripinfo-output", "simple_tripinfo.xml"]])
     sumo_thread.start()
-
     # Executa a função run (controle do SUMO) após o início do SUMO
     sumo_thread.join()  # Aguarda até que o SUMO esteja pronto
+
+    net = sumolib.net.readNet(
+        "../Adapters/co_simulation/sumo_configuration/simple-map/simple-map.net.xml")  # Carrega a rede do SUMO atraves do sumolib para acesso estatico
+
+    #sumolib para dados estaticos da rede e traci para dados dinamicos da simulação
+
+    #teste = net.getEdge("-1545").getLanes()
+    #for i in teste:
+    #    print(i.getPermissions())
 
     run()
