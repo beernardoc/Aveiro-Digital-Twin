@@ -7,9 +7,12 @@ from bson import json_util
 from bson.objectid import ObjectId
 import paho.mqtt.publish as publish
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_cors import CORS
 
 
 app = Flask(__name__)
+
+CORS(app)
 
 app.secret_key = 'myawesomesecretkey'
 
@@ -59,6 +62,28 @@ def get_user(id):
     response = json_util.dumps(user)
     return Response(response, mimetype="application/json")
 
+@app.route('/api/login', methods=['POST'])
+def login():
+
+    # Receiving Data
+    email = request.json['email']
+    password = request.json['password']
+
+    # Find the user by email
+    user = mongo.db.users.find_one({'email': email})
+
+    # If user not found, return error
+    if not user:
+        return jsonify({'message': 'User not found'}), 404
+
+    # Check if the password is correct
+    if not check_password_hash(user['password'], password):
+        return jsonify({'message': 'Incorrect password'}), 401
+
+    # If everything is correct, return a success message
+    # In a real application, you would also return a token or session ID here
+    return jsonify({'message': 'Login successful', 'username': user['username']}), 200
+
 
 @app.route('/users/<id>', methods=['DELETE'])
 def delete_user(id):
@@ -99,9 +124,7 @@ def not_found(error=None):
 @app.route('/api/run3D', methods=['POST'])
 def run_3D():
     try:
-        subprocess.run(["python3", "../Adapters/co_simulation/simulation_3D.py",
-                        "Adapters/co_simulation/sumo_configuration/ruadapega.sumocfg", "--tls-manager", "carla",
-                        "--sumo-gui"], check=True)
+        subprocess.Popen(["python3", "../Adapters/co_simulation/simulation_3D.py"])
         return jsonify({'message': 'Comando executado com sucesso'}), 200
     except subprocess.CalledProcessError as e:
         return jsonify({'error': e}), 500
@@ -179,5 +202,7 @@ def add_car():
     #"start": {"log": "-8.660106693274248", "lat": "40.635327506990194"}
     #}' http://localhost:5000/api/addSimulatedCar
 
+
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0')

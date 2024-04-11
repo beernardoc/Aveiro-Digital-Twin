@@ -25,7 +25,7 @@ pip install -r requirements.txt
 
 - Load map
 ```bash
-python3 config.py -x ~/Desktop/PI_Digital_Twin/Adapters/co_simulation/sumo_configuration/output.xodr
+python3 config.py -x ~/Desktop/PI_Digital_Twin/Adapters/co_simulation/sumo_configuration/simple-map/map-clean.xodr
 ```
 
 - Run co-simulation

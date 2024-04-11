@@ -104,30 +104,63 @@ def addOrUpdateRealCar(received):
 
 
 def addSimulatedCar(received):
-    print("received", received)
+    print(type(received))
     data = json.loads(received.decode('utf-8'))
-    logI, latI = data["start"]["log"], data["start"]["lat"]
-    logE, latE = data["end"]["log"], data["end"]["lat"]
+    print("data", data.keys())
 
-    print("logI: {}, latI: {}".format(logI, latI))
-    print("logE: {}, latE: {}".format(logE, latE))
+    if data.keys() == {"start", "end"}:
+        logI, latI = data["start"]["log"], data["start"]["lat"]
+        logE, latE = data["end"]["log"], data["end"]["lat"]
 
-    x, y = net.convertLonLat2XY(logI, latI)
-
-    print("x", x)
-    print("y", y)
-
-    Start = traci.simulation.convertRoad(float(logI), float(latI), isGeo=True, vClass="passenger")
-    End = traci.simulation.convertRoad(float(logE), float(latE), isGeo=True, vClass="passenger")
-
-    print("Start", Start)
-    print("End", End)
-    ts = str(time.time_ns())
-    traci.route.add("route_simulated{}".format(ts), [Start[0], End[0]])
-
-    traci.vehicle.add(vehID="simulated{}".format(ts), routeID="route_simulated{}".format(ts), typeID="vehicle.audi.a2", depart="now", departSpeed=0, departLane="best")
+        print("logI: {}, latI: {}".format(logI, latI))
+        print("logE: {}, latE: {}".format(logE, latE))
 
 
+        Start = traci.simulation.convertRoad(float(logI), float(latI), isGeo=True, vClass="passenger")
+        End = traci.simulation.convertRoad(float(logE), float(latE), isGeo=True, vClass="passenger")
+
+        print("Start", Start)
+        print("End", End)
+        ts = str(time.time_ns())
+        traci.route.add("route_simulated{}".format(ts), [Start[0], End[0]])
+
+        traci.vehicle.add(vehID="simulated{}".format(ts), routeID="route_simulated{}".format(ts),
+                          typeID="vehicle.audi.a2", depart="now", departSpeed=0, departLane="best")
+        return "Veículo adicionado com informações de início e fim"
+
+    elif data.keys() == {"start"}:
+        allowedEdges = [i.getID() for i in net.getEdges() if "driving" in i.getType()]
+        randomEdge = random.choice(allowedEdges)
+        logI, latI = data["start"]["log"], data["start"]["lat"]
+
+        print("logI: {}, latI: {}".format(logI, latI))
+
+        Start = traci.simulation.convertRoad(float(logI), float(latI), isGeo=True, vClass="passenger")
+
+        print("Start", Start)
+        ts = str(time.time_ns())
+        traci.route.add("route_simulated{}".format(ts), [Start[0], randomEdge])
+
+        traci.vehicle.add(vehID="simulated{}".format(ts), routeID="route_simulated{}".format(ts),
+                          typeID="vehicle.audi.a2", depart="now", departSpeed=0, departLane="best")
+        return "Veículo adicionado com informações de início"
+
+    elif data.keys() == {"end"}:
+        allowedEdges = [i.getID() for i in net.getEdges() if "driving" in i.getType()]
+        randomEdge = random.choice(allowedEdges)
+        logE, latE = data["end"]["log"], data["end"]["lat"]
+
+        print("logE: {}, latE: {}".format(logE, latE))
+
+        End = traci.simulation.convertRoad(float(logE), float(latE), isGeo=True, vClass="passenger")
+
+        print("End", End)
+        ts = str(time.time_ns())
+        traci.route.add("route_simulated{}".format(ts), [randomEdge, End[0]])
+
+        traci.vehicle.add(vehID="simulated{}".format(ts), routeID="route_simulated{}".format(ts),
+                          typeID="vehicle.audi.a2", depart="now", departSpeed=0, departLane="best")
+        return "Veículo adicionado com informações de fim"
 
 
 
@@ -139,7 +172,7 @@ def addRandomTraffic(QtdCars):
 
         for count in range(QtdCars):
             routeID = "route_{}".format(time.time_ns())
-            vehicle_id = "sumo_{}".format(time.time_ns())
+            vehicle_id = "random_{}".format(time.time_ns())
             route = traci.simulation.findRoute(random.choice(allowedEdges), random.choice(allowedEdges), vType="vehicle.audi.a2")
             if route.edges:
                 traci.route.add(routeID, route.edges)
