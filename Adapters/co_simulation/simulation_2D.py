@@ -1,16 +1,20 @@
 import json
-import os
 import random
-import sys
 import optparse
 import threading
 import time
 
 import sumolib
-
 import traci
+import sys
+import os
+
 import paho.mqtt.client as mqtt
-from flask import logging
+
+
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+file_path = os.path.join(os.path.dirname(__file__), "radar.json")
+from coord_distance import calculate_bearing
 
 
 def get_options():
@@ -28,10 +32,6 @@ lista = {}
 def run():
     step = 0
     while True:
-        #if len(lista) > 0:
-        #    for key in lista.keys():
-        #        addOrUpdateCar({"vehicle": key, "data": lista[
-        #           key]})  # para nao desregular os steps do sumo, a função addOrUpdateCar é chamada aqui
 
         traci.simulationStep()
 
@@ -43,40 +43,98 @@ def run():
     sys.stdout.flush()
 
 
-def addOrUpdateCar(received):
-    log, lat = received["data"]["location"]["lng"], received["data"]["location"]["lat"]
-    vehID = received["vehicle"]
-    x, y = traci.simulation.convertGeo(log, lat, True)
-    nextEdge = traci.simulation.convertRoad(log, lat, True)[
-        0]  # calcula a proxima aresta que o veículo vai passar de acordo com as coordenadas recebidas
+def addOrUpdateRealCar(received):
+    print("received", received)
+    log, lat, heading = received["longitude"], received["latitude"], received["heading"]
+    print("log: {}, lat: {}, heading: {}".format(log, lat, heading))
+    # if the heading is positive it is directed to the sensor, if it is negative it is directed away from the sensor
+    # get the sensor information from radar.json
+    with open(file_path, "r") as f:
+        data = json.load(f)
+        radar = data[0]
+        # get the angle from the sensor to the vehicle
+        angle = calculate_bearing((radar['coord']['lat'], radar['coord']['lng']), (lat, log))
+        if radar['angle_type'] == 0:
+            if 0 <= angle <= 90 or 270 <= angle <= 360:
+                if heading < 0:
+                    nextEdge = radar['lanes']['near']
+                else:
+                    nextEdge = radar['lanes']['far']
+            else:
+                if heading < 0:
+                    nextEdge = radar['lanes']['far']
+                else:
+                    nextEdge = radar['lanes']['near']
+        f.close()
+
+
+
+    vehID = str(received["objectID"])
+    x, y = net.convertLonLat2XY(log, lat) # Converte as coordenadas para o sistema de coordenadas do SUMO
+    nextEdge = str(nextEdge)
     allCars = traci.vehicle.getIDList()
     print("next", nextEdge)
 
-    if vehID in allCars:  # Verifica se o veículo já existe
+    if vehID in allCars:
         print(traci.vehicle.getRoadID(vehID))
         if traci.vehicle.getRoadID(vehID) == nextEdge or nextEdge.startswith(":cluster") or "_" in nextEdge:
-            traci.vehicle.moveToXY(vehID, nextEdge, 0, x, y,
-                                   keepRoute=1)  # se a proxima for a mesma, cluster ou de junção, move com moveTOXY
 
+            traci.vehicle.setSpeed(vehID, 10)
+            global count
+            if count >= 15 :
+                traci.vehicle.setSpeed(vehID, 10)
+            elif count > 10:
+                traci.vehicle.setSpeed(vehID, 0)
+
+            count += 1
+            print(count)
 
         else:
-            traci.vehicle.changeTarget(vehID, nextEdge)  # se a proxima aresta for diferente, muda a rota
+            traci.vehicle.changeTarget(vehID, nextEdge) # se a proxima aresta for diferente, muda a rota
             print("mudou", traci.vehicle.getRoute(vehID))
 
 
-    else:  # Adiciona um novo veículo
-        traci.route.add(routeID=("route_" + vehID), edges=[nextEdge])  # adiciona uma rota para o veículo
-        print("definiu rota")
-        traci.vehicle.add(vehID, routeID=("route_" + vehID), typeID="vehicle.audi.a2", depart="now", departSpeed=0,
-                          departLane="best", )
+    else: # Adiciona um novo veículo
+        traci.route.add(routeID=("route_" + vehID), edges=[nextEdge]) # adiciona uma rota para o veículo
+        traci.vehicle.add(vehID, routeID=("route_" + vehID), typeID="vehicle.audi.a2", depart="now", departSpeed=0, departLane="best")
+        traci.vehicle.moveToXY(vehID, nextEdge, 0, x, y, keepRoute=1) # se a proxima for a mesma, cluster ou de junção, move com moveTOXY
         print(traci.vehicle.getRoute(vehID))
-        print("aq", traci.vehicle.getRoadID(vehID))
         print("adicionado")
 
 
-def addRandomTraffic(QtdCars):
-    allowedEdges = [i.getID() for i in net.getEdges() for j in i.getLanes() if "passenger" in j.getPermissions()]
 
+def addSimulatedCar(received):
+    print("received", received)
+    data = json.loads(received.decode('utf-8'))
+    logI, latI = data["start"]["log"], data["start"]["lat"]
+    logE, latE = data["end"]["log"], data["end"]["lat"]
+
+    print("logI: {}, latI: {}".format(logI, latI))
+    print("logE: {}, latE: {}".format(logE, latE))
+
+    x, y = net.convertLonLat2XY(logI, latI)
+
+    print("x", x)
+    print("y", y)
+
+    Start = traci.simulation.convertRoad(float(logI), float(latI), isGeo=True, vClass="passenger")
+    End = traci.simulation.convertRoad(float(logE), float(latE), isGeo=True, vClass="passenger")
+
+    print("Start", Start)
+    print("End", End)
+    ts = str(time.time_ns())
+    traci.route.add("route_simulated{}".format(ts), [Start[0], End[0]])
+
+    traci.vehicle.add(vehID="simulated{}".format(ts), routeID="route_simulated{}".format(ts), typeID="vehicle.audi.a2", depart="now", departSpeed=0, departLane="best")
+
+
+
+
+
+
+def addRandomTraffic(QtdCars):
+    allowedEdges = [i.getID() for i in net.getEdges() if "driving" in i.getType()]
+    print(allowedEdges)
     if len(allowedEdges) != 0:
 
         for count in range(QtdCars):
@@ -100,16 +158,19 @@ def on_publish(client, userdata, mid):
 def on_message(client, userdata, msg):
     topic = msg.topic
     print(topic)
-    if topic == "/teste":
+    if topic == "/realDatateste": # TODO: Mudar para topico real
         payload = json.loads(msg.payload)
-        lista[payload["vehicle"]] = payload["data"]
-        print(lista)
+        addOrUpdateRealCar(payload)
     if topic == "/addRandomTraffic":
         payload = json.loads(msg.payload)
         try:
             addRandomTraffic(int(payload))
         except Exception as e:
             print(e)
+    if topic == "/addSimulatedCar":
+        print("entrou", topic)
+        payload = msg.payload
+        addSimulatedCar(payload)
 
 
 if __name__ == "__main__":
@@ -125,8 +186,9 @@ if __name__ == "__main__":
     mqtt_client.on_publish = on_publish
     mqtt_client.on_message = on_message
     mqtt_client.connect("localhost", 1883, 60)
-    mqtt_client.subscribe("/teste")
+    mqtt_client.subscribe("/realDatateste")
     mqtt_client.subscribe("/addRandomTraffic")
+    mqtt_client.subscribe("/addSimulatedCar")
     mqtt_client.loop_start()  # Inicia o loop de eventos MQTT em uma thread separada
 
     # Inicia o SUMO em uma thread separada
@@ -145,10 +207,10 @@ if __name__ == "__main__":
     sumo_thread.join()  # Aguarda até que o SUMO esteja pronto
 
     net = sumolib.net.readNet(
-        "../Adapters/co_simulation/sumo_configuration/simple-map/simple-map.net.xml")  # Carrega a rede do SUMO atraves do sumolib para acesso estatico
+        "../Adapters/co_simulation/sumo_configuration/simple-map/simple-map.net.xml",withInternal=True)  # Carrega a rede do SUMO atraves do sumolib para acesso estatico
 
     #sumolib para dados estaticos da rede e traci para dados dinamicos da simulação
-
+    print(type(net.getEdge("-1545").getType()))
     #teste = net.getEdge("-1545").getLanes()
     #for i in teste:
     #    print(i.getPermissions())

@@ -133,7 +133,7 @@ def addOrUpdateCar(received):
     log, lat, heading = received["data"]["location"]["lng"], received["data"]["location"]["lat"], received["data"]["heading"]
     # if the heading is positive it is directed to the sensor, if it is negative it is directed away from the sensor
     # get the sensor information from radar.json
-    f = open("../radar.json", "r")
+    f = open("radar.json", "r")
     radar_data = json.load(f)
     radar = radar_data[0]
     # get the angle from the sensor to the vehicle
