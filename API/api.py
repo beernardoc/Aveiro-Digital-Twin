@@ -9,7 +9,6 @@ import paho.mqtt.publish as publish
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_cors import CORS
 
-
 app = Flask(__name__)
 
 CORS(app)
@@ -18,6 +17,9 @@ app.secret_key = 'myawesomesecretkey'
 
 app.config['MONGO_URI'] = 'mongodb://localhost:27017/digitaltwin'
 mongo = PyMongo(app)
+
+process3d = None
+process2d = None
 
 
 @app.route('/api')
@@ -62,9 +64,9 @@ def get_user(id):
     response = json_util.dumps(user)
     return Response(response, mimetype="application/json")
 
+
 @app.route('/api/login', methods=['POST'])
 def login():
-
     # Receiving Data
     email = request.json['email']
     password = request.json['password']
@@ -124,7 +126,8 @@ def not_found(error=None):
 @app.route('/api/run3D', methods=['POST'])
 def run_3D():
     try:
-        subprocess.Popen(["python3", "../Adapters/co_simulation/simulation_3D.py"])
+        global process3d
+        process3d = subprocess.Popen(["python3", "../Adapters/co_simulation/simulation_3D.py"])
         return jsonify({'message': 'Comando executado com sucesso'}), 200
     except subprocess.CalledProcessError as e:
         return jsonify({'error': e}), 500
@@ -133,7 +136,8 @@ def run_3D():
 @app.route('/api/run2D', methods=['POST'])
 def run_2D():
     try:
-        subprocess.Popen(["python3", "../Adapters/co_simulation/simulation_2D.py"])
+        global process2d
+        process2d = subprocess.Popen(["python3", "../Adapters/co_simulation/simulation_2D.py"])
         return jsonify({'message': 'Comando iniciado com sucesso'}), 200
     except subprocess.CalledProcessError as e:
         return jsonify({'error': e}), 500
@@ -152,7 +156,8 @@ def add_random_traffic():
         return jsonify({'error': e}), 500
 
     # curl -X POST -d "" "http://localhost:5000/api/addRandomTraffic?qtd=500"
-    
+
+
 @app.route('/api/testaddRealCar', methods=['POST'])
 def test_add_real_car():
     try:
@@ -202,6 +207,22 @@ def add_car():
     #"start": {"log": "-8.660106693274248", "lat": "40.635327506990194"}
     #}' http://localhost:5000/api/addSimulatedCar
 
+
+@app.route('/api/endSimulation', methods=['POST'])
+def end_simulation():
+    try:
+        publish.single("/endSimulation", payload="", hostname="localhost", port=1883)
+        if process2d is not None:
+            process2d.kill()
+
+        if process3d is not None:
+            process3d.kill()
+
+        return jsonify({'message': 'Simulação finalizada com sucesso'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+    # curl -X POST -d "" "http://localhost:5000/api/endSimulation"
 
 
 if __name__ == '__main__':

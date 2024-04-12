@@ -180,6 +180,14 @@ def addRandomTraffic(QtdCars):
                               departLane="best", )
 
 
+def endSimulation():
+    traci.close()
+    sys.stdout.flush()
+
+
+
+
+
 def on_connect(client, userdata, flags, rc):
     print(f"Conectado ao broker com código de resultado {rc}")
 
@@ -205,6 +213,11 @@ def on_message(client, userdata, msg):
         payload = msg.payload
         addSimulatedCar(payload)
 
+    if topic == "/endSimulation":
+        print("Ending simulation...")
+        endSimulation()
+        print("Simulation ended")
+
 
 if __name__ == "__main__":
     options = get_options()
@@ -222,6 +235,8 @@ if __name__ == "__main__":
     mqtt_client.subscribe("/realDatateste")
     mqtt_client.subscribe("/addRandomTraffic")
     mqtt_client.subscribe("/addSimulatedCar")
+    mqtt_client.subscribe("/endSimulation")
+
     mqtt_client.loop_start()  # Inicia o loop de eventos MQTT em uma thread separada
 
     # Inicia o SUMO em uma thread separada
@@ -230,7 +245,9 @@ if __name__ == "__main__":
     sumo_thread = threading.Thread(target=traci.start, args=[
         [sumoBinary, "-c", "../Adapters/co_simulation/sumo_configuration/simple-map/simple-map.sumocfg",
          "--tripinfo-output",
-         "tripinfo.xml"]])
+         "tripinfo.xml",
+         "--quit-on-end"
+         ]])
 
     # Simple sumo network
     # sumo_thread = threading.Thread(target=traci.start, args=[
