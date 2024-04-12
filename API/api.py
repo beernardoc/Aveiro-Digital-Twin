@@ -1,5 +1,7 @@
+from asyncio import sleep
 import json
 import os
+import signal
 import subprocess
 from flask import Flask, request, jsonify, Response
 from flask_pymongo import PyMongo
@@ -20,7 +22,7 @@ mongo = PyMongo(app)
 
 process3d = None
 process2d = None
-
+processCarla = None
 
 @app.route('/api')
 def api():
@@ -126,6 +128,10 @@ def not_found(error=None):
 @app.route('/api/run3D', methods=['POST'])
 def run_3D():
     try:
+        global processCarla
+        processCarla = subprocess.Popen(["./../Adapters/co_simulation/runCarla.sh"])
+        sleep(10)
+
         global process3d
         process3d = subprocess.Popen(["python3", "../Adapters/co_simulation/simulation_3D.py"])
         return jsonify({'message': 'Comando executado com sucesso'}), 200
@@ -217,6 +223,9 @@ def end_simulation():
 
         if process3d is not None:
             process3d.kill()
+
+        if processCarla is not None:
+            processCarla.send_signal(signal.SIGINT)
 
         return jsonify({'message': 'Simulação finalizada com sucesso'}), 200
     except Exception as e:
