@@ -18,6 +18,12 @@ Project for the Project in Informatics class
 pip install -r requirements.txt
 ```
 
+- Run carla server and load map
+```bash
+./runCarla.sh
+```
+
+
 - Run carla server
 ```bash
 ./CarlaUE4.sh
