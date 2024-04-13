@@ -4,6 +4,7 @@
 
 import argparse
 import logging
+import random
 import time
 import json
 import os
@@ -55,18 +56,8 @@ def synchronization_loop(args):
     synchronization = SimulationSynchronization(sumo_simulation, carla_simulation, args.tls_manager,
                                                 args.sync_vehicle_color, args.sync_vehicle_lights)
     try:
-        mqtt_client.subscribe("/teste")
         while True:
-            
 
-            # if traci.simulation.getTime() == 10:
-            #     traci.route.add(routeID="route_0", edges=["-478", "-462"])
-            #     traci.vehicle.add(vehID="car_0", routeID="route_0", typeID="vehicle.audi.a2", depart="now", departSpeed=0, departLane="best")
-            
-            if len(lista) > 0:
-                for key in lista.keys():
-                    addOrUpdateCar({"vehicle": key, "data": lista[key]})
-            
             start = time.time()
 
             synchronization.tick()
@@ -99,41 +90,13 @@ def get_options():
     options, args = opt_parser.parse_args()
     return options
 
-global step
-
-def run():
-    mqtt_client.subscribe("/teste")
-
-    step = 0
-    while True:
-
-
-
-        if len(lista) > 0:
-            for key in lista.keys():
-                addOrUpdateCar({"vehicle": key, "data": lista[key]}) # para nao desregular os steps do sumo, a função addOrUpdateCar é chamada aqui
-
-
-
-
-        traci.simulationStep()
-        
-        
-
-
-        step += 1
-
-     
-
-    traci.close()
-    sys.stdout.flush()
 
 
 def addOrUpdateCar(received):
     log, lat, heading = received["data"]["location"]["lng"], received["data"]["location"]["lat"], received["data"]["heading"]
     # if the heading is positive it is directed to the sensor, if it is negative it is directed away from the sensor
     # get the sensor information from radar.json
-    f = open("../radar.json", "r")
+    f = open("radar.json", "r")
     radar_data = json.load(f)
     radar = radar_data[0]
     # get the angle from the sensor to the vehicle
@@ -189,6 +152,80 @@ def addOrUpdateCar(received):
         print("adicionado")
 
 
+def addSimulatedCar(received):
+    print(type(received))
+    data = json.loads(received.decode('utf-8'))
+    print("data", data.keys())
+
+    if data.keys() == {"start", "end"}:
+        logI, latI = data["start"]["log"], data["start"]["lat"]
+        logE, latE = data["end"]["log"], data["end"]["lat"]
+
+        print("logI: {}, latI: {}".format(logI, latI))
+        print("logE: {}, latE: {}".format(logE, latE))
+
+
+        Start = traci.simulation.convertRoad(float(logI), float(latI), isGeo=True, vClass="passenger")
+        End = traci.simulation.convertRoad(float(logE), float(latE), isGeo=True, vClass="passenger")
+
+        print("Start", Start)
+        print("End", End)
+        ts = str(time.time_ns())
+        traci.route.add("route_simulated{}".format(ts), [Start[0], End[0]])
+
+        traci.vehicle.add(vehID="simulated{}".format(ts), routeID="route_simulated{}".format(ts),
+                          typeID="vehicle.audi.a2", depart="now", departSpeed=0, departLane="best")
+        return "Veículo adicionado com informações de início e fim"
+
+    elif data.keys() == {"start"}:
+        allowedEdges = [i.getID() for i in net.getEdges() if "driving" in i.getType()]
+        randomEdge = random.choice(allowedEdges)
+        logI, latI = data["start"]["log"], data["start"]["lat"]
+
+        print("logI: {}, latI: {}".format(logI, latI))
+
+        Start = traci.simulation.convertRoad(float(logI), float(latI), isGeo=True, vClass="passenger")
+
+        print("Start", Start)
+        ts = str(time.time_ns())
+        traci.route.add("route_simulated{}".format(ts), [Start[0], randomEdge])
+
+        traci.vehicle.add(vehID="simulated{}".format(ts), routeID="route_simulated{}".format(ts),
+                          typeID="vehicle.audi.a2", depart="now", departSpeed=0, departLane="best")
+        return "Veículo adicionado com informações de início"
+
+    elif data.keys() == {"end"}:
+        allowedEdges = [i.getID() for i in net.getEdges() if "driving" in i.getType()]
+        randomEdge = random.choice(allowedEdges)
+        logE, latE = data["end"]["log"], data["end"]["lat"]
+
+        print("logE: {}, latE: {}".format(logE, latE))
+
+        End = traci.simulation.convertRoad(float(logE), float(latE), isGeo=True, vClass="passenger")
+
+        print("End", End)
+        ts = str(time.time_ns())
+        traci.route.add("route_simulated{}".format(ts), [randomEdge, End[0]])
+
+        traci.vehicle.add(vehID="simulated{}".format(ts), routeID="route_simulated{}".format(ts),
+                          typeID="vehicle.audi.a2", depart="now", departSpeed=0, departLane="best")
+        return "Veículo adicionado com informações de fim"
+
+
+def addRandomTraffic(QtdCars):
+    allowedEdges = [i.getID() for i in net.getEdges() if "driving" in i.getType()]
+    print(allowedEdges)
+    if len(allowedEdges) != 0:
+
+        for count in range(QtdCars):
+            routeID = "route_{}".format(time.time_ns())
+            vehicle_id = "random_{}".format(time.time_ns())
+            route = traci.simulation.findRoute(random.choice(allowedEdges), random.choice(allowedEdges), vType="vehicle.kawasaki.ninja")
+            if route.edges:
+                traci.route.add(routeID, route.edges)
+                traci.vehicle.add(vehicle_id, routeID, typeID="vehicle.kawasaki.ninja", depart="now", departSpeed=0,
+                              departLane="best", )
+
 def on_connect(client, userdata, flags, rc):
     print(f"Conectado ao broker com código de resultado {rc}")
 
@@ -198,60 +235,43 @@ def on_publish(client, userdata, mid):
 
 
 def on_message(client, userdata, msg):
-    received = json.loads(msg.payload.decode())
-    #print(f"Received `{received}` from `{msg.topic}` topic")
-    lista[received["vehicle"]] = received["data"]
+    topic = msg.topic
+    print(topic)
+    if topic == "/addRandomTraffic":
+        payload = json.loads(msg.payload)
+        try:
+            addRandomTraffic(int(payload))
+        except Exception as e:
+            print(e)
+    if topic == "/addSimulatedCar":
+        print("entrou", topic)
+        payload = msg.payload
+        addSimulatedCar(payload)
+
 
 def synchronization_loop_wrapper(arguments):
     synchronization_loop(arguments)
 
 if __name__ == "__main__":
-    argparser = argparse.ArgumentParser(description=__doc__)
-    argparser.add_argument('sumo_cfg_file', type=str, help='sumo configuration file')
-    argparser.add_argument('--carla-host',
-                           metavar='H',
-                           default='127.0.0.1',
-                           help='IP of the carla host server (default: 127.0.0.1)')
-    argparser.add_argument('--carla-port',
-                           metavar='P',
-                           default=2000,
-                           type=int,
-                           help='TCP port to listen to (default: 2000)')
-    argparser.add_argument('--sumo-host',
-                           metavar='H',
-                           default=None,
-                           help='IP of the sumo host server (default: 127.0.0.1)')
-    argparser.add_argument('--sumo-port',
-                           metavar='P',
-                           default=None,
-                           type=int,
-                           help='TCP port to listen to (default: 8813)')
-    argparser.add_argument('--sumo-gui', action='store_true', help='run the gui version of sumo')
-    argparser.add_argument('--step-length',
-                           default=0.05,
-                           type=float,
-                           help='set fixed delta seconds (default: 0.05s)')
-    argparser.add_argument('--client-order',
-                           metavar='TRACI_CLIENT_ORDER',
-                           default=1,
-                           type=int,
-                           help='client order number for the co-simulation TraCI connection (default: 1)')
-    argparser.add_argument('--sync-vehicle-lights',
-                           action='store_true',
-                           help='synchronize vehicle lights state (default: False)')
-    argparser.add_argument('--sync-vehicle-color',
-                           action='store_true',
-                           help='synchronize vehicle color (default: False)')
-    argparser.add_argument('--sync-vehicle-all',
-                           action='store_true',
-                           help='synchronize all vehicle properties (default: False)')
-    argparser.add_argument('--tls-manager',
-                           type=str,
-                           choices=['none', 'sumo', 'carla'],
-                           help="select traffic light manager (default: none)",
-                           default='none')
-    argparser.add_argument('--debug', action='store_true', help='enable debug messages')
-    arguments = argparser.parse_args()
+    class StaticArguments:
+        def __init__(self):
+            self.sumo_cfg_file = "../Adapters/co_simulation/sumo_configuration/simple-map/simple-map.sumocfg"
+            self.carla_host = '127.0.0.1'
+            self.carla_port = 2000
+            self.sumo_host = None
+            self.sumo_port = None
+            self.sumo_gui = True
+            self.step_length = 0.05
+            self.client_order = 1
+            self.sync_vehicle_lights = False
+            self.sync_vehicle_color = False
+            self.sync_vehicle_all = False
+            self.tls_manager = 'carla'
+            self.debug = False
+
+
+    # Cria uma instância dos argumentos estáticos
+    arguments = StaticArguments()
 
     if arguments.sync_vehicle_all is True:
         arguments.sync_vehicle_lights = True
@@ -274,7 +294,15 @@ if __name__ == "__main__":
     mqtt_client.on_publish = on_publish
     mqtt_client.on_message = on_message
     mqtt_client.connect("localhost", 1883, 60)
+    mqtt_client.subscribe("/realDatateste")
+    mqtt_client.subscribe("/addRandomTraffic")
+    mqtt_client.subscribe("/addSimulatedCar")
     mqtt_client.loop_start()  # Inicia o loop de eventos MQTT em uma thread separada
+
+    net = sumolib.net.readNet(
+        "../Adapters/co_simulation/sumo_configuration/simple-map/simple-map.net.xml",
+        withInternal=True)  # Carrega a rede do SUMO atraves do sumolib para acesso estatico
+
 
     
 
