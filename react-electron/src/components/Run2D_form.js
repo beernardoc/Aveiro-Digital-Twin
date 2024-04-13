@@ -2,9 +2,6 @@ import React from 'react';
 import teste from '../asset/teste.png';
 import axios from "axios";
 
-
-
-
 const Run2D_form = () => {
 
     const API = "http://localhost:5000/api";

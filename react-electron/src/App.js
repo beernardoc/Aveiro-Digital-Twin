@@ -10,6 +10,7 @@ import axios from 'axios';
 import HomePage from "./pages/HomePage";
 import Run2D from "./pages/Run2DPage";
 import AddRandom from "./pages/AddRandom";
+import Run3DPage from './pages/Run3DPage';
 
 const api = "http://localhost:5000/api";
 
@@ -34,10 +35,11 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage /> } />
           <Route path="/run2D" element={ <Run2D />} />
+          <Route path="/run3D" element={<Run3DPage />} />
           <Route path="/car" element={<><Sidebar /> <CarPage /></>} />
           <Route path="/button" element={<><Sidebar /> <button onClick={runPythonScript}>RUN</button></>} />
           <Route path="/simulation" element={<><Sidebar /> <SimulationPage /></>} />
-            <Route path="/addRandom" element={<><Sidebar /> <AddRandom /></>} />
+          <Route path="/addRandom" element={<><Sidebar /> <AddRandom /></>} />
         </Routes>
       </div>
     </Router>
