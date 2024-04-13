@@ -6,10 +6,10 @@ from bson import json_util
 from bson.objectid import ObjectId
 import paho.mqtt.publish as publish
 from werkzeug.security import generate_password_hash, check_password_hash
-
+from flask_cors import CORS
 
 app = Flask(__name__)
-
+CORS(app)
 app.secret_key = 'myawesomesecretkey'
 
 app.config['MONGO_URI'] = 'mongodb://localhost:27017/digitaltwin'

@@ -6,6 +6,7 @@ import { faRandom, faRobot, faCar, faMotorcycle, faBicycle, faPersonWalking } fr
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from 'react-router-dom';
 import './Sidebar.css';
+import { Tooltip } from 'react-tooltip';
 
 
 library.add(faRandom, faRobot, faCar, faMotorcycle, faBicycle, faPersonWalking);
@@ -13,17 +14,18 @@ function Sidebar() {
  return (
     <div className="sidebar">
       <div className="sidebar-content">
-        <div className="sidebar-checkbox">
-          <input type="checkbox" id="realData" name="realData" />
-          <label htmlFor="realData">Real Data</label>
-        </div>
+
         <div className="sidebar-cards">
+          <Link to="/addRandom" data-tooltip-id="Firsttooltip"
+                data-tooltip-content="Add vehicles with random directions"
+                data-tooltip-place="bottom">
           <div className="card">
             <div className="card-icon">
               <FontAwesomeIcon icon="random" size="2x" />
             </div>
             <h2>Random</h2>
           </div>
+          </Link>
           <Link to="/car">
             <div className="card">
               <div className="card-icon">
@@ -58,6 +60,8 @@ function Sidebar() {
           </div>
         </div>
       </div>
+      <Tooltip id="Firsttooltip"/>
+
     </div>
  );
 }

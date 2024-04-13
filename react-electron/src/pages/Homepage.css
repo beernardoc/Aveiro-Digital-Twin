@@ -1,0 +1,18 @@
+.bgimage {
+    background-image: url('../asset/tuto_sumo.jpg');
+    background-size: cover;
+
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 100%;
+    width: 100%;
+    position: relative;
+    z-index: -1;
+}
+
+
+h1 {
+    font-size: 4rem;
+    font-weight: 700;
+    color: rgba(40, 167, 69, 0.8); /* Altere a cor para usar o valor correto do alfa */
+}

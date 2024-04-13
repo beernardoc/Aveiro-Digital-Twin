@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Card from '../components/VehicleCard';
 import { faRandom, faCar, faMotorcycle } from '@fortawesome/free-solid-svg-icons';
 import './SimulationPage.css';
+import Navbar from "../components/Navbar";
 
 const SimulationPage = () => {
  const [cards, setCards] = useState([
@@ -20,6 +21,9 @@ const SimulationPage = () => {
  };
 
  return (
+     <div>
+
+
     <div className="simulation-page-container">
         <div className="main-content">
         <div className="sidebar-cards">
@@ -29,6 +33,7 @@ const SimulationPage = () => {
         </div>
             <button className="simulate-button" onClick={() => console.log('Simular')}>Simular</button>
         </div>
+    </div>
     </div>
  );
 };
