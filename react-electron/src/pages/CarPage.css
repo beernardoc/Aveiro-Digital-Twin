@@ -1,70 +1,71 @@
 .car-page-container {
     display: flex;
-    height: 100vh; 
+    height: 100vh;
     position: relative;
 }
 
 .car-page {
-    height: calc(100%- 90px); 
-    flex: 3; 
+    height: calc(100%- 90px);
+    flex: 3;
     padding: 20px;
-    padding-top: 110px; 
+    padding-top: 70px;
     padding-left: 310px;
     background-color: #d0daf0;
     color: #ffffff;
+    width: 100%;
 }
-   
+
+
+
+
 .car-page h1 {
     color: #1c2548;
 }
-   
-.car-page form {
-    background-color: #1c2548;
+
+.form-container {
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
     padding: 20px;
-    border-radius: 10px;
+    border-radius: 8px;
+    background-color: #f4f4f4;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    height: 400px;
+}
+
+.form-group {
     margin-bottom: 20px;
 }
-   
-.car-page label {
+
+label {
     display: block;
-    margin-bottom: 10px;
+    font-weight: bold;
 }
-   
-.car-page input {
+
+input[type="text"],
+input[type="number"],
+select {
     width: 100%;
-    padding: 5px;
-    margin-bottom: 10px;
-    border-radius: 5px;
-    border: 1px solid #7191d2;
-    color: #ffffff;
-    background-color: #1c2548;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
 }
-   
-.buttons-container {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    margin-top: 20px;
-}
-   
-.buttons-container button {
-    padding: 15px 30px;
-    background-color: #7191d2;
-    color: white;
+
+button[type="submit"] {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
     border: none;
-    border-radius: 50px;
+    border-radius: 4px;
+    background-color: #007bff;
+    color: #fff;
     cursor: pointer;
     transition: background-color 0.3s ease;
-    bottom: 20px; 
-    right: 20px; 
-    font-size: 18px;
 }
-   
-.buttons-container .cancel-button:hover {
-    background-color: #f47065;
+
+button[type="submit"]:hover {
+    background-color: #0056b3;
 }
-   
-.buttons-container .add-button:hover {
-    background-color: #7740a4;
-}
-   
+

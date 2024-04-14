@@ -1,6 +1,6 @@
 import React from 'react';
 import axios from 'axios';
-import teste from '../asset/teste3d.png';  
+import teste from '../asset/carla.jpg';
 
 const Run3D_form = () => {
 
@@ -45,25 +45,29 @@ const Run3D_form = () => {
                                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             />
                         </div>
-                        <div className="mb-4">
-                            <label htmlFor="addRealData" className="inline-flex items-center">
+                        <div
+                            className="mb-4 flex items-center"> {/* Adicionado flex e items-center para alinhar o checkbox à esquerda */}
+                            <div
+                                className="inline-flex items-center"> {/* Adicionado para envolver o checkbox e o texto */}
                                 <input
                                     type="checkbox"
                                     id="addRealData"
                                     name="addRealData"
-                                    className="form-checkbox h-5 w-5 text-blue-500"
+                                    className="form-checkbox text-blue-500 h-5 w-5"
                                 />
-                                <span className="ml-2 text-gray-700">Add real data?</span>
-                            </label>
+                                <span className="ml-2 text-sm">Add real data?</span>
+                            </div>
                         </div>
                         <div className="mb-4">
                             <p className="text-sm text-gray-600">
-                            The 3D simulation will be performed using CARLA. Make sure your system meets the following minimum requirements: Quad-core CPU, 8 GB RAM, NVIDIA GTX 1060. For best performance, an NVIDIA RTX 2070 or higher GPU and 16 GB RAM are recommended.
+                                The 3D simulation will be performed using CARLA. Make sure your system meets the
+                                following minimum requirements: Quad-core CPU, 8 GB RAM, NVIDIA GTX 1060. For best
+                                performance, an NVIDIA RTX 2070 or higher GPU and 16 GB RAM are recommended.
                             </p>
                         </div>
-                        <div className="flex items-center justify-between">
+                        <div className="text-center">
                             <button type="submit"
-                                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                                    className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                                 Start Simulation
                             </button>
                         </div>
