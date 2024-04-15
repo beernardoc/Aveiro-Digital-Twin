@@ -210,9 +210,9 @@ def add_car():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-    #curl - X POST - H "Content-Type: application/json" -d '{
-    #"end": {"log": "-8.655386132941464", "lat": "40.63525392116133"},
-    #"start": {"log": "-8.660106693274248", "lat": "40.635327506990194"}
+    #curl -X POST -H "Content-Type: application/json" -d '{
+    #"end": {"lng": "-8.655386132941464", "lat": "40.63525392116133"},
+    #"start": {"lng": "-8.660106693274248", "lat": "40.635327506990194"}
     #}' http://localhost:5000/api/addSimulatedCar
 
 

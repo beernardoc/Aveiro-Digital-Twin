@@ -27,21 +27,42 @@ def get_options():
 
 global step
 lista = {}
-
+simulated_vehicles = {}
 
 def run():
     step = 0
     while True:
 
         traci.simulationStep()
-
-
         step += 1
+
+        # Check if there are more than 1 simulated vehicles
+        if len(simulated_vehicles) > 0:
+            for vehicle_id in simulated_vehicles:
+                if vehicle_id in traci.vehicle.getIDList():
+                    checkDestination(vehicle_id, simulated_vehicles[vehicle_id])
 
 
     traci.close()
     sys.stdout.flush()
 
+
+# Function to check if vehicle has reached destination
+def checkDestination(vehicle_id, destination_coordinates):
+    global simulated_vehicles
+    # Check if vehicle is in the list of simulated vehicles and is still in the simulation
+    if vehicle_id in simulated_vehicles and vehicle_id in traci.vehicle.getIDList():
+        vehicle_position = traci.vehicle.getPosition(vehicle_id)
+        if vehicle_position is not None:
+            print("Vehicle {} is at position: {}".format(vehicle_id, vehicle_position))
+            print("Destination coordinates: {}".format(destination_coordinates))
+            distance_to_destination = traci.simulation.getDistance2D(float(vehicle_position[0]), float(vehicle_position[1]), float(destination_coordinates[0]), float(destination_coordinates[1]))
+            if distance_to_destination < 5:  # 5 meters from destination
+                traci.vehicle.stop(vehicle_id)
+                simulated_vehicles.pop(vehicle_id, None)
+                print("Vehicle {} has reached its destination.".format(vehicle_id))
+    else:
+        print("Vehicle {} not found in the list of simulated vehicles.".format(vehicle_id))
 
 def addOrUpdateRealCar(received):
     print("received", received)
@@ -102,7 +123,6 @@ def addOrUpdateRealCar(received):
         print("adicionado")
 
 
-
 def addSimulatedCar(received):
     print(type(received))
     data = json.loads(received.decode('utf-8'))
@@ -122,6 +142,9 @@ def addSimulatedCar(received):
         print("Start", Start)
         print("End", End)
         ts = str(time.time_ns())
+
+        # Store destination coordinates
+        destination_coordinates = End
         
         traci.route.add("route_simulated{}".format(ts), [Start[0], End[0]])
         routeEdges = traci.route.getEdges("route_simulated{}".format(ts)) # agora percorremos isso, e sempre que iniciar com : ou _ usamos o getOutgoingEdges para subsituir por um edge que começa ali
@@ -149,6 +172,10 @@ def addSimulatedCar(received):
         traci.vehicle.add(vehID="simulated{}".format(ts), routeID="route_simulated{}".format(ts),
                           typeID="vehicle.audi.a2", depart=departure_time, departSpeed=0, departLane="best")
         print("Veículo adicionado com informações de início e fim", "simulated{}".format(ts))
+
+        # Store simulated vehicle ID and its destination coordinates
+        simulated_vehicle_id = traci.vehicle.getIDList()[-1]
+        simulated_vehicles[simulated_vehicle_id] = destination_coordinates
         
         # make the car move to XY
         x, y = net.convertLonLat2XY(logI, latI)
@@ -167,9 +194,17 @@ def addSimulatedCar(received):
         print("Start", Start)
         ts = str(time.time_ns())
         traci.route.add("route_simulated{}".format(ts), [Start[0], randomEdge])
+
+        # Store destination coordinates
+        destination_coordinates = randomEdge
         
         traci.vehicle.add(vehID="simulated{}".format(ts), routeID="route_simulated{}".format(ts),
                           typeID="vehicle.audi.a2", depart="now", departSpeed=0, departLane="best")
+        
+        # Store simulated vehicle ID and its destination coordinates
+        simulated_vehicle_id = traci.vehicle.getIDList()[-1]
+        simulated_vehicles[simulated_vehicle_id] = destination_coordinates
+        
         return "Veículo adicionado com informações de início"
 
     elif data.keys() == {"end"}:
@@ -185,8 +220,17 @@ def addSimulatedCar(received):
         ts = str(time.time_ns())
         traci.route.add("route_simulated{}".format(ts), [randomEdge, End[0]])
 
+        # Store destination coordinates
+        destination_coordinates = End
+
+
         traci.vehicle.add(vehID="simulated{}".format(ts), routeID="route_simulated{}".format(ts),
                           typeID="vehicle.audi.a2", depart="now", departSpeed=0, departLane="best")
+        
+        # Store simulated vehicle ID and its destination coordinates
+        simulated_vehicle_id = traci.vehicle.getIDList()[-1]
+        simulated_vehicles[simulated_vehicle_id] = destination_coordinates
+
         return "Veículo adicionado com informações de fim"
 
 
