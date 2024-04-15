@@ -4,6 +4,7 @@ import 'leaflet/dist/leaflet.css';
 import './MapComponent.css';
 import L from 'leaflet';
 import {Tooltip} from "react-tooltip";
+import axios from 'axios';
 
 const initialMarkerIcon = new L.icon({
     iconUrl: 'https://cdn0.iconfinder.com/data/icons/small-n-flat/24/678111-map-marker-512.png',
@@ -59,13 +60,25 @@ const MapComponent = () => {
     const insertCar = () => {
         if (initialPosition && finalPosition) {
             const car = {
-                start: initialPosition,
-                end: finalPosition,
-                quantity: document.getElementById('Quantity').value,
-                departure: document.getElementById('Departure').value,
+                "start": {
+                    "lng": initialPosition.lng,
+                    "lat": initialPosition.lat
+                },
+                "end": {
+                    "lng": finalPosition.lng,
+                    "lat": finalPosition.lat
+                }
             };
 
-            console.log(car);
+            axios.post('http://localhost:5000/api/addSimulatedCar', car)
+                    .then(response => {
+                        // Lida com a resposta da solicitação
+                        console.log(response.data);
+                    })
+                    .catch(error => {
+                        // Lida com erros na solicitação
+                        console.error('Erro ao enviar objeto para a rota:', error);
+                    });
 
             }
 

@@ -109,8 +109,8 @@ def addSimulatedCar(received):
     print("data", data.keys())
 
     if data.keys() == {"start", "end"}:
-        logI, latI = data["start"]["log"], data["start"]["lat"]
-        logE, latE = data["end"]["log"], data["end"]["lat"]
+        logI, latI = data["start"]["lng"], data["start"]["lat"]
+        logE, latE = data["end"]["lng"], data["end"]["lat"]
 
         print("logI: {}, latI: {}".format(logI, latI))
         print("logE: {}, latE: {}".format(logE, latE))
@@ -118,20 +118,47 @@ def addSimulatedCar(received):
 
         Start = traci.simulation.convertRoad(float(logI), float(latI), isGeo=True, vClass="passenger")
         End = traci.simulation.convertRoad(float(logE), float(latE), isGeo=True, vClass="passenger")
-
+        
         print("Start", Start)
         print("End", End)
         ts = str(time.time_ns())
+        
         traci.route.add("route_simulated{}".format(ts), [Start[0], End[0]])
+        routeEdges = traci.route.getEdges("route_simulated{}".format(ts)) # agora percorremos isso, e sempre que iniciar com : ou _ usamos o getOutgoingEdges para subsituir por um edge que começa ali
+
+        for edge in routeEdges:
+            if edge.startswith(":") or "_" in edge:
+                print("edge", edge)
+                outgoingEdges = net.getEdge(edge).getOutgoing()
+                print("outgoing", outgoingEdges)
+                ts = str(time.time_ns())
+                for i in outgoingEdges:
+                    edgeIndex = routeEdges.index(edge)
+                    if edgeIndex == 0:
+                        traci.route.add("route_simulated{}".format(ts), [i.getID(), End[0]])
+                        break
+                    traci.route.add("route_simulated{}".format(ts), [Start[0], i.getID()])
+                    break
+
+        print("aq",routeEdges)
+        print("route_simulated{}".format(ts))
+
+        # in order to move the vehicle without teleporting
+        departure_time = traci.simulation.getCurrentTime() + 1000
 
         traci.vehicle.add(vehID="simulated{}".format(ts), routeID="route_simulated{}".format(ts),
-                          typeID="vehicle.audi.a2", depart="now", departSpeed=0, departLane="best")
-        return "Veículo adicionado com informações de início e fim"
+                          typeID="vehicle.audi.a2", depart=departure_time, departSpeed=0, departLane="best")
+        print("Veículo adicionado com informações de início e fim", "simulated{}".format(ts))
+        
+        # make the car move to XY
+        x, y = net.convertLonLat2XY(logI, latI)
+        traci.vehicle.moveToXY("simulated{}".format(ts), Start[0], 0, x, y, keepRoute=1)
+        print("moveToXY", "simulated{}".format(ts))
 
     elif data.keys() == {"start"}:
         allowedEdges = [i.getID() for i in net.getEdges() if "driving" in i.getType()]
         randomEdge = random.choice(allowedEdges)
-        logI, latI = data["start"]["log"], data["start"]["lat"]
+        logI, latI = data["start"]["lng"], data["start"]["lat"]
 
         print("logI: {}, latI: {}".format(logI, latI))
 
@@ -140,7 +167,7 @@ def addSimulatedCar(received):
         print("Start", Start)
         ts = str(time.time_ns())
         traci.route.add("route_simulated{}".format(ts), [Start[0], randomEdge])
-
+        
         traci.vehicle.add(vehID="simulated{}".format(ts), routeID="route_simulated{}".format(ts),
                           typeID="vehicle.audi.a2", depart="now", departSpeed=0, departLane="best")
         return "Veículo adicionado com informações de início"
@@ -148,7 +175,7 @@ def addSimulatedCar(received):
     elif data.keys() == {"end"}:
         allowedEdges = [i.getID() for i in net.getEdges() if "driving" in i.getType()]
         randomEdge = random.choice(allowedEdges)
-        logE, latE = data["end"]["log"], data["end"]["lat"]
+        logE, latE = data["end"]["lng"], data["end"]["lat"]
 
         print("logE: {}, latE: {}".format(logE, latE))
 
@@ -210,6 +237,7 @@ def on_message(client, userdata, msg):
             print(e)
     if topic == "/addSimulatedCar":
         print("entrou", topic)
+        print(msg.payload)
         payload = msg.payload
         addSimulatedCar(payload)
 
