@@ -132,78 +132,99 @@ def addSimulatedCar(received):
         logI, latI = data["start"]["lng"], data["start"]["lat"]
         logE, latE = data["end"]["lng"], data["end"]["lat"]
 
-        print("logI: {}, latI: {}".format(logI, latI))
-        print("logE: {}, latE: {}".format(logE, latE))
-
 
         Start = traci.simulation.convertRoad(float(logI), float(latI), isGeo=True, vClass="passenger")
         End = traci.simulation.convertRoad(float(logE), float(latE), isGeo=True, vClass="passenger")
-        
+
         print("Start", Start)
         print("End", End)
         ts = str(time.time_ns())
+        routeName = "route_simulated{}".format(ts)
 
         # Store destination coordinates
         destination_coordinates = End
-        
-        traci.route.add("route_simulated{}".format(ts), [Start[0], End[0]])
-        routeEdges = traci.route.getEdges("route_simulated{}".format(ts)) # agora percorremos isso, e sempre que iniciar com : ou _ usamos o getOutgoingEdges para subsituir por um edge que começa ali
+
+        traci.route.add(routeName, [Start[0], End[0]])
+        routeEdges = traci.route.getEdges(routeName) # agora percorremos isso, e sempre que iniciar com : ou _ usamos o getOutgoingEdges para subsituir por um edge que começa ali
+        finalEdges = []
 
         for edge in routeEdges:
             if edge.startswith(":") or "_" in edge:
                 print("edge", edge)
                 outgoingEdges = net.getEdge(edge).getOutgoing()
                 print("outgoing", outgoingEdges)
-                ts = str(time.time_ns())
+
                 for i in outgoingEdges:
                     edgeIndex = routeEdges.index(edge)
                     if edgeIndex == 0:
-                        traci.route.add("route_simulated{}".format(ts), [i.getID(), End[0]])
+                        finalEdges.append(str(i.getID()))
                         break
-                    traci.route.add("route_simulated{}".format(ts), [Start[0], i.getID()])
+                    finalEdges.append(str(i.getID()))
                     break
+            else:
+                finalEdges.append(str(edge))
 
-        print("aq",routeEdges)
-        print("route_simulated{}".format(ts))
 
-        # in order to move the vehicle without teleporting
-        departure_time = traci.simulation.getCurrentTime() + 1000
-
-        traci.vehicle.add(vehID="simulated{}".format(ts), routeID="route_simulated{}".format(ts),
-                          typeID="vehicle.audi.a2", depart=departure_time, departSpeed=0, departLane="best")
+        finalRouteName = "route_simulated{}".format(str(time.time_ns()))
+        traci.route.add(finalRouteName, finalEdges)
+        traci.vehicle.add(vehID="simulated{}".format(finalRouteName), routeID=finalRouteName,
+                          typeID="vehicle.audi.a2", depart=traci.simulation.getTime() + 2, departSpeed=0, departLane="best")
         print("Veículo adicionado com informações de início e fim", "simulated{}".format(ts))
 
         # Store simulated vehicle ID and its destination coordinates
-        simulated_vehicle_id = traci.vehicle.getIDList()[-1]
-        simulated_vehicles[simulated_vehicle_id] = destination_coordinates
-        
+       # simulated_vehicle_id = traci.vehicle.getIDList()[-1]
+       # simulated_vehicles[simulated_vehicle_id] = destination_coordinates
+       # print("simulated_vehicles", simulated_vehicles)
+
         # make the car move to XY
         x, y = net.convertLonLat2XY(logI, latI)
-        traci.vehicle.moveToXY("simulated{}".format(ts), Start[0], 0, x, y, keepRoute=1)
+        traci.vehicle.moveToXY("simulated{}".format(finalRouteName), Start[0], 0, x, y, keepRoute=1)
         print("moveToXY", "simulated{}".format(ts))
+
+
 
     elif data.keys() == {"start"}:
         allowedEdges = [i.getID() for i in net.getEdges() if "driving" in i.getType()]
         randomEdge = random.choice(allowedEdges)
+        print("random", randomEdge)
         logI, latI = data["start"]["lng"], data["start"]["lat"]
 
         print("logI: {}, latI: {}".format(logI, latI))
 
         Start = traci.simulation.convertRoad(float(logI), float(latI), isGeo=True, vClass="passenger")
 
-        print("Start", Start)
-        ts = str(time.time_ns())
-        traci.route.add("route_simulated{}".format(ts), [Start[0], randomEdge])
+        if Start[0].startswith(":") or "_" in Start[0]:
+            outgoingEdges = net.getEdge(Start[0]).getOutgoing()
+            nextEdge = next(iter(outgoingEdges)).getID()
 
+            ts = str(time.time_ns())
+            routeName = "route_simulated{}".format(ts)
+            traci.route.add(routeName, [nextEdge, randomEdge])
+
+
+        else:
+            ts = str(time.time_ns())
+            routeName = "route_simulated{}".format(ts)
+            traci.route.add(routeName, [Start[0], randomEdge])
+
+        print("edgees:", traci.route.getEdges(routeName))
         # Store destination coordinates
         destination_coordinates = randomEdge
-        
-        traci.vehicle.add(vehID="simulated{}".format(ts), routeID="route_simulated{}".format(ts),
-                          typeID="vehicle.audi.a2", depart="now", departSpeed=0, departLane="best")
+        traci.vehicle.add(vehID="simulated{}".format(ts), routeID=routeName,
+                              typeID="vehicle.audi.a2", depart=traci.simulation.getTime() + 5, departSpeed=0, departLane="best")
+
+        # make the car move to XY
+        x, y = net.convertLonLat2XY(logI, latI)
+        traci.vehicle.moveToXY("simulated{}".format(ts), Start[0], 0, x, y, keepRoute=1)
+        print("moveToXY", "simulated{}".format(ts))
+
+
+
+
         
         # Store simulated vehicle ID and its destination coordinates
-        simulated_vehicle_id = traci.vehicle.getIDList()[-1]
-        simulated_vehicles[simulated_vehicle_id] = destination_coordinates
+        #simulated_vehicle_id = traci.vehicle.getIDList()[-1]
+        #simulated_vehicles[simulated_vehicle_id] = destination_coordinates
         
         return "Veículo adicionado com informações de início"
 
@@ -330,6 +351,8 @@ if __name__ == "__main__":
 
     net = sumolib.net.readNet(
         "../Adapters/co_simulation/sumo_configuration/simple-map/simple-map.net.xml",withInternal=True)  # Carrega a rede do SUMO atraves do sumolib para acesso estatico
+
+    sumolib.net.ve
 
     #sumolib para dados estaticos da rede e traci para dados dinamicos da simulação
     print(type(net.getEdge("-1545").getType()))

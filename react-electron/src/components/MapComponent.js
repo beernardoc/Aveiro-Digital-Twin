@@ -58,8 +58,9 @@ const MapComponent = () => {
     }
 
     const insertCar = () => {
+        var car = {};
         if (initialPosition && finalPosition) {
-            const car = {
+            car = {
                 "start": {
                     "lng": initialPosition.lng,
                     "lat": initialPosition.lat
@@ -70,7 +71,29 @@ const MapComponent = () => {
                 }
             };
 
-            axios.post('http://localhost:5000/api/addSimulatedCar', car)
+
+            }
+
+         else if (initialPosition) {
+            car = {
+                "start": {
+                    "lng": initialPosition.lng,
+                    "lat": initialPosition.lat
+                }
+            };
+
+
+        }
+         else {
+            car = {
+                "end": {
+                    "lng": finalPosition.lng,
+                    "lat": finalPosition.lat
+                }
+            };
+        }
+
+        axios.post('http://localhost:5000/api/addSimulatedCar', car)
                     .then(response => {
                         // Lida com a resposta da solicitação
                         console.log(response.data);
@@ -79,28 +102,6 @@ const MapComponent = () => {
                         // Lida com erros na solicitação
                         console.error('Erro ao enviar objeto para a rota:', error);
                     });
-
-            }
-
-         else if (initialPosition) {
-            const car = {
-                start: initialPosition,
-                quantity: document.getElementById('Quantity').value,
-                departure: document.getElementById('Departure').value,
-            };
-
-            console.log(car);
-
-        }
-         else {
-            const car = {
-                end: finalPosition,
-                quantity: document.getElementById('Quantity').value,
-                departure: document.getElementById('Departure').value,
-            };
-
-            console.log(car);
-        }
     }
 
     return (
