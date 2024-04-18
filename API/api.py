@@ -1,3 +1,4 @@
+import threading
 from asyncio import sleep
 import json
 import os
@@ -8,14 +9,15 @@ from flask_pymongo import PyMongo
 from bson import json_util
 from bson.objectid import ObjectId
 import paho.mqtt.publish as publish
+import paho.mqtt.client as mqtt
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_cors import CORS
+import flask_socketio as socketio
 
 app = Flask(__name__)
-CORS(app)
-
-
-CORS(app)
+app.config['SECRET_KEY'] = 'secret!'
+CORS(app, resources={r"/*": {"origins": "*"}})
+socketio = socketio.SocketIO(app, cors_allowed_origins="*")
 
 app.secret_key = 'myawesomesecretkey'
 
@@ -236,5 +238,57 @@ def end_simulation():
     # curl -X POST -d "" "http://localhost:5000/api/endSimulation"
 
 
+@app.route('/api/cars', methods=['POST'])
+def cars():
+    try:
+        data = request.json
+        print("Dados recebidos:", data)
+        return jsonify({'message': 'Veículo adicionado com sucesso'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+
+
+
+def on_connect(client, userdata, flags, rc):
+    print(f"Conectado ao broker com código de resultado {rc}")
+
+
+def on_publish(client, userdata, mid):
+    print("Mensagem publicada com sucesso (api)")
+
+
+def on_message(client, userdata, msg):
+    topic = msg.topic
+    print(topic)
+    print(msg.payload)
+    if topic == '/cars':
+        ## usar socketio para enviar a mensagem para o front
+        socketio.emit('cars', msg.payload)
+        print('enviado')
+
+
+def start_mqtt_connection():
+    # Inicia a conexão MQTT
+    mqtt_client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1)
+    mqtt_client.on_connect = on_connect
+    mqtt_client.on_publish = on_publish
+    mqtt_client.on_message = on_message
+    mqtt_client.connect("localhost", 1883, 60)
+    mqtt_client.subscribe("/cars")
+
+
+    mqtt_client.loop_forever()  # Use loop_forever() para manter a conexão MQTT em execução indefinidamente
+
+def start_flask():
+    app.run(host='0.0.0.0')
+
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0')
+    # Inicie a conexão MQTT em uma nova thread
+    mqtt_thread = threading.Thread(target=start_mqtt_connection)
+    mqtt_thread.start()
+
+    # Inicie o Flask em uma nova thread
+    flask_thread = threading.Thread(target=start_flask)
+    flask_thread.start()
