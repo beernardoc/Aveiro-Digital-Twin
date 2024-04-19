@@ -15,6 +15,7 @@ import sumolib
 import traci
 import paho.mqtt.client as mqtt
 
+file_path = os.path.join(os.path.dirname(__file__), "radar.json")
 from coord_distance import calculate_bearing
 
 
@@ -42,6 +43,11 @@ except IndexError:
 from sumo_integration.sumo_simulation import SumoSimulation  # pylint: disable=wrong-import-position
 from sumo_integration.carla_simulation import CarlaSimulation  # pylint: disable=wrong-import-position
 from modules.simulation_synchronization import SimulationSynchronization
+
+
+net = sumolib.net.readNet(
+    "../Adapters/co_simulation/sumo_configuration/simple-map/aveiro.net.xml",
+    withInternal=True)  # Carrega a rede do SUMO atraves do sumolib para acesso estatico
 
 
 
@@ -150,6 +156,70 @@ def addOrUpdateCar(received):
         traci.vehicle.moveToXY(vehID, nextEdge, 0, x, y, keepRoute=1) # se a proxima for a mesma, cluster ou de junção, move com moveTOXY
         print(traci.vehicle.getRoute(vehID))
         # print("aq", traci.vehicle.getRoadID(vehID))
+        print("adicionado")
+
+def addOrUpdateRealCar(received):
+    print("received", received)
+    log, lat, heading = received["longitude"], received["latitude"], received["heading"]
+    print("log: {}, lat: {}, heading: {}".format(log, lat, heading))
+    # if the heading is positive it is directed to the sensor, if it is negative it is directed away from the sensor
+    # get the sensor information from radar.json
+    with open(file_path, "r") as f:
+        data = json.load(f)
+        radar = data[1]
+        # get the angle from the sensor to the vehicle
+        angle = calculate_bearing((radar['coord']['lat'], radar['coord']['lng']), (lat, log))
+        if radar['angle_type'] == 0:
+            if 0 <= angle <= 90 or 270 <= angle <= 360:
+                if heading < 0:
+                    nextEdge = radar['lanes']['near']
+                else:
+                    nextEdge = radar['lanes']['far']
+
+            else:
+                if heading < 0:
+                    nextEdge = radar['lanes']['far']
+                else:
+                    nextEdge = radar['lanes']['near']
+
+        elif radar['angle_type'] == 1:
+            if 0 <= angle <= 90 or 270 <= angle <= 360:
+                if heading < 0:
+                    nextEdge = radar['lanes']['far']
+                else:
+                    nextEdge = radar['lanes']['near']
+
+            else:
+                if heading < 0:
+                    nextEdge = radar['lanes']['near']
+                else:
+                    nextEdge = radar['lanes']['far']
+        f.close()
+
+    vehID = str(received["objectID"])
+    x, y = net.convertLonLat2XY(log, lat)  # Converte as coordenadas para o sistema de coordenadas do SUMO
+    nextEdge = str(nextEdge)
+    allCars = traci.vehicle.getIDList()
+    print("next", nextEdge)
+
+    if vehID in allCars:
+        print(traci.vehicle.getRoadID(vehID))
+        if traci.vehicle.getRoadID(vehID) == nextEdge or nextEdge.startswith(":cluster") or "_" in nextEdge:
+
+            new_speed = received["speed"]
+            traci.vehicle.setSpeed(vehID, new_speed)
+        else:
+            traci.vehicle.changeTarget(vehID, nextEdge)  # se a proxima aresta for diferente, muda a rota
+            print("mudou", traci.vehicle.getRoute(vehID))
+
+
+    else:  # Adiciona um novo veículo
+        traci.route.add(routeID=("route_" + vehID), edges=[nextEdge])  # adiciona uma rota para o veículo
+        traci.vehicle.add(vehID, routeID=("route_" + vehID), typeID="vehicle.audi.a2", depart=traci.simulation.getTime() + 0.5, departSpeed=0,
+                          departLane="best")
+        traci.vehicle.moveToXY(vehID, nextEdge, 0, x, y,
+                               keepRoute=1)  # se a proxima for a mesma, cluster ou de junção, move com moveTOXY
+        print(traci.vehicle.getRoute(vehID))
         print("adicionado")
 
 
@@ -305,6 +375,12 @@ def addRandomTraffic(QtdCars):
 def on_connect(client, userdata, flags, rc):
     print(f"Conectado ao broker com código de resultado {rc}")
 
+def on_connect_real_data(client, userdata, flags, reason_code, properties):
+    print("Connected with result code " + str(reason_code))
+    # Subscribing in on_connect() means that if we lose the connection and
+    # reconnect then subscriptions will be renewed.
+    client.subscribe("p35/jetson/radar-plus")  
+
 
 def on_publish(client, userdata, mid):
     print("Mensagem publicada com sucesso")
@@ -313,6 +389,10 @@ def on_publish(client, userdata, mid):
 def on_message(client, userdata, msg):
     topic = msg.topic
     print(topic)
+    if topic == "p35/jetson/radar-plus":
+        print("REAL DATA")
+        payload = json.loads(msg.payload)
+        addOrUpdateRealCar(payload)
     if topic == "/addRandomTraffic":
         payload = json.loads(msg.payload)
         try:
@@ -375,10 +455,15 @@ if __name__ == "__main__":
     mqtt_client.subscribe("/addSimulatedCar")
     mqtt_client.loop_start()  # Inicia o loop de eventos MQTT em uma thread separada
 
-    net = sumolib.net.readNet(
-        "../Adapters/co_simulation/sumo_configuration/simple-map/aveiro.net.xml",
-        withInternal=True)  # Carrega a rede do SUMO atraves do sumolib para acesso estatico
-
-
     
+    mqtt_thread = threading.Thread(target=mqtt_client.loop_start)
+    mqtt_thread.start()
 
+
+    realData_mqtt_client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
+
+    realData_mqtt_client.on_connect = on_connect_real_data
+    realData_mqtt_client.on_message = on_message
+    realData_mqtt_client.connect("atcll-data.nap.av.it.pt", 1884)
+
+    realData_mqtt_client.loop_start()
