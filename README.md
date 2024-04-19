@@ -42,29 +42,25 @@ python3 config.py -x ~/Desktop/PI_Digital_Twin/Adapters/co_simulation/sumo_confi
 
 ## Export map
 
-- Geramos o .osm
+- Generated the .osm file through https://www.openstreetmap.org/
 
-- Limpamos no JOSM
+- Polished the mapping, removing unwanted parts with JOSM
 
-- Apagamos as linhas de delete 
+- Deleted the 'delete' actions from the .osm file
 
 ```
-osmfilter in.osm --drop-tags="@action='delete'" -o=out.osm
+osmfilter *in*.osm --drop-tags="@action='delete'" -o=*out*.osm
 ```
 
-- com Adapters/co_simulation/map_adjustor/osm_to_xodr/main.py
-    - Crio um header ideal para o xodr
-    - Crio um novo arquivo .osm modificado (map_modified_for_Carla.osm)
+- using Adapters/co_simulation/map_adjustor/osm_to_xodr/main.py
+    - Generate the header to the xodr file
+    - Generate a new .osm file to transform to .xodr (map_modified_for_Carla.osm)
     
-- com Adapters/co_simulation/map_adjustor/osm_to_xodr/converter.py crio o xodr para o carla (map_modified_for_Carla.osmcomo parametro dentro do .py ) ***
+- using Adapters/co_simulation/map_adjustor/osm_to_xodr/converter.py create the .xodr file for CARLA (map_modified_for_Carla.osm as a parameter inside converter.py ) ***
 
-- A partir do xodr é que vou criar a network para ser interpretada pelo sumo
+- Through the .xodr file, we can generate the network (.net.xml) file for SUMO
 ```
 python3 Adapters/co_simulation/map_adjustor/xodr_to_netxml/netconvert_carla.py --output *out*.net.xml --guess-tls ~/Desktop/PI_Digital_Twin/Adapters/co_simulation/sumo_configuration/simple-map/*in*.xodr 
 ```
 
-- Altero o .sumocfg com as entradas desejadas
-
-
-
-
+- Change the .sumocfg with the desired inputs
