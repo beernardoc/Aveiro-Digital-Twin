@@ -381,7 +381,7 @@ def _netconvert_carla_impl(xodr_file, output, tmpdir, guess_tls=False):
             '--geometry.remove',
             '--opendrive.curve-resolution', '1',
             '--opendrive.import-all-lanes',
-            '--type-files', os.path.join(basedir, 'data/opendrive_netconvert.typ.xml'),
+            '--type-files', os.path.join(basedir, 'opendrive_netconvert.typ.xml'),
             # Necessary to link odr and sumo ids.
             '--output.original-names',
             # Discard loading traffic lights as them will be inserted manually afterwards.

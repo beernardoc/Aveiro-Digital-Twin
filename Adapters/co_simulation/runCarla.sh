@@ -18,7 +18,7 @@ bash ~/Desktop/CARLA_0.9.15/CarlaUE4.sh -windowed -ResX=800 -ResY=600 &
 sleep 5
 echo "Carla is running"
 echo "Loading Map..."
-python3 ~/Desktop/CARLA_0.9.15/PythonAPI/util/config.py -x ~/Desktop/PI_Digital_Twin/Adapters/co_simulation/sumo_configuration/simple-map/map-clean.xodr &
+python3 ~/Desktop/CARLA_0.9.15/PythonAPI/util/config.py -x ~/Desktop/PI_Digital_Twin/Adapters/co_simulation/sumo_configuration/simple-map/aveiro.xodr &
 
 # Wait for Ctrl+C
 wait

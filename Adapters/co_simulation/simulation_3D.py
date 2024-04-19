@@ -376,7 +376,7 @@ if __name__ == "__main__":
     mqtt_client.loop_start()  # Inicia o loop de eventos MQTT em uma thread separada
 
     net = sumolib.net.readNet(
-        "../Adapters/co_simulation/sumo_configuration/simple-map/simple-map.net.xml",
+        "../Adapters/co_simulation/sumo_configuration/simple-map/aveiro.net.xml",
         withInternal=True)  # Carrega a rede do SUMO atraves do sumolib para acesso estatico
 
 

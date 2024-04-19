@@ -352,11 +352,10 @@ if __name__ == "__main__":
     sumo_thread.join()  # Aguarda até que o SUMO esteja pronto
 
     net = sumolib.net.readNet(
-        "../Adapters/co_simulation/sumo_configuration/simple-map/simple-map.net.xml",
+        "../Adapters/co_simulation/sumo_configuration/simple-map/aveiro.net.xml",
         withInternal=True)  # Carrega a rede do SUMO atraves do sumolib para acesso estatico
 
     #sumolib para dados estaticos da rede e traci para dados dinamicos da simulação
-    print(type(net.getEdge("-1545").getType()))
     #teste = net.getEdge("-1545").getLanes()
     #for i in teste:
     #    print(i.getPermissions())

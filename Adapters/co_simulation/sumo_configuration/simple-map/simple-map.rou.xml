@@ -2,6 +2,6 @@
 
 <routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
     <vehicle id="0" type="vehicle.audi.a2" depart="3.00">
-        <route edges="-1545 -1590"/>
+        <route edges="-5134 -5287"/>
     </vehicle>
 </routes>
