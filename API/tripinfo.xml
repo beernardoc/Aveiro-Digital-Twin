@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- generated on 2024-04-15 12:50:46 by Eclipse SUMO GUI Version 1.12.0
+<!-- generated on 2024-04-19 18:09:50 by Eclipse SUMO GUI Version 1.12.0
 <configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/sumoConfiguration.xsd">
 
     <input>
-        <net-file value="../Adapters/co_simulation/sumo_configuration/simple-map/simple-map.net.xml"/>
+        <net-file value="../Adapters/co_simulation/sumo_configuration/simple-map/aveiro.net.xml"/>
         <route-files value="../Adapters/co_simulation/sumo_configuration/simple-map/carlavtypes.rou.xml,../Adapters/co_simulation/sumo_configuration/simple-map/simple-map.rou.xml"/>
     </input>
 
@@ -13,7 +13,7 @@
     </output>
 
     <traci_server>
-        <remote-port value="59741"/>
+        <remote-port value="59307"/>
         <num-clients value="1"/>
     </traci_server>
 

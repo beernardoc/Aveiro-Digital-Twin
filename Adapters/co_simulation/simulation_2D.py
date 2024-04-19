@@ -327,7 +327,7 @@ if __name__ == "__main__":
     mqtt_client.on_publish = on_publish
     mqtt_client.on_message = on_message
     mqtt_client.connect("localhost", 1883, 60)
-    mqtt_client.subscribe("/realDatateste")
+    mqtt_client.subscribe("/realDatateste") # vira o topico real
     mqtt_client.subscribe("/addRandomTraffic")
     mqtt_client.subscribe("/addSimulatedCar")
     mqtt_client.subscribe("/endSimulation")
