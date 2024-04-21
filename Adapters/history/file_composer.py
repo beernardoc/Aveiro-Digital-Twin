@@ -107,3 +107,13 @@ class FileComposer:
         """
 
         self.tree.write(file_name, encoding='utf-8', xml_declaration=True)
+
+# test if the class works
+composer = FileComposer('base_file.xml')
+
+vehicles = [
+    {'vehicle': {'id': '0', 'type': 'test', 'depart': '0'}, 'route': ['-123', '-321', '-231']},
+    {'vehicle': {'id': '1', 'type': 'test', 'depart': '0'}, 'route': ['-456', '-654', '-564']}
+]
+
+composer.add_vehicles(vehicles)
