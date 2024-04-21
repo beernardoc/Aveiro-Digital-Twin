@@ -1,4 +1,6 @@
 import xml.etree.ElementTree as ET
+import xml.dom.minidom
+import io
 
 class FileComposer:
     """
@@ -12,6 +14,7 @@ class FileComposer:
         self.base_file = base_file
         self.tree = ET.parse(self.base_file)
         self.root = self.tree.getroot()
+        self.temp_file = io.StringIO()
 
     def add_vehicles(self, vehicles):
         """
@@ -55,9 +58,6 @@ class FileComposer:
         # Insert the vehicle tag in the XML file
         self.root.insert(len(self.root), new_vehicle)
 
-        # Save the changes
-        self.save(self.base_file)
-
     def add_route_tag(self, route, vehicle_id):
         """
         Add a route tag to the XML file.
@@ -77,9 +77,6 @@ class FileComposer:
                 child.append(new_route)
                 break
 
-        # Save the changes
-        self.save(self.base_file)
-
     def add_comment(self, id, type, depart):
         """
         Add a comment to the XML file.
@@ -97,16 +94,24 @@ class FileComposer:
         # Insert the comment tag in the XML file
         self.root.insert(len(self.root), new_comment)
 
-        # Save the changes
-        self.save(self.base_file)
-
-    def save(self, file_name):
+    def get_result_string(self):
         """
-        Save the XML file with a new name.
-        :param file_name: The new file name
+        Return the XML content as a string.
         """
+        # Convert the XML tree to a string
+        xml_string = ET.tostring(self.root, encoding='utf-8')
 
-        self.tree.write(file_name, encoding='utf-8', xml_declaration=True)
+        # Parse the XML string into a minidom Document
+        dom = xml.dom.minidom.parseString(xml_string)
+
+        # Pretty print the XML with indentation and newlines
+        dom.writexml(self.temp_file, addindent='\t', newl='\n', encoding='utf-8')
+
+        # Get the content of the in-memory file
+        self.temp_file.seek(0)  # Move cursor to the beginning
+        xml_content = self.temp_file.read()
+
+        return xml_content
 
 # test if the class works
 composer = FileComposer('base_file.xml')
@@ -117,3 +122,5 @@ vehicles = [
 ]
 
 composer.add_vehicles(vehicles)
+
+print(composer.get_result_string())

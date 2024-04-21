@@ -1,3 +1,2 @@
-<?xml version='1.0' encoding='utf-8'?>
-<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
-<!--Vehicle with id 0 and type test depart at 0--><vehicle id="0" type="test" depart="0"><route edges="-123 -321 -231" /></vehicle><!--Vehicle with id 1 and type test depart at 0--><vehicle id="1" type="test" depart="0"><route edges="-456 -654 -564" /></vehicle></routes>
+<?xml version="1.0" encoding="utf-8"?>
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd"></routes>
