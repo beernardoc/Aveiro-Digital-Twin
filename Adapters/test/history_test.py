@@ -37,3 +37,21 @@ class TestFileComposer(unittest.TestCase):
         self.assertEqual(self.file_composer.root[1].attrib, vehicle)
         self.assertEqual(self.file_composer.root[1][0].tag, 'route')
         self.assertEqual(self.file_composer.root[1][0].attrib, {'edges': '-123 -321 -231'})
+
+    def test_add_vehicles(self):
+        vehicles = [
+            {'vehicle': {'id': '0', 'type': 'test_car', 'depart': '0'}, 'route': ['-123', '-321', '-231']},
+            {'vehicle': {'id': '1', 'type': 'test_car', 'depart': '0'}, 'route': ['-456', '-654', '-564']}
+        ]
+        self.file_composer.add_vehicles(vehicles)
+
+        # their shoud be 2 vehicles and 2 routes
+        self.assertEqual(len(self.file_composer.root), 4)
+        self.assertEqual(self.file_composer.root[1].tag, 'vehicle')
+        self.assertEqual(self.file_composer.root[1].attrib, vehicles[0]['vehicle'])
+        self.assertEqual(self.file_composer.root[1][0].tag, 'route')
+        self.assertEqual(self.file_composer.root[1][0].attrib, {'edges': '-123 -321 -231'})
+        self.assertEqual(self.file_composer.root[3].tag, 'vehicle')
+        self.assertEqual(self.file_composer.root[3].attrib, vehicles[1]['vehicle'])
+        self.assertEqual(self.file_composer.root[3][0].tag, 'route')
+        self.assertEqual(self.file_composer.root[3][0].attrib, {'edges': '-456 -654 -564'})
