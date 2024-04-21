@@ -12,13 +12,6 @@ class FileComposer:
         self.base_file = base_file
         self.tree = ET.parse(self.base_file)
         self.root = self.tree.getroot()
-        self.insert_point = None
-
-        # Find the insert point, which is inside the routes tag
-        for child in self.root:
-            if child.tag == 'routes':
-                self.insert_point = child
-                break
 
     def add_vehicles(self, vehicles):
         """
@@ -60,10 +53,10 @@ class FileComposer:
         new_vehicle.set('depart', vehicle['depart'])
 
         # Insert the vehicle tag in the XML file
-        self.root.insert(self.root.index(self.insert_point) + 1, new_vehicle)
+        self.root.insert(len(self.root), new_vehicle)
 
         # Save the changes
-        self.tree.write(self.base_file, encoding='utf-8', xml_declaration=True)
+        self.save(self.base_file)
 
     def add_route_tag(self, route, vehicle_id):
         """
@@ -85,7 +78,7 @@ class FileComposer:
                 break
 
         # Save the changes
-        self.tree.write(self.base_file, encoding='utf-8', xml_declaration=True)
+        self.save(self.base_file)
 
     def add_comment(self, id, type, depart):
         """
@@ -96,13 +89,21 @@ class FileComposer:
         """
 
         # Create the comment
-        comment = f'<!-- Vehicle with id {id} and type {type} depart at {depart} -->'
+        comment = f'Vehicle with id {id} and type {type} depart at {depart}'
 
         # Create the comment tag
         new_comment = ET.Comment(comment)
 
         # Insert the comment tag in the XML file
-        self.root.insert(self.root.index(self.insert_point) + 1, new_comment)
+        self.root.insert(len(self.root), new_comment)
 
         # Save the changes
-        self.tree.write(self.base_file, encoding='utf-8', xml_declaration=True)
+        self.save(self.base_file)
+
+    def save(self, file_name):
+        """
+        Save the XML file with a new name.
+        :param file_name: The new file name
+        """
+
+        self.tree.write(file_name, encoding='utf-8', xml_declaration=True)
