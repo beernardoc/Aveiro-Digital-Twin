@@ -1,7 +1,46 @@
+.homepage-background {
+    background-image: url('../asset/traffic_dribble.gif');
+    position: absolute;
+    top: 50px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    height: calc(100vh - 50px);
+    width: 100%;
+}
 
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #131524ee;
+    z-index: 1;
+}
 
-h1 {
-    font-size: 4rem;
+.content-above-overlay {
+    position: relative; 
+    z-index: 2;
+}
+
+.text-h1-home {
+    font-family: monospace, serif;
+    font-size: 5rem;
     font-weight: 700;
-    color: rgba(40, 167, 69, 0.8); /* Altere a cor para usar o valor correto do alfa */
+    color: #ffffff;
+    text-shadow: 2px 2px 5px #F47065;
+}
+
+.btn-2d-3d {
+    color: #ffffff;
+    font-size: larger;
+    background-color: #7191D2;
+}
+
+.btn-2d-3d:hover {
+    background-color: #F47065;
 }

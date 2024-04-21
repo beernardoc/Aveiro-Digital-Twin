@@ -1,6 +1,7 @@
 import React from 'react';
 import axios from 'axios';
 import teste from '../asset/carla.jpg';
+import './Run2D_3D_form.css';
 
 const Run3D_form = () => {
 
@@ -22,19 +23,14 @@ const Run3D_form = () => {
     };
 
     return (
-        <div
-            className="bg-cover bg-center bg-no-repeat"
-            style={{
-                backgroundImage: `url(${teste})`,
-                height: '100vh',
-                width: '100vw', // Ajuste a largura da imagem de fundo para cobrir toda a largura da tela
-            }}
-        >
-            <div className="container mx-auto px-4 py-8 flex items-center justify-center">
-                <div className="w-full max-w-lg bg-white bg-opacity-90 rounded-lg shadow-lg p-8">
+
+        <div className='run3d-background'>
+            <div className="overlay-run"></div> 
+            <div className="content-above-overlay py-8 flex justify-center">
+                <div className="mt-9 max-w-lg bg-white bg-opacity-80 rounded-lg p-8">
                     <form onSubmit={handleSubmit}>
                         <div className="mb-4">
-                            <label htmlFor="configFile" className="block text-gray-700 text-sm font-bold mb-2">
+                            <label htmlFor="configFile" className="mb-1">
                                 Configuration File (.xml)
                             </label>
                             <input
@@ -42,11 +38,11 @@ const Run3D_form = () => {
                                 id="configFile"
                                 name="configFile"
                                 accept=".xml"
-                                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                className="w-full px-4 py-2 border rounded-md"
                             />
                         </div>
                         <div
-                            className="mb-4 flex items-center"> {/* Adicionado flex e items-center para alinhar o checkbox à esquerda */}
+                            className="mb-4 flex"> {/* Adicionado flex e items-center para alinhar o checkbox à esquerda */}
                             <div
                                 className="inline-flex items-center"> {/* Adicionado para envolver o checkbox e o texto */}
                                 <input
@@ -59,17 +55,14 @@ const Run3D_form = () => {
                             </div>
                         </div>
                         <div className="mb-4">
-                            <p className="text-sm text-gray-600">
+                            <p className="text-sm text-gray-600 text-run">
                                 The 3D simulation will be performed using CARLA. Make sure your system meets the
                                 following minimum requirements: Quad-core CPU, 8 GB RAM, NVIDIA GTX 1060. For best
                                 performance, an NVIDIA RTX 2070 or higher GPU and 16 GB RAM are recommended.
                             </p>
                         </div>
                         <div className="text-center">
-                            <button type="submit"
-                                    className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                                Start Simulation
-                            </button>
+                            <button type="submit" className="btn-2d-3d"> Start Simulation </button>
                         </div>
                     </form>
                 </div>

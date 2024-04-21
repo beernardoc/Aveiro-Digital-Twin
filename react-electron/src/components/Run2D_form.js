@@ -1,6 +1,6 @@
 import React from 'react';
-import teste from '../asset/teste.png';
 import axios from "axios";
+import './Run2D_3D_form.css';
 
 const Run2D_form = () => {
 
@@ -21,20 +21,16 @@ const Run2D_form = () => {
     };
 
     return (
-        <div
-            className="bg-cover bg-center bg-no-repeat"
-            style={{
-                backgroundImage: `url(${teste})`,
-                height: '100vh',
-                width: '100vw', // Ajuste a largura da imagem de fundo para cobrir toda a largura da tela
-            }}
-        >
-            <div className="container mt-2 mx-auto px-4 py-8 flex items-center justify-center">
-                <div className="mt-9 w-full max-w-lg bg-white bg-opacity-90 rounded-lg shadow-lg p-8">
+        
+        <div className='run2d-background'>
+            <div className="overlay-run"></div> 
+            <div className="content-above-overlay py-8 flex justify-center">
+                <div className="mt-9 max-w-lg bg-white bg-opacity-80 rounded-lg p-8">
                     <form onSubmit={handleSubmit}>
                         <div className="mb-4">
-                            <label htmlFor="configFile" className="block mb-1">Would you like to add a default
-                                configuration file (.xml)?</label>
+                            <label htmlFor="configFile" className="mb-1">Would you like to add a default
+                                configuration file (.xml)?
+                            </label>
                             <input
                                 type="file"
                                 id="configFile"
@@ -44,7 +40,7 @@ const Run2D_form = () => {
                             />
                         </div>
                         <div
-                            className="mb-4 flex items-center"> {/* Adicionado flex e items-center para alinhar o checkbox à esquerda */}
+                            className="mb-4 flex"> {/* Adicionado flex e items-center para alinhar o checkbox à esquerda */}
                             <div
                                 className="inline-flex items-center"> {/* Adicionado para envolver o checkbox e o texto */}
                                 <input
@@ -57,16 +53,12 @@ const Run2D_form = () => {
                             </div>
                         </div>
                         <div className="mb-4">
-                            <p className="text-sm text-gray-500">Now you will start the 2D digital twin of Aveiro city.
+                            <p className="text-sm text-gray-500 text-run">Now you will start the 2D digital twin of Aveiro city.
                                 For this, it's necessary that you have Sumo properly installed on your computer.
                                 Don't worry if you haven't added any configuration files at this step; during execution, you'll be able to dynamically adjust the simulation.</p>
 
                         </div>
-                        <div className="text-center">
-                            <button type="submit"
-                                    className="px-6 py-3 bg-green-500 text-white font-bold rounded-md hover:bg-green-600">Start Simulation
-                            </button>
-                        </div>
+                        <button type="submit" className="btn-2d-3d">Start Simulation</button>
                     </form>
                 </div>
             </div>
