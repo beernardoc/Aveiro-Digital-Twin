@@ -112,15 +112,3 @@ class FileComposer:
         xml_content = self.temp_file.read()
 
         return xml_content
-
-# test if the class works
-composer = FileComposer('base_file.xml')
-
-vehicles = [
-    {'vehicle': {'id': '0', 'type': 'test', 'depart': '0'}, 'route': ['-123', '-321', '-231']},
-    {'vehicle': {'id': '1', 'type': 'test', 'depart': '0'}, 'route': ['-456', '-654', '-564']}
-]
-
-composer.add_vehicles(vehicles)
-
-print(composer.get_result_string())
