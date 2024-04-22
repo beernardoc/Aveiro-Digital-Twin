@@ -48,10 +48,10 @@ def run():
         data = {"vehicle": {"quantity": len(vehicles), "ids": vehicles, "types": vehicle_type}, "time": simulation_time}
         publish.single("/cars", payload=json.dumps(data), hostname="localhost", port=1883)
 
-        if len(simulated_vehicles) > 0:
-            for vehicle_id in simulated_vehicles:
-                if vehicle_id in traci.vehicle.getIDList():
-                    checkDestination(vehicle_id, simulated_vehicles[vehicle_id])
+        # if len(simulated_vehicles) > 0:
+        #     for vehicle_id in simulated_vehicles:
+        #         if vehicle_id in traci.vehicle.getIDList():
+        #             checkDestination(vehicle_id, simulated_vehicles[vehicle_id])
 
     traci.close()
     sys.stdout.flush()
