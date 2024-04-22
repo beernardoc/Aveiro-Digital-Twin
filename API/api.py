@@ -13,6 +13,7 @@ import paho.mqtt.client as mqtt
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_cors import CORS
 import flask_socketio as socketio
+from flask_swagger_ui import get_swaggerui_blueprint
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
@@ -23,6 +24,18 @@ app.secret_key = 'myawesomesecretkey'
 
 app.config['MONGO_URI'] = 'mongodb://localhost:27017/digitaltwin'
 mongo = PyMongo(app)
+
+SWAGGER_URL="/swagger"
+API_URL="/static/swagger.json"
+
+swagger_ui_blueprint = get_swaggerui_blueprint(
+    SWAGGER_URL,
+    API_URL,
+    config={
+        'app_name': 'Access API'
+    }
+)
+app.register_blueprint(swagger_ui_blueprint, url_prefix=SWAGGER_URL)
 
 process3d = None
 process2d = None
