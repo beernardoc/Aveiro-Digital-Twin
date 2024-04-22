@@ -93,6 +93,7 @@ const MapComponent = () => {
             };
         }
 
+        console.log('Car:', car);
         axios.post('http://localhost:5000/api/addSimulatedCar', car)
                     .then(response => {
                         // Lida com a resposta da solicitação

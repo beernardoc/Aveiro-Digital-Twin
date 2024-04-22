@@ -48,10 +48,10 @@ def run():
         data = {"vehicle": {"quantity": len(vehicles), "ids": vehicles, "types": vehicle_type}, "time": simulation_time}
         publish.single("/cars", payload=json.dumps(data), hostname="localhost", port=1883)
 
-        if len(simulated_vehicles) > 0:
-            for vehicle_id in simulated_vehicles:
-                if vehicle_id in traci.vehicle.getIDList():
-                    checkDestination(vehicle_id, simulated_vehicles[vehicle_id])
+        # if len(simulated_vehicles) > 0:
+        #     for vehicle_id in simulated_vehicles:
+        #         if vehicle_id in traci.vehicle.getIDList():
+        #             checkDestination(vehicle_id, simulated_vehicles[vehicle_id])
 
     traci.close()
     sys.stdout.flush()
@@ -191,9 +191,9 @@ def addSimulatedCar(received):
         print("Veículo adicionado com informações de início e fim", "simulated{}".format(ts))
 
         # Store simulated vehicle ID and its destination coordinates
-        simulated_vehicle_id = "simulated{}".format(finalRouteName)
-        simulated_vehicles[simulated_vehicle_id] = destination_coordinates
-        print("simulated_vehicles", simulated_vehicles)
+        # simulated_vehicle_id = "simulated{}".format(finalRouteName)
+        # simulated_vehicles[simulated_vehicle_id] = destination_coordinates
+        # print("simulated_vehicles", simulated_vehicles)
 
         # make the car move to XY
         x, y = net.convertLonLat2XY(logI, latI)
@@ -314,22 +314,22 @@ allCars = set()
 def on_message(client, userdata, msg):
     topic = msg.topic
     print(topic)
-    if topic == "p35/jetson/radar-plus":
-        print("REAL DATA")
-        payload = json.loads(msg.payload)
-        # addOrUpdateRealCar(payload)
-        print("id", payload["objectID"])
-        global allCars
-        if payload["objectID"] not in allCars:
-            allCars.add(payload["objectID"])
-            addOrUpdateRealCar(payload)
-        if len(allCars) > 20:
-            # remove the smallest 5 objectID
-            temp = list(allCars)
-            temp.sort()
-            print("allCars", allCars)
-            for i in range(5):
-                allCars.remove(temp[i])
+    # if topic == "p35/jetson/radar-plus":
+    #     print("REAL DATA")
+    #     payload = json.loads(msg.payload)
+    #     # addOrUpdateRealCar(payload)
+    #     print("id", payload["objectID"])
+    #     global allCars
+    #     if payload["objectID"] not in allCars:
+    #         allCars.add(payload["objectID"])
+    #         addOrUpdateRealCar(payload)
+    #     if len(allCars) > 20:
+    #         # remove the smallest 5 objectID
+    #         temp = list(allCars)
+    #         temp.sort()
+    #         print("allCars", allCars)
+    #         for i in range(5):
+    #             allCars.remove(temp[i])
     if topic == "/addRandomTraffic":
         payload = json.loads(msg.payload)
         try:
@@ -387,13 +387,13 @@ if __name__ == "__main__":
     mqtt_thread.start()
 
 
-    realData_mqtt_client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
+    # realData_mqtt_client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
 
-    realData_mqtt_client.on_connect = on_connect_real_data
-    realData_mqtt_client.on_message = on_message
-    realData_mqtt_client.connect("atcll-data.nap.av.it.pt", 1884)
+    # realData_mqtt_client.on_connect = on_connect_real_data
+    # realData_mqtt_client.on_message = on_message
+    # realData_mqtt_client.connect("atcll-data.nap.av.it.pt", 1884)
 
-    realData_mqtt_client.loop_start()
+    # realData_mqtt_client.loop_start()
 
     #sumolib para dados estaticos da rede e traci para dados dinamicos da simulação
     #teste = net.getEdge("-1545").getLanes()
