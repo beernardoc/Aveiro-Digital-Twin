@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- generated on 2024-04-22 00:48:02 by Eclipse SUMO GUI Version 1.19.0
+<!-- generated on 2024-04-22 15:58:48 by Eclipse SUMO GUI Version 1.12.0
 <configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/sumoConfiguration.xsd">
 
     <input>
@@ -13,7 +13,7 @@
     </output>
 
     <traci_server>
-        <remote-port value="43645"/>
+        <remote-port value="49855"/>
         <num-clients value="1"/>
     </traci_server>
 
@@ -26,4 +26,8 @@
 -->
 
 <tripinfos xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/tripinfo_file.xsd">
+    <tripinfo id="35036" depart="1.00" departLane="-5258_2" departPos="18.32" departSpeed="0.00" departDelay="-1.00" arrival="2.00" arrivalLane="-5258_2" arrivalPos="18.42" arrivalSpeed="1.98" duration="1.00" routeLength="0.10" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="0.87" rerouteNo="0" devices="tripinfo_35036" vType="vehicle.audi.a2" speedFactor="1.06" vaporized=""/>
+    <tripinfo id="35037" depart="4.00" departLane="-5258_2" departPos="13.01" departSpeed="0.00" departDelay="0.00" arrival="6.00" arrivalLane="-5258_2" arrivalPos="18.42" arrivalSpeed="3.54" duration="2.00" routeLength="5.41" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="1.59" rerouteNo="0" devices="tripinfo_35037" vType="vehicle.audi.a2" speedFactor="1.01" vaporized=""/>
+    <tripinfo id="35040" depart="5.00" departLane="-5258_2" departPos="14.96" departSpeed="0.00" departDelay="-1.00" arrival="8.00" arrivalLane="-5258_2" arrivalPos="18.42" arrivalSpeed="4.04" duration="3.00" routeLength="3.46" waitingTime="1.00" waitingCount="1" stopTime="0.00" timeLoss="2.64" rerouteNo="0" devices="tripinfo_35040" vType="vehicle.audi.a2" speedFactor="1.08" vaporized=""/>
+    <tripinfo id="35039" depart="6.00" departLane=":414_0_2" departPos="1.28" departSpeed="0.00" departDelay="0.00" arrival="11.00" arrivalLane="-5258_2" arrivalPos="18.42" arrivalSpeed="11.70" duration="5.00" routeLength="30.36" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="2.37" rerouteNo="0" devices="tripinfo_35039" vType="vehicle.audi.a2" speedFactor="1.03" vaporized=""/>
 </tripinfos>

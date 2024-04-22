@@ -26,7 +26,7 @@ def get_options():
 
 
 global step
-lista = {}
+allVehicle = set()
 simulated_vehicles = {}
 
 net = sumolib.net.readNet(
@@ -82,63 +82,57 @@ def addOrUpdateRealCar(received):
     print("received", received)
     log, lat, heading = received["longitude"], received["latitude"], received["heading"]
     print("log: {}, lat: {}, heading: {}".format(log, lat, heading))
-    # if the heading is positive it is directed to the sensor, if it is negative it is directed away from the sensor
-    # get the sensor information from radar.json
-    with open(file_path, "r") as f:
-        data = json.load(f)
-        radar = data[1]
-        # get the angle from the sensor to the vehicle
-        angle = calculate_bearing((radar['coord']['lat'], radar['coord']['lng']), (lat, log))
-        if radar['angle_type'] == 0:
-            if 0 <= angle <= 90 or 270 <= angle <= 360:
-                if heading < 0:
-                    nextEdge = radar['lanes']['near']
-                else:
-                    nextEdge = radar['lanes']['far']
-
-            else:
-                if heading < 0:
-                    nextEdge = radar['lanes']['far']
-                else:
-                    nextEdge = radar['lanes']['near']
-
-        elif radar['angle_type'] == 1:
-            if 0 <= angle <= 90 or 270 <= angle <= 360:
-                if heading < 0:
-                    nextEdge = radar['lanes']['far']
-                else:
-                    nextEdge = radar['lanes']['near']
-
-            else:
-                if heading < 0:
-                    nextEdge = radar['lanes']['near']
-                else:
-                    nextEdge = radar['lanes']['far']
-        f.close()
 
     vehID = str(received["objectID"])
     x, y = net.convertLonLat2XY(log, lat)  # Converte as coordenadas para o sistema de coordenadas do SUMO
-    nextEdge = str(nextEdge)
     allCars = traci.vehicle.getIDList()
-    print("next", nextEdge)
 
     if vehID in allCars:
-        print(traci.vehicle.getRoadID(vehID))
-        if traci.vehicle.getRoadID(vehID) == nextEdge or nextEdge.startswith(":cluster") or "_" in nextEdge:
-
-            new_speed = received["speed"]
-            traci.vehicle.setSpeed(vehID, new_speed)
-        else:
-            traci.vehicle.changeTarget(vehID, nextEdge)  # se a proxima aresta for diferente, muda a rota
-            print("mudou", traci.vehicle.getRoute(vehID))
+        new_speed = received["speed"]
+        traci.vehicle.setSpeed(vehID, new_speed)
 
 
-    else:  # Adiciona um novo veículo
-        traci.route.add(routeID=("route_" + vehID), edges=[nextEdge])  # adiciona uma rota para o veículo
-        traci.vehicle.add(vehID, routeID=("route_" + vehID), typeID="vehicle.audi.a2", depart=traci.simulation.getTime() + 0.5, departSpeed=0,
+    elif vehID not in allVehicle:  # Adiciona um novo veículo
+        # if the heading is positive it is directed to the sensor, if it is negative it is directed away from the sensor
+        # get the sensor information from radar.json
+        with open(file_path, "r") as f:
+            data = json.load(f)
+            radar = data[1]
+            # get the angle from the sensor to the vehicle
+            angle = calculate_bearing((radar['coord']['lat'], radar['coord']['lng']), (lat, log))
+            if radar['angle_type'] == 0:
+                if 0 <= angle <= 90 or 270 <= angle <= 360:
+                    if heading < 0:
+                        route = radar['lanes']['near']
+                    else:
+                        route = radar['lanes']['far']
+
+                else:
+                    if heading < 0:
+                        route = radar['lanes']['far']
+                    else:
+                        route = radar['lanes']['near']
+
+            elif radar['angle_type'] == 1:
+                if 0 <= angle <= 90 or 270 <= angle <= 360:
+                    if heading < 0:
+                        route = radar['lanes']['far']
+                    else:
+                        route = radar['lanes']['near']
+
+                else:
+                    if heading < 0:
+                        route = radar['lanes']['near']
+                    else:
+                        route = radar['lanes']['far']
+            f.close()
+
+        traci.route.add(routeID=("route_" + vehID), edges=route)  # adiciona uma rota para o veículo
+        traci.vehicle.add(vehID, routeID=("route_" + vehID), typeID="vehicle.audi.a2", depart=traci.simulation.getTime() + 1, departSpeed=0,
                           departLane="best")
-        traci.vehicle.moveToXY(vehID, nextEdge, 0, x, y,
+        traci.vehicle.moveToXY(vehID, route[0], 0, x, y,
                                keepRoute=1)  # se a proxima for a mesma, cluster ou de junção, move com moveTOXY
+        allVehicle.add(vehID)
         print(traci.vehicle.getRoute(vehID))
         print("adicionado")
 
