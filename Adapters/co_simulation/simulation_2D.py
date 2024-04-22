@@ -48,10 +48,10 @@ def run():
         data = {"vehicle": {"quantity": len(vehicles), "ids": vehicles, "types": vehicle_type}, "time": simulation_time}
         publish.single("/cars", payload=json.dumps(data), hostname="localhost", port=1883)
 
-        # if len(simulated_vehicles) > 0:
-        #     for vehicle_id in simulated_vehicles:
-        #         if vehicle_id in traci.vehicle.getIDList():
-        #             checkDestination(vehicle_id, simulated_vehicles[vehicle_id])
+        if len(simulated_vehicles) > 0:
+            for vehicle_id in simulated_vehicles:
+                if vehicle_id in traci.vehicle.getIDList():
+                    checkDestination(vehicle_id, simulated_vehicles[vehicle_id])
 
     traci.close()
     sys.stdout.flush()
@@ -63,19 +63,19 @@ def checkDestination(vehicle_id, destination_coordinates):
     # Check if vehicle is in the list of simulated vehicles and is still in the simulation
     if vehicle_id in simulated_vehicles and vehicle_id in traci.vehicle.getIDList():
         vehicle_position = traci.vehicle.getPosition(vehicle_id)
-        # convert position to lon/lat
-        x, y = net.convertXY2LonLat(vehicle_position[0], vehicle_position[1])
-        print("Vehicle {} coordinates: ({}, {})".format(vehicle_id, x, y))
+
+        # Convert lon/lat to x/y of destination
+        x, y = net.convertLonLat2XY(destination_coordinates[0], destination_coordinates[1])
+
         if vehicle_position is not None:
-            print("Destination coordinates: {}".format(destination_coordinates))
-            distance_to_destination = traci.simulation.getDistance2D(float(x),
-                                                                     float(y),
-                                                                     float(destination_coordinates[0]),
-                                                                     float(destination_coordinates[1]), True)
+            distance_to_destination = traci.simulation.getDistance2D(float(vehicle_position[0]),
+                                                                     float(vehicle_position[1]),
+                                                                     float(x),
+                                                                     float(y))
             
             print("Distance to destination: {}".format(distance_to_destination))
             if distance_to_destination < 5:  # 5 meters from destination
-                traci.vehicle.stop(vehicle_id)
+                traci.vehicle.remove(vehicle_id)
                 simulated_vehicles.pop(vehicle_id, None)
                 print("Vehicle {} has reached its destination.".format(vehicle_id))
     else:
