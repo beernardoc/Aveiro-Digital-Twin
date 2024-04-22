@@ -314,22 +314,22 @@ allCars = set()
 def on_message(client, userdata, msg):
     topic = msg.topic
     print(topic)
-    if topic == "p35/jetson/radar-plus":
-        print("REAL DATA")
-        payload = json.loads(msg.payload)
-        # addOrUpdateRealCar(payload)
-        print("id", payload["objectID"])
-        global allCars
-        if payload["objectID"] not in allCars:
-            allCars.add(payload["objectID"])
-            addOrUpdateRealCar(payload)
-        if len(allCars) > 20:
-            # remove the smallest 5 objectID
-            temp = list(allCars)
-            temp.sort()
-            print("allCars", allCars)
-            for i in range(5):
-                allCars.remove(temp[i])
+    # if topic == "p35/jetson/radar-plus":
+    #     print("REAL DATA")
+    #     payload = json.loads(msg.payload)
+    #     # addOrUpdateRealCar(payload)
+    #     print("id", payload["objectID"])
+    #     global allCars
+    #     if payload["objectID"] not in allCars:
+    #         allCars.add(payload["objectID"])
+    #         addOrUpdateRealCar(payload)
+    #     if len(allCars) > 20:
+    #         # remove the smallest 5 objectID
+    #         temp = list(allCars)
+    #         temp.sort()
+    #         print("allCars", allCars)
+    #         for i in range(5):
+    #             allCars.remove(temp[i])
     if topic == "/addRandomTraffic":
         payload = json.loads(msg.payload)
         try:
