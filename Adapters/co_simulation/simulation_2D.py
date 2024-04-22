@@ -309,7 +309,8 @@ def on_message(client, userdata, msg):
     if topic == "p35/jetson/radar-plus":
         print("REAL DATA")
         payload = json.loads(msg.payload)
-        addOrUpdateRealCar(payload)
+        # addOrUpdateRealCar(payload)
+        print("id", payload["objectID"])
     if topic == "/addRandomTraffic":
         payload = json.loads(msg.payload)
         try:
@@ -334,19 +335,6 @@ if __name__ == "__main__":
         sumoBinary = sumolib.checkBinary('sumo')
     else:
         sumoBinary = sumolib.checkBinary('sumo-gui')
-
-    # Inicia a conexão MQTT
-    mqtt_client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1)
-    mqtt_client.on_connect = on_connect
-    mqtt_client.on_publish = on_publish
-    mqtt_client.on_message = on_message
-    mqtt_client.connect("localhost", 1883, 60)
-    mqtt_client.subscribe("/realDatateste") # vira o topico real
-    mqtt_client.subscribe("/addRandomTraffic")
-    mqtt_client.subscribe("/addSimulatedCar")
-    mqtt_client.subscribe("/endSimulation")
-
-    mqtt_client.loop_start()  # Inicia o loop de eventos MQTT em uma thread separada
 
     # Inicia o SUMO em uma thread separada
 
