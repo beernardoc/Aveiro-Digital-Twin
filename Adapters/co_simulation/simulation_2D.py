@@ -159,7 +159,8 @@ def addSimulatedCar(received):
         routeName = "route_simulated{}".format(ts)
 
         # Store destination coordinates
-        destination_coordinates = End
+        destination_coordinates = (logE, latE)
+        
 
         traci.route.add(routeName, [Start[0], End[0]])
         routeEdges = traci.route.getEdges(
@@ -190,9 +191,9 @@ def addSimulatedCar(received):
         print("Veículo adicionado com informações de início e fim", "simulated{}".format(ts))
 
         # Store simulated vehicle ID and its destination coordinates
-        # simulated_vehicle_id = traci.vehicle.getIDList()[-1]
-        # simulated_vehicles[simulated_vehicle_id] = destination_coordinates
-        # print("simulated_vehicles", simulated_vehicles)
+        simulated_vehicle_id = "simulated{}".format(finalRouteName)
+        simulated_vehicles[simulated_vehicle_id] = destination_coordinates
+        print("simulated_vehicles", simulated_vehicles)
 
         # make the car move to XY
         x, y = net.convertLonLat2XY(logI, latI)
