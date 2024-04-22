@@ -1,0 +1,51 @@
+.run2d-background {
+    background-image: url('../asset/teste.png');
+    position: absolute;
+    top: 50px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    height: calc(100vh - 50px);
+    width: 100%;
+}
+
+.run3d-background {
+    background-image: url('../asset/carla.jpg');
+    position: absolute;
+    top: 50px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    height: calc(100vh - 50px);
+    width: 100%;
+}
+
+.overlay-run {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #131524d0;
+    z-index: 1;
+}
+
+.text-run {
+    text-align: left;
+}
+
+.btn-2d-3d {
+    color: #ffffff !important;
+    font-size: larger !important;
+    background-color: #7191D2 !important;
+}
+
+.btn-2d-3d:hover {
+    background-color: #F47065 !important;
+}
