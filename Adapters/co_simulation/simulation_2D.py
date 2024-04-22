@@ -92,7 +92,7 @@ def addOrUpdateRealCar(received):
         traci.vehicle.setSpeed(vehID, new_speed)
 
 
-    elif vehID not in allVehicle:  # Adiciona um novo veículo
+    else:  # Adiciona um novo veículo
         # if the heading is positive it is directed to the sensor, if it is negative it is directed away from the sensor
         # get the sensor information from radar.json
         with open(file_path, "r") as f:
@@ -132,7 +132,7 @@ def addOrUpdateRealCar(received):
                           departLane="best")
         traci.vehicle.moveToXY(vehID, route[0], 0, x, y,
                                keepRoute=1)  # se a proxima for a mesma, cluster ou de junção, move com moveTOXY
-        allVehicle.add(vehID)
+        # allVehicle.add(vehID)
         print(traci.vehicle.getRoute(vehID))
         print("adicionado")
 
@@ -274,6 +274,8 @@ def addRandomTraffic(QtdCars):
             routeID = "route_{}".format(time.time_ns())
             vehicle_id = "random_{}".format(time.time_ns())
             typeID = random.choice(types)
+            if typeID == "DEFAULT_PEDTYPE":
+                typeID = "DEFAULT_VEHTYPE"
             route = traci.simulation.findRoute(random.choice(allowedEdges), random.choice(allowedEdges), typeID)
             if route.edges:
                 traci.route.add(routeID, route.edges)
@@ -302,6 +304,7 @@ def on_connect_real_data(client, userdata, flags, reason_code, properties):
 def on_publish(client, userdata, mid):
     print("Mensagem publicada com sucesso (simulation)")
 
+allCars = set()
 
 def on_message(client, userdata, msg):
     topic = msg.topic
@@ -311,6 +314,17 @@ def on_message(client, userdata, msg):
         payload = json.loads(msg.payload)
         # addOrUpdateRealCar(payload)
         print("id", payload["objectID"])
+        global allCars
+        if payload["objectID"] not in allCars:
+            allCars.add(payload["objectID"])
+            addOrUpdateRealCar(payload)
+        if len(allCars) > 20:
+            # remove the smallest 5 objectID
+            temp = list(allCars)
+            temp.sort()
+            print("allCars", allCars)
+            for i in range(5):
+                allCars.remove(temp[i])
     if topic == "/addRandomTraffic":
         payload = json.loads(msg.payload)
         try:

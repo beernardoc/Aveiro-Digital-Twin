@@ -20,6 +20,7 @@ aniso8601==9.0.1
 bidict==0.23.1
 blinker==1.7.0
 builtin-interfaces==1.2.1
+carla==0.9.15
 certifi==2024.2.2
 click==8.1.7
 composition-interfaces==1.2.1
@@ -57,6 +58,7 @@ launch-xml==1.0.5
 launch-yaml==1.0.5
 lifecycle-msgs==1.2.1
 logging-demo==0.20.3
+lxml==5.2.1
 map-msgs==2.1.0
 MarkupSafe==2.1.5
 message-filters==4.3.3
