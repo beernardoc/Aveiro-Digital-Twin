@@ -13,15 +13,8 @@ const Run2D = () => {
     }
 
     return (
-        <div>
-
-            <div className="mt-7 container mx-auto px-4 py-8 flex items-center justify-center">
-
+        <div >
                 <Run2D_form/>
-
-            </div>
-
-
         </div>
 
 

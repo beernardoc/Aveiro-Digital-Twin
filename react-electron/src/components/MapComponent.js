@@ -130,11 +130,11 @@ const MapComponent = () => {
                 <MapEventsHandler handleMapClick={handleMapClick} />
             </MapContainer>
             <div className="mt-5">
-                <button className="mr-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                <button className="btn-clear rounded"
                         onClick={handleRemoveMarkers}>Clear markers
                 </button>
                 <button
-                    className="ml-2 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                    className="btn-add-car rounded"
                     data-tooltip-id="Firsttooltip"
                     data-tooltip-content="You need to select at least one initial position"
                     data-tooltip-place="bottom"

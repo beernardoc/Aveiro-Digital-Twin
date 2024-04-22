@@ -59,7 +59,7 @@ const Run2D_form = () => {
                         </div>
                         <div className="text-center">
                             <button type="submit"
-                                    className="px-6 py-3 bg-green-500 text-white font-bold rounded-md hover:bg-green-600">Add random traffic
+                                    className="btn-2d-3d">Add random traffic
                             </button>
                         </div>
                     </form>
