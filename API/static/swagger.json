@@ -211,6 +211,264 @@
                     }
                 }
             }
+        },
+        "/api/login": {
+            "post": {
+              "description": "Login to the system",
+              "produces": ["application/json"],
+              "parameters": [
+                {
+                  "name": "Login",
+                  "in": "body",
+                  "description": "User credentials for login",
+                  "required": true,
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "email": {
+                        "type": "string"
+                      },
+                      "password": {
+                        "type": "string"
+                      }
+                    },
+                    "required": ["email", "password"]
+                  }
+                }
+              ],
+              "responses": {
+                "200": {
+                  "description": "Login successful",
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "message": {
+                        "type": "string"
+                      },
+                      "username": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "401": {
+                  "description": "Incorrect password"
+                },
+                "404": {
+                  "description": "User not found"
+                }
+              }
+            }
+        },
+        "/api/run3D": {
+            "post": {
+              "description": "Start a 3D simulation",
+              "produces": ["application/json"],
+              "responses": {
+                "200": {
+                  "description": "Command executed successfully",
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "message": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "500": {
+                  "description": "Internal server error",
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "/api/run2D": {
+            "post": {
+              "description": "Start a 2D simulation",
+              "produces": ["application/json"],
+              "responses": {
+                "200": {
+                  "description": "Command started successfully",
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "message": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "500": {
+                  "description": "Internal server error",
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+        },
+        "/api/addRandomTraffic": {
+            "post": {
+              "description": "Add random traffic to the simulation",
+              "parameters": [
+                {
+                  "name": "qtd",
+                  "in": "query",
+                  "description": "Number of vehicles to add as random traffic",
+                  "required": true,
+                  "type": "integer",
+                  "minimum": 1
+                }
+              ],
+              "responses": {
+                "200": {
+                  "description": "Random traffic added successfully",
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "message": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "400": {
+                  "description": "Bad request, \"qtd\" parameter is required",
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "500": {
+                  "description": "Internal server error",
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+        },
+        "/api/addSimulatedCar": {
+            "post": {
+              "description": "Add a simulated car to the simulation",
+              "parameters": [
+                {
+                  "name": "Car Data",
+                  "in": "body",
+                  "description": "Data of the car to be added to the simulation",
+                  "required": true,
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "start": {
+                        "type": "object",
+                        "properties": {
+                          "lng": {
+                            "type": "string",
+                            "description": "Longitude of the starting point"
+                          },
+                          "lat": {
+                            "type": "string",
+                            "description": "Latitude of the starting point"
+                          }
+                        },
+                        "required": ["lng", "lat"]
+                      },
+                      "end": {
+                        "type": "object",
+                        "properties": {
+                          "lng": {
+                            "type": "string",
+                            "description": "Longitude of the ending point"
+                          },
+                          "lat": {
+                            "type": "string",
+                            "description": "Latitude of the ending point"
+                          }
+                        },
+                        "required": ["lng", "lat"]
+                      }
+                    },
+                    "required": ["start", "end"]
+                  }
+                }
+              ],
+              "responses": {
+                "200": {
+                  "description": "Simulated car added successfully",
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "message": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "500": {
+                  "description": "Internal server error",
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+        },
+        "/api/endSimulation": {
+            "post": {
+              "description": "End the simulation",
+              "responses": {
+                "200": {
+                  "description": "Simulation ended successfully",
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "message": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "500": {
+                  "description": "Internal server error",
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
         }
     }
 }
