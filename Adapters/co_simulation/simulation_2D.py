@@ -30,7 +30,7 @@ allVehicle = set()
 simulated_vehicles = {}
 
 net = sumolib.net.readNet(
-        "../Adapters/co_simulation/sumo_configuration/simple-map/aveiro.net.xml",
+        "../Adapters/co_simulation/sumo_configuration/simple-map/simple-map.net.xml",
         withInternal=True)  # Carrega a rede do SUMO atraves do sumolib para acesso estatico
 
 
@@ -152,53 +152,23 @@ def addSimulatedCar(received):
 
         Start = traci.simulation.convertRoad(float(logI), float(latI), isGeo=True, vClass="passenger")
         End = traci.simulation.convertRoad(float(logE), float(latE), isGeo=True, vClass="passenger")
-
         print("Start", Start)
         print("End", End)
-        ts = str(time.time_ns())
-        routeName = "route_simulated{}".format(ts)
+        route = traci.simulation.findRoute(Start[0], End[0], "vehicle.audi.a2")
 
-        # Store destination coordinates
-        destination_coordinates = (logE, latE)
-        
+        if route.edges:
+            ts = str(time.time_ns())
+            traci.route.add("route_simulated{}".format(ts), route.edges)
+            traci.vehicle.add(vehID="simulated{}".format(ts), routeID="route_simulated{}".format(ts),
+                              typeID="vehicle.audi.a2", depart=traci.simulation.getTime() + 2, departSpeed=0, departLane="best")
 
-        traci.route.add(routeName, [Start[0], End[0]])
-        routeEdges = traci.route.getEdges(
-            routeName)  # agora percorremos isso, e sempre que iniciar com : ou _ usamos o getOutgoingEdges para subsituir por um edge que começa ali
-        finalEdges = []
 
-        for edge in routeEdges:
-            if edge.startswith(":") or "_" in edge:
-                print("edge", edge)
-                outgoingEdges = net.getEdge(edge).getOutgoing()
-                print("outgoing", outgoingEdges)
+            x, y = net.convertLonLat2XY(logI, latI)
+            traci.vehicle.moveToXY("simulated{}".format(ts), Start[0], 0, x, y, keepRoute=1)
+        else:
+            return "Não foi possível encontrar uma rota válida"
 
-                for i in outgoingEdges:
-                    edgeIndex = routeEdges.index(edge)
-                    if edgeIndex == 0:
-                        finalEdges.append(str(i.getID()))
-                        break
-                    finalEdges.append(str(i.getID()))
-                    break
-            else:
-                finalEdges.append(str(edge))
 
-        finalRouteName = "route_simulated{}".format(str(time.time_ns()))
-        traci.route.add(finalRouteName, finalEdges)
-        traci.vehicle.add(vehID="simulated{}".format(finalRouteName), routeID=finalRouteName,
-                          typeID="vehicle.audi.a2", depart=traci.simulation.getTime() + 2, departSpeed=0,
-                          departLane="best")
-        print("Veículo adicionado com informações de início e fim", "simulated{}".format(ts))
-
-        # Store simulated vehicle ID and its destination coordinates
-        # simulated_vehicle_id = "simulated{}".format(finalRouteName)
-        # simulated_vehicles[simulated_vehicle_id] = destination_coordinates
-        # print("simulated_vehicles", simulated_vehicles)
-
-        # make the car move to XY
-        x, y = net.convertLonLat2XY(logI, latI)
-        traci.vehicle.moveToXY("simulated{}".format(finalRouteName), Start[0], 0, x, y, keepRoute=1)
-        print("moveToXY", "simulated{}".format(ts))
 
 
 
@@ -212,37 +182,22 @@ def addSimulatedCar(received):
 
         Start = traci.simulation.convertRoad(float(logI), float(latI), isGeo=True, vClass="passenger")
 
-        if Start[0].startswith(":") or "_" in Start[0]:
-            outgoingEdges = net.getEdge(Start[0]).getOutgoing()
-            nextEdge = next(iter(outgoingEdges)).getID()
 
+        route = traci.simulation.findRoute(Start[0], randomEdge, "vehicle.audi.a2")
+
+        if route.edges:
             ts = str(time.time_ns())
-            routeName = "route_simulated{}".format(ts)
-            traci.route.add(routeName, [nextEdge, randomEdge])
+            traci.route.add("route_simulated{}".format(ts), route.edges)
+            traci.vehicle.add(vehID="simulated{}".format(ts), routeID="route_simulated{}".format(ts),
+                              typeID="vehicle.audi.a2", depart=traci.simulation.getTime() + 2, departSpeed=0, departLane="best")
 
+
+            x, y = net.convertLonLat2XY(logI, latI)
+            traci.vehicle.moveToXY("simulated{}".format(ts), Start[0], 0, x, y, keepRoute=1)
 
         else:
-            ts = str(time.time_ns())
-            routeName = "route_simulated{}".format(ts)
-            traci.route.add(routeName, [Start[0], randomEdge])
+            return "Não foi possível encontrar uma rota válida"
 
-        print("edgees:", traci.route.getEdges(routeName))
-        # Store destination coordinates
-        destination_coordinates = randomEdge
-        traci.vehicle.add(vehID="simulated{}".format(ts), routeID=routeName,
-                          typeID="vehicle.audi.a2", depart=traci.simulation.getTime() + 5, departSpeed=0,
-                          departLane="best")
-
-        # make the car move to XY
-        x, y = net.convertLonLat2XY(logI, latI)
-        traci.vehicle.moveToXY("simulated{}".format(ts), Start[0], 0, x, y, keepRoute=1)
-        print("moveToXY", "simulated{}".format(ts))
-
-        # Store simulated vehicle ID and its destination coordinates
-        #simulated_vehicle_id = traci.vehicle.getIDList()[-1]
-        #simulated_vehicles[simulated_vehicle_id] = destination_coordinates
-
-        return "Veículo adicionado com informações de início"
 
     elif data.keys() == {"end"}:
         allowedEdges = [i.getID() for i in net.getEdges() if "driving" in i.getType()]
@@ -253,21 +208,20 @@ def addSimulatedCar(received):
 
         End = traci.simulation.convertRoad(float(logE), float(latE), isGeo=True, vClass="passenger")
 
-        print("End", End)
-        ts = str(time.time_ns())
-        traci.route.add("route_simulated{}".format(ts), [randomEdge, End[0]])
 
-        # Store destination coordinates
-        destination_coordinates = End
+        route = traci.simulation.findRoute(randomEdge, End[0], "vehicle.audi.a2")
 
-        traci.vehicle.add(vehID="simulated{}".format(ts), routeID="route_simulated{}".format(ts),
-                          typeID="vehicle.audi.a2", depart="now", departSpeed=0, departLane="best")
+        if route.edges:
+            ts = str(time.time_ns())
+            traci.route.add("route_simulated{}".format(ts), route.edges)
+            traci.vehicle.add(vehID="simulated{}".format(ts), routeID="route_simulated{}".format(ts),
+                              typeID="vehicle.audi.a2", depart=traci.simulation.getTime() + 2, departSpeed=0, departLane="best")
 
-        # Store simulated vehicle ID and its destination coordinates
-        simulated_vehicle_id = traci.vehicle.getIDList()[-1]
-        simulated_vehicles[simulated_vehicle_id] = destination_coordinates
+            x, y = net.convertLonLat2XY(logE, latE)
+            traci.vehicle.moveToXY("simulated{}".format(ts), randomEdge, 0, x, y, keepRoute=1)
 
-        return "Veículo adicionado com informações de fim"
+        else:
+            return "Não foi possível encontrar uma rota válida"
 
 
 def addRandomTraffic(QtdCars):
