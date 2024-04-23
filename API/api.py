@@ -274,12 +274,11 @@ def on_publish(client, userdata, mid):
 
 def on_message(client, userdata, msg):
     topic = msg.topic
-    print(topic)
-    print(msg.payload)
+
     if topic == '/cars':
         ## usar socketio para enviar a mensagem para o front
         socketio.emit('cars', msg.payload)
-        print('enviado')
+
 
 
 def start_mqtt_connection():
