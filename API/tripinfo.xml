@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- generated on 2024-04-22 17:03:51 by Eclipse SUMO GUI Version 1.19.0
+<!-- generated on 2024-04-23 00:34:48 by Eclipse SUMO GUI Version 1.12.0
 <configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/sumoConfiguration.xsd">
 
     <input>
@@ -13,7 +13,7 @@
     </output>
 
     <traci_server>
-        <remote-port value="39967"/>
+        <remote-port value="57281"/>
         <num-clients value="1"/>
     </traci_server>
 
@@ -26,4 +26,7 @@
 -->
 
 <tripinfos xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/tripinfo_file.xsd">
+    <tripinfo id="0" depart="3.00" departLane="-5134_1" departPos="3.81" departSpeed="0.00" departDelay="0.00" arrival="83.00" arrivalLane="-5287_1" arrivalPos="41.07" arrivalSpeed="14.55" duration="80.00" routeLength="1069.51" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="6.73" rerouteNo="0" devices="tripinfo_0" vType="vehicle.audi.a2" speedFactor="1.06" vaporized=""/>
+    <tripinfo id="simulatedroute_simulated1713828919875254618" depart="49.00" departLane="-4709_1" departPos="278.35" departSpeed="0.00" departDelay="-1.00" arrival="85.00" arrivalLane="-5073_1" arrivalPos="251.06" arrivalSpeed="14.70" duration="36.00" routeLength="414.63" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="6.50" rerouteNo="0" devices="tripinfo_simulatedroute_simulated1713828919875254618" vType="vehicle.audi.a2" speedFactor="1.06" vaporized=""/>
+    <tripinfo id="simulatedroute_simulated1713828933525762962" depart="71.00" departLane="-4709_1" departPos="278.35" departSpeed="0.00" departDelay="-1.00" arrival="110.00" arrivalLane="-5073_1" arrivalPos="251.06" arrivalSpeed="12.50" duration="39.00" routeLength="414.63" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="6.06" rerouteNo="0" devices="tripinfo_simulatedroute_simulated1713828933525762962" vType="vehicle.audi.a2" speedFactor="0.94" vaporized=""/>
 </tripinfos>
