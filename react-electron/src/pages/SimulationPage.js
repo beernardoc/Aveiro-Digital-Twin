@@ -8,6 +8,7 @@ import socketIOClient from 'socket.io-client';
 
 const SimulationPage = () => {
     const [message, setMessage] = useState('');
+    const [parsedMessage, setParsedMessage] = useState(null); // Adiciona um novo estado para armazenar o objeto parseado
 
     useEffect(() => {
         const socket = socketIOClient('http://localhost:5000'); 
@@ -19,15 +20,30 @@ const SimulationPage = () => {
             
             setMessage(decodedMessage);
             console.log('Mensagem recebida do servidor:', decodedMessage);
+
+            // Convertendo a string JSON em um objeto JavaScript
+            const parsed = JSON.parse(decodedMessage);
+            setParsedMessage(parsed);
         });
 
         return () => socket.disconnect();
     }, []);
 
+    // Verifica se a mensagem parseada está disponível antes de tentar acessar suas propriedades
     return (
         <div className="simulation-page-container">
             <div className="simulation-page">
-                <p>WebSocket Message: {message}</p>
+                {parsedMessage && (
+                    <>
+                        <h2>Time: {parsedMessage.time} segundos</h2>
+                        <h2>Quantity: {parsedMessage.vehicle && parsedMessage.vehicle.quantity}</h2>
+                        <div className="vehicle-cards">
+                            {parsedMessage.vehicle && parsedMessage.vehicle.ids && parsedMessage.vehicle.ids.map((id, index) => (
+                                <Card key={index} id={id} />
+                            ))}
+                        </div>
+                    </>
+                )}
             </div>
         </div>
     );
