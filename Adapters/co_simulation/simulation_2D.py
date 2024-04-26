@@ -303,7 +303,7 @@ def on_connect_real_data(client, userdata, flags, reason_code, properties):
     print("Connected with result code " + str(reason_code))
     # Subscribing in on_connect() means that if we lose the connection and
     # reconnect then subscriptions will be renewed.
-    client.subscribe("p35/jetson/radar-plus")  
+    #client.subscribe("p35/jetson/radar-plus")  
 
 
 def on_publish(client, userdata, mid):

@@ -15,7 +15,7 @@ trap cleanup SIGINT
 
 echo "Starting Carla..."
 bash ~/Desktop/CARLA_0.9.15/CarlaUE4.sh -windowed -ResX=800 -ResY=600 &
-sleep 5
+sleep 10
 echo "Carla is running"
 echo "Loading Map..."
 python3 ~/Desktop/CARLA_0.9.15/PythonAPI/util/config.py -x ~/Desktop/PI_Digital_Twin/Adapters/co_simulation/sumo_configuration/simple-map/aveiro.xodr &
