@@ -58,24 +58,23 @@ def run():
     sys.stdout.flush()
 
 
-# Function to check if vehicle has reached destination
 def checkDestination(vehicle_id, destination_coordinates):
     global simulated_vehicles
     # Check if vehicle is in the list of simulated vehicles and is still in the simulation
     if vehicle_id in simulated_vehicles and vehicle_id in traci.vehicle.getIDList():
         vehicle_position = traci.vehicle.getPosition(vehicle_id)
 
-        # Convert lon/lat to x/y of destination
-        x, y = net.convertLonLat2XY(destination_coordinates[0], destination_coordinates[1])
+        print("Vehicle {} position: {}".format(vehicle_id, vehicle_position))
+        print("Destination coordinates: {}".format(destination_coordinates))
 
         if vehicle_position is not None:
             distance_to_destination = traci.simulation.getDistance2D(float(vehicle_position[0]),
                                                                      float(vehicle_position[1]),
-                                                                     float(x),
-                                                                     float(y))
+                                                                     float(destination_coordinates[0]),
+                                                                     float(destination_coordinates[1]))
             
             print("Distance to destination: {}".format(distance_to_destination))
-            if distance_to_destination < 5:  # 5 meters from destination
+            if distance_to_destination < 6:  # 6 meters from destination (MUDAR COMO ACHARMOS MELHOR)
                 traci.vehicle.remove(vehicle_id)
                 simulated_vehicles.pop(vehicle_id, None)
                 print("Vehicle {} has reached its destination.".format(vehicle_id))
@@ -168,7 +167,8 @@ def addSimulatedCar(received):
             x, y = net.convertLonLat2XY(logI, latI)
 
             # Store destination
-            simulated_vehicles["simulated{}".format(ts)] = (logE, latE)
+            x1, y1 = net.convertLonLat2XY(logE, latE)
+            simulated_vehicles["simulated{}".format(ts)] = (x1, y1)
 
             traci.vehicle.moveToXY("simulated{}".format(ts), Start[0], 0, x, y, keepRoute=1)
         else:
@@ -199,11 +199,12 @@ def addSimulatedCar(received):
 
 
             x, y = net.convertLonLat2XY(logI, latI)
+            traci.vehicle.moveToXY("simulated{}".format(ts), Start[0], 0, x, y, keepRoute=1)
 
             # Store destination
-            simulated_vehicles["simulated{}".format(ts)] = (randomEdge[0], randomEdge[1])
-
-            traci.vehicle.moveToXY("simulated{}".format(ts), Start[0], 0, x, y, keepRoute=1)
+            edge = net.getEdge(randomEdge)
+            x1, y1 = edge.getShape()[0]
+            simulated_vehicles["simulated{}".format(ts)] = (x1, y1)
 
         else:
             return "Não foi possível encontrar uma rota válida"
@@ -227,12 +228,14 @@ def addSimulatedCar(received):
             traci.vehicle.add(vehID="simulated{}".format(ts), routeID="route_simulated{}".format(ts),
                               typeID="vehicle.audi.a2", depart=traci.simulation.getTime() + 2, departSpeed=0, departLane="best")
 
-            x, y = net.convertLonLat2XY(logE, latE)
+
+            edge = net.getEdge(randomEdge)
+            x, y = edge.getShape()[0]
+            traci.vehicle.moveToXY("simulated{}".format(ts), randomEdge, 0, x, y, keepRoute=1)
 
             # Store destination
-            simulated_vehicles["simulated{}".format(ts)] = (logE, latE)
-
-            traci.vehicle.moveToXY("simulated{}".format(ts), randomEdge, 0, x, y, keepRoute=1)
+            x1, y1 = net.convertLonLat2XY(logE, latE)
+            simulated_vehicles["simulated{}".format(ts)] = (x1, y1)
 
         else:
             return "Não foi possível encontrar uma rota válida"
