@@ -48,10 +48,11 @@ def run():
         data = {"vehicle": {"quantity": len(vehicles), "ids": vehicles, "types": vehicle_type}, "time": simulation_time}
         publish.single("/cars", payload=json.dumps(data), hostname="localhost", port=1883)
 
-        # if len(simulated_vehicles) > 0:
-        #     for vehicle_id in simulated_vehicles:
-        #         if vehicle_id in traci.vehicle.getIDList():
-        #             checkDestination(vehicle_id, simulated_vehicles[vehicle_id])
+        if len(simulated_vehicles) > 0:
+            for vehicle_id in list(simulated_vehicles.keys()):
+                if vehicle_id in traci.vehicle.getIDList():
+                    checkDestination(vehicle_id, simulated_vehicles[vehicle_id])
+
 
     traci.close()
     sys.stdout.flush()
@@ -156,6 +157,7 @@ def addSimulatedCar(received):
         print("End", End)
         route = traci.simulation.findRoute(Start[0], End[0], "vehicle.audi.a2")
 
+
         if route.edges:
             ts = str(time.time_ns())
             traci.route.add("route_simulated{}".format(ts), route.edges)
@@ -164,6 +166,10 @@ def addSimulatedCar(received):
 
 
             x, y = net.convertLonLat2XY(logI, latI)
+
+            # Store destination
+            simulated_vehicles["simulated{}".format(ts)] = (logE, latE)
+
             traci.vehicle.moveToXY("simulated{}".format(ts), Start[0], 0, x, y, keepRoute=1)
         else:
             return "Não foi possível encontrar uma rota válida"
@@ -193,6 +199,10 @@ def addSimulatedCar(received):
 
 
             x, y = net.convertLonLat2XY(logI, latI)
+
+            # Store destination
+            simulated_vehicles["simulated{}".format(ts)] = (randomEdge[0], randomEdge[1])
+
             traci.vehicle.moveToXY("simulated{}".format(ts), Start[0], 0, x, y, keepRoute=1)
 
         else:
@@ -218,6 +228,10 @@ def addSimulatedCar(received):
                               typeID="vehicle.audi.a2", depart=traci.simulation.getTime() + 2, departSpeed=0, departLane="best")
 
             x, y = net.convertLonLat2XY(logE, latE)
+
+            # Store destination
+            simulated_vehicles["simulated{}".format(ts)] = (logE, latE)
+
             traci.vehicle.moveToXY("simulated{}".format(ts), randomEdge, 0, x, y, keepRoute=1)
 
         else:
