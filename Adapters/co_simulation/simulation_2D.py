@@ -41,14 +41,6 @@ def run():
 
         traci.simulationStep()
         step += 1
-        ##################### test ############################
-        with open(roundabout_file_path, "r") as f:
-            data = json.load(f)
-            roundabout = data[0]
-            f.close()
-            for edge in roundabout["edges"]:
-                traci.edge.setMaxSpeed(edge, 0)
-            
 
         simulation_time = traci.simulation.getTime()
         vehicles = traci.vehicle.getIDList()
