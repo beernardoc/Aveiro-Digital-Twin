@@ -46,7 +46,7 @@ from modules.simulation_synchronization import SimulationSynchronization
 
 
 net = sumolib.net.readNet(
-    "../Adapters/co_simulation/sumo_configuration/simple-map/aveiro.net.xml",
+    "../Adapters/co_simulation/sumo_configuration/simple-map/simple-map.net.xml",
     withInternal=True)  # Carrega a rede do SUMO atraves do sumolib para acesso estatico
 
 
@@ -68,10 +68,17 @@ def synchronization_loop(args):
 
             synchronization.tick()
 
+
             end = time.time()
             elapsed = end - start
             if elapsed < args.step_length:
                 time.sleep(args.step_length - elapsed)
+
+
+            if len(simulated_vehicles) > 0:
+                for vehicle_id in list(simulated_vehicles.keys()):
+                    if vehicle_id in traci.vehicle.getIDList():
+                        checkDestination(vehicle_id, simulated_vehicles[vehicle_id])
 
     except KeyboardInterrupt:
         logging.info('Cancelled by user.')
@@ -103,16 +110,13 @@ def checkDestination(vehicle_id, destination_coordinates):
     if vehicle_id in simulated_vehicles and vehicle_id in traci.vehicle.getIDList():
         vehicle_position = traci.vehicle.getPosition(vehicle_id)
 
-        print("Vehicle {} position: {}".format(vehicle_id, vehicle_position))
-        print("Destination coordinates: {}".format(destination_coordinates))
-
         if vehicle_position is not None:
             distance_to_destination = traci.simulation.getDistance2D(float(vehicle_position[0]),
                                                                      float(vehicle_position[1]),
                                                                      float(destination_coordinates[0]),
                                                                      float(destination_coordinates[1]))
             
-            print("Distance to destination: {}".format(distance_to_destination))
+            print("{} - Distance to destination: {}".format(vehicle_id, distance_to_destination))
             if distance_to_destination < 6:  # 6 meters from destination (MUDAR COMO ACHARMOS MELHOR)
                 traci.vehicle.remove(vehicle_id)
                 simulated_vehicles.pop(vehicle_id, None)
@@ -458,10 +462,10 @@ if __name__ == "__main__":
     mqtt_thread.start()
 
 
-    realData_mqtt_client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
+    # realData_mqtt_client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
 
-    realData_mqtt_client.on_connect = on_connect_real_data
-    realData_mqtt_client.on_message = on_message
-    realData_mqtt_client.connect("atcll-data.nap.av.it.pt", 1884)
+    # realData_mqtt_client.on_connect = on_connect_real_data
+    # realData_mqtt_client.on_message = on_message
+    # realData_mqtt_client.connect("atcll-data.nap.av.it.pt", 1884)
 
-    realData_mqtt_client.loop_start()
+    # realData_mqtt_client.loop_start()

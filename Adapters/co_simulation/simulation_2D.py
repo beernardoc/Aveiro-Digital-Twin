@@ -48,10 +48,10 @@ def run():
         data = {"vehicle": {"quantity": len(vehicles), "ids": vehicles, "types": vehicle_type}, "time": simulation_time}
         publish.single("/cars", payload=json.dumps(data), hostname="localhost", port=1883)
 
-        if len(simulated_vehicles) > 0:
-            for vehicle_id in list(simulated_vehicles.keys()):
-                if vehicle_id in traci.vehicle.getIDList():
-                    checkDestination(vehicle_id, simulated_vehicles[vehicle_id])
+        # if len(simulated_vehicles) > 0:
+        #     for vehicle_id in list(simulated_vehicles.keys()):
+        #         if vehicle_id in traci.vehicle.getIDList():
+        #             checkDestination(vehicle_id, simulated_vehicles[vehicle_id])
 
 
     traci.close()
@@ -64,16 +64,13 @@ def checkDestination(vehicle_id, destination_coordinates):
     if vehicle_id in simulated_vehicles and vehicle_id in traci.vehicle.getIDList():
         vehicle_position = traci.vehicle.getPosition(vehicle_id)
 
-        print("Vehicle {} position: {}".format(vehicle_id, vehicle_position))
-        print("Destination coordinates: {}".format(destination_coordinates))
-
         if vehicle_position is not None:
             distance_to_destination = traci.simulation.getDistance2D(float(vehicle_position[0]),
                                                                      float(vehicle_position[1]),
                                                                      float(destination_coordinates[0]),
                                                                      float(destination_coordinates[1]))
             
-            print("Distance to destination: {}".format(distance_to_destination))
+            #print("{} - Distance to destination: {}".format(vehicle_id, distance_to_destination))
             if distance_to_destination < 6:  # 6 meters from destination (MUDAR COMO ACHARMOS MELHOR)
                 traci.vehicle.remove(vehicle_id)
                 simulated_vehicles.pop(vehicle_id, None)
