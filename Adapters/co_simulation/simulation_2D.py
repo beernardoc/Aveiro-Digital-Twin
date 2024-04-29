@@ -81,6 +81,9 @@ def checkDestination(vehicle_id, destination_coordinates):
     else:
         print("Vehicle {} not found in the list of simulated vehicles.".format(vehicle_id))
 
+def blockRoad(edgeID):
+    traci.edge.setMaxSpeed(edgeID, 0)
+
 
 def addOrUpdateRealCar(received):
     print("received", received)
@@ -317,6 +320,10 @@ def on_message(client, userdata, msg):
         print("Ending simulation...")
         endSimulation()
         print("Simulation ended")
+
+    if topic == "/blockRoad":
+        payload = json.loads(msg.payload)
+        blockRoad(payload["edgeID"])
 
 
 if __name__ == "__main__":

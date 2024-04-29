@@ -261,6 +261,15 @@ def cars():
         return jsonify({'error': str(e)}), 500
 
 
+@app.route('/api/blockRoad', methods=['POST'])
+def block_road():
+    try:
+        data = request.json
+        print("Dados recebidos:", data)
+        publish.single("/blockRoad", payload=json.dumps(data), hostname="localhost", port=1883)
+        return jsonify({'message': 'Bloqueio de estrada adicionado com sucesso'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 
 
