@@ -31,7 +31,7 @@ function App() {
   return (
     <Router>
       <div className="App">
-<Navbar />
+        <Navbar />
         <Routes>
           <Route path="/" element={<HomePage /> } />
           <Route path="/run2D" element={ <Run2D />} />
