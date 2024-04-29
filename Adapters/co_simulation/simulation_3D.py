@@ -46,7 +46,7 @@ from modules.simulation_synchronization import SimulationSynchronization
 
 
 net = sumolib.net.readNet(
-    "../Adapters/co_simulation/sumo_configuration/simple-map/aveiro.net.xml",
+    "../Adapters/co_simulation/sumo_configuration/simple-map/UA.net.xml",
     withInternal=True)  # Carrega a rede do SUMO atraves do sumolib para acesso estatico
 
 
@@ -68,10 +68,17 @@ def synchronization_loop(args):
 
             synchronization.tick()
 
+
             end = time.time()
             elapsed = end - start
             if elapsed < args.step_length:
                 time.sleep(args.step_length - elapsed)
+
+
+            # if len(simulated_vehicles) > 0:
+            #     for vehicle_id in list(simulated_vehicles.keys()):
+            #         if vehicle_id in traci.vehicle.getIDList():
+            #             checkDestination(vehicle_id, simulated_vehicles[vehicle_id])
 
     except KeyboardInterrupt:
         logging.info('Cancelled by user.')
@@ -103,16 +110,13 @@ def checkDestination(vehicle_id, destination_coordinates):
     if vehicle_id in simulated_vehicles and vehicle_id in traci.vehicle.getIDList():
         vehicle_position = traci.vehicle.getPosition(vehicle_id)
 
-        print("Vehicle {} position: {}".format(vehicle_id, vehicle_position))
-        print("Destination coordinates: {}".format(destination_coordinates))
-
         if vehicle_position is not None:
             distance_to_destination = traci.simulation.getDistance2D(float(vehicle_position[0]),
                                                                      float(vehicle_position[1]),
                                                                      float(destination_coordinates[0]),
                                                                      float(destination_coordinates[1]))
             
-            print("Distance to destination: {}".format(distance_to_destination))
+            print("{} - Distance to destination: {}".format(vehicle_id, distance_to_destination))
             if distance_to_destination < 6:  # 6 meters from destination (MUDAR COMO ACHARMOS MELHOR)
                 traci.vehicle.remove(vehicle_id)
                 simulated_vehicles.pop(vehicle_id, None)
@@ -243,59 +247,34 @@ def addSimulatedCar(received):
     data = json.loads(received.decode('utf-8'))
     print("data", data.keys())
 
+
     if data.keys() == {"start", "end"}:
         logI, latI = data["start"]["lng"], data["start"]["lat"]
         logE, latE = data["end"]["lng"], data["end"]["lat"]
 
-
         Start = traci.simulation.convertRoad(float(logI), float(latI), isGeo=True, vClass="passenger")
         End = traci.simulation.convertRoad(float(logE), float(latE), isGeo=True, vClass="passenger")
-
         print("Start", Start)
         print("End", End)
-        ts = str(time.time_ns())
-        routeName = "route_simulated{}".format(ts)
-
-        # Store destination
-        x1, y1 = net.convertLonLat2XY(logE, latE)
-        simulated_vehicles["simulated{}".format(ts)] = (x1, y1)
-
-        traci.route.add(routeName, [Start[0], End[0]])
-        routeEdges = traci.route.getEdges(routeName) # agora percorremos isso, e sempre que iniciar com : ou _ usamos o getOutgoingEdges para subsituir por um edge que começa ali
-        finalEdges = []
-
-        for edge in routeEdges:
-            if edge.startswith(":") or "_" in edge:
-                print("edge", edge)
-                outgoingEdges = net.getEdge(edge).getOutgoing()
-                print("outgoing", outgoingEdges)
-
-                for i in outgoingEdges:
-                    edgeIndex = routeEdges.index(edge)
-                    if edgeIndex == 0:
-                        finalEdges.append(str(i.getID()))
-                        break
-                    finalEdges.append(str(i.getID()))
-                    break
-            else:
-                finalEdges.append(str(edge))
+        route = traci.simulation.findRoute(Start[0], End[0], "vehicle.audi.a2")
 
 
-        finalRouteName = "route_simulated{}".format(str(time.time_ns()))
-        traci.route.add(finalRouteName, finalEdges)
-        traci.vehicle.add(vehID="simulated{}".format(finalRouteName), routeID=finalRouteName,
-                          typeID="vehicle.audi.a2", depart=traci.simulation.getTime() + 2, departSpeed=0, departLane="best")
-        print("Veículo adicionado com informações de início e fim", "simulated{}".format(ts))
+        if route.edges:
+            ts = str(time.time_ns())
+            traci.route.add("route_simulated{}".format(ts), route.edges)
+            traci.vehicle.add(vehID="simulated{}".format(ts), routeID="route_simulated{}".format(ts),
+                              typeID="vehicle.audi.a2", depart=traci.simulation.getTime() + 2, departSpeed=0, departLane="best")
 
-        # Store simulated vehicle ID and its destination coordinates
-       # simulated_vehicle_id = traci.vehicle.getIDList()[-1]
-       # simulated_vehicles[simulated_vehicle_id] = destination_coordinates
-       # print("simulated_vehicles", simulated_vehicles)
 
-        # make the car move to XY
-        x, y = net.convertLonLat2XY(logI, latI)
-        traci.vehicle.moveToXY("simulated{}".format(finalRouteName), Start[0], 0, x, y, keepRoute=1)
-        print("moveToXY", "simulated{}".format(ts))
+            x, y = net.convertLonLat2XY(logI, latI)
+
+            # Store destination
+            x1, y1 = net.convertLonLat2XY(logE, latE)
+            simulated_vehicles["simulated{}".format(ts)] = (x1, y1)
+
+            traci.vehicle.moveToXY("simulated{}".format(ts), Start[0], 0, x, y, keepRoute=1)
+        else:
+            return "Não foi possível encontrar uma rota válida"
 
 
 
@@ -309,36 +288,26 @@ def addSimulatedCar(received):
 
         Start = traci.simulation.convertRoad(float(logI), float(latI), isGeo=True, vClass="passenger")
 
-        if Start[0].startswith(":") or "_" in Start[0]:
-            outgoingEdges = net.getEdge(Start[0]).getOutgoing()
-            nextEdge = next(iter(outgoingEdges)).getID()
 
+        route = traci.simulation.findRoute(Start[0], randomEdge, "vehicle.audi.a2")
+
+        if route.edges:
             ts = str(time.time_ns())
-            routeName = "route_simulated{}".format(ts)
-            traci.route.add(routeName, [nextEdge, randomEdge])
+            traci.route.add("route_simulated{}".format(ts), route.edges)
+            traci.vehicle.add(vehID="simulated{}".format(ts), routeID="route_simulated{}".format(ts),
+                              typeID="vehicle.audi.a2", depart=traci.simulation.getTime() + 2, departSpeed=0, departLane="best")
 
+
+            x, y = net.convertLonLat2XY(logI, latI)
+            traci.vehicle.moveToXY("simulated{}".format(ts), Start[0], 0, x, y, keepRoute=1)
+
+            # Store destination
+            edge = net.getEdge(randomEdge)
+            x1, y1 = edge.getShape()[0]
+            simulated_vehicles["simulated{}".format(ts)] = (x1, y1)
 
         else:
-            ts = str(time.time_ns())
-            routeName = "route_simulated{}".format(ts)
-            traci.route.add(routeName, [Start[0], randomEdge])
-
-        print("edgees:", traci.route.getEdges(routeName))
-
-        traci.vehicle.add(vehID="simulated{}".format(ts), routeID=routeName,
-                              typeID="vehicle.audi.a2", depart=traci.simulation.getTime() + 5, departSpeed=0, departLane="best")
-
-        # make the car move to XY
-        x, y = net.convertLonLat2XY(logI, latI)
-        traci.vehicle.moveToXY("simulated{}".format(ts), Start[0], 0, x, y, keepRoute=1)
-        print("moveToXY", "simulated{}".format(ts))
-
-        # Store destination
-        edge = net.getEdge(randomEdge)
-        x1, y1 = edge.getShape()[0]
-        simulated_vehicles["simulated{}".format(ts)] = (x1, y1)
-        
-        return "Veículo adicionado com informações de início"
+            return "Não foi possível encontrar uma rota válida"
 
     elif data.keys() == {"end"}:
         allowedEdges = [i.getID() for i in net.getEdges() if "driving" in i.getType()]
@@ -493,10 +462,10 @@ if __name__ == "__main__":
     mqtt_thread.start()
 
 
-    realData_mqtt_client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
+    # realData_mqtt_client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
 
-    realData_mqtt_client.on_connect = on_connect_real_data
-    realData_mqtt_client.on_message = on_message
-    realData_mqtt_client.connect("atcll-data.nap.av.it.pt", 1884)
+    # realData_mqtt_client.on_connect = on_connect_real_data
+    # realData_mqtt_client.on_message = on_message
+    # realData_mqtt_client.connect("atcll-data.nap.av.it.pt", 1884)
 
-    realData_mqtt_client.loop_start()
+    # realData_mqtt_client.loop_start()

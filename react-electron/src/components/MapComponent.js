@@ -7,7 +7,7 @@ import {Tooltip} from "react-tooltip";
 import axios from 'axios';
 
 const initialMarkerIcon = new L.icon({
-    iconUrl: 'https://cdn0.iconfinder.com/data/icons/small-n-flat/24/678111-map-marker-512.png',
+    iconUrl: 'https://cdn4.iconfinder.com/data/icons/location-45/68/pin_map_start_route-256.png',
     iconSize: [25, 41],
     iconAnchor: [12, 41],
     popupAnchor: [1, -34],
@@ -15,7 +15,7 @@ const initialMarkerIcon = new L.icon({
 });
 
 const finalMarkerIcon = new L.icon({
-    iconUrl: 'https://cdn0.iconfinder.com/data/icons/small-n-flat/24/678111-map-marker-512.png',
+    iconUrl: 'https://cdn1.iconfinder.com/data/icons/location-outline/91/Location_05-512.png',
     iconSize: [25, 41],
     iconAnchor: [12, 41],
     popupAnchor: [1, -34],
@@ -27,6 +27,17 @@ const MapComponent = () => {
     const [initialPosition, setInitialPosition] = useState(null);
     const [finalPosition, setFinalPosition] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false); // Estado para controlar se o modal está aberto
+    const [markerStart, setMarkerStart] = useState(null);
+
+    const handleAddStart = () => {
+        setClickCount(0);
+        setMarkerStart(true);
+    }
+
+    const handleAddFinish = () => {
+        setClickCount(1);
+        setMarkerStart(false);
+    }
 
     const handleMapClick = (e) => {
         const { lat, lng } = e.latlng;
@@ -34,17 +45,14 @@ const MapComponent = () => {
 
         if (clickCount === 0) {
             setInitialPosition({ lat, lng });
-            setClickCount(1);
         } else {
             setFinalPosition({ lat, lng });
-            setClickCount(0);
         }
     };
 
     const handleRemoveMarkers = () => {
         setInitialPosition(null);
         setFinalPosition(null);
-        setClickCount(0);
     };
 
     const handleSubmit = () => {
@@ -131,7 +139,16 @@ const MapComponent = () => {
                 <MapEventsHandler handleMapClick={handleMapClick} />
             </MapContainer>
             <div className="mt-5">
+                <button className="btn-clear rounded" 
+                        style={{width: '150px', backgroundColor: markerStart ? 'green' : '#F47065'}} 
+                        onClick={handleAddStart}>Start Position
+                </button>
                 <button className="btn-clear rounded"
+                        style={{width: '150px', backgroundColor: markerStart ?  '#F47065' : 'green' }} 
+                        onClick={handleAddFinish}>Finish Position
+                </button>
+                <button className="btn-clear rounded"
+                        style={{marginLeft: '200px'}} 
                         onClick={handleRemoveMarkers}>Clear markers
                 </button>
                 <button
