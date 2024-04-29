@@ -46,7 +46,7 @@ from modules.simulation_synchronization import SimulationSynchronization
 
 
 net = sumolib.net.readNet(
-    "../Adapters/co_simulation/sumo_configuration/simple-map/simple-map.net.xml",
+    "../Adapters/co_simulation/sumo_configuration/simple-map/UA.net.xml",
     withInternal=True)  # Carrega a rede do SUMO atraves do sumolib para acesso estatico
 
 
@@ -75,10 +75,10 @@ def synchronization_loop(args):
                 time.sleep(args.step_length - elapsed)
 
 
-            if len(simulated_vehicles) > 0:
-                for vehicle_id in list(simulated_vehicles.keys()):
-                    if vehicle_id in traci.vehicle.getIDList():
-                        checkDestination(vehicle_id, simulated_vehicles[vehicle_id])
+            # if len(simulated_vehicles) > 0:
+            #     for vehicle_id in list(simulated_vehicles.keys()):
+            #         if vehicle_id in traci.vehicle.getIDList():
+            #             checkDestination(vehicle_id, simulated_vehicles[vehicle_id])
 
     except KeyboardInterrupt:
         logging.info('Cancelled by user.')

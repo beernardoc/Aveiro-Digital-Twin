@@ -30,7 +30,7 @@ allVehicle = set()
 simulated_vehicles = {}
 
 net = sumolib.net.readNet(
-        "../Adapters/co_simulation/sumo_configuration/simple-map/simple-map.net.xml",
+        "../Adapters/co_simulation/sumo_configuration/simple-map/UA.net.xml",
         withInternal=True)  # Carrega a rede do SUMO atraves do sumolib para acesso estatico
 
 
@@ -45,8 +45,8 @@ def run():
         vehicles = traci.vehicle.getIDList()
         vehicle_type = traci.vehicletype.getIDList()
 
-        data = {"vehicle": {"quantity": len(vehicles), "ids": vehicles, "types": vehicle_type}, "time": simulation_time}
-        publish.single("/cars", payload=json.dumps(data), hostname="localhost", port=1883)
+        #data = {"vehicle": {"quantity": len(vehicles), "ids": vehicles, "types": vehicle_type}, "time": simulation_time}
+        #publish.single("/cars", payload=json.dumps(data), hostname="localhost", port=1883)
 
         # if len(simulated_vehicles) > 0:
         #     for vehicle_id in list(simulated_vehicles.keys()):
@@ -329,8 +329,8 @@ if __name__ == "__main__":
     sumo_thread = threading.Thread(target=traci.start, args=[
         [sumoBinary, "-c", "../Adapters/co_simulation/sumo_configuration/simple-map/simple-map.sumocfg",
          "--tripinfo-output",
-         "tripinfo.xml",
-         "--quit-on-end"
+         "tripinfo.xml"
+         
          ]])
 
     # Simple sumo network

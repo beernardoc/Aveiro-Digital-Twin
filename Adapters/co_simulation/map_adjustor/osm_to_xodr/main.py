@@ -18,7 +18,7 @@ import numpy as np
 from pyproj import CRS, Transformer
 import xml.etree.ElementTree as ET
 
-osmPath = 'out.osm'
+osmPath = 'map-clean.osm'
 regionSpecificScaleFactor = 1.0
 
 
