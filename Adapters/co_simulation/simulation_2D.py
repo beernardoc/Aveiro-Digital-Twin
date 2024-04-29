@@ -13,7 +13,8 @@ import paho.mqtt.client as mqtt
 import paho.mqtt.publish as publish
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-file_path = os.path.join(os.path.dirname(__file__), "radar.json")
+radar_file_path = os.path.join(os.path.dirname(__file__), "radar.json")
+roundabout_file_path = os.path.join(os.path.dirname(__file__), "roundabout.json")
 from coord_distance import calculate_bearing
 
 
@@ -40,6 +41,14 @@ def run():
 
         traci.simulationStep()
         step += 1
+        ##################### test ############################
+        with open(roundabout_file_path, "r") as f:
+            data = json.load(f)
+            roundabout = data[0]
+            f.close()
+            for edge in roundabout["edges"]:
+                traci.edge.setMaxSpeed(edge, 0)
+            
 
         simulation_time = traci.simulation.getTime()
         vehicles = traci.vehicle.getIDList()
@@ -102,7 +111,7 @@ def addOrUpdateRealCar(received):
     else:  # Adiciona um novo veículo
         # if the heading is positive it is directed to the sensor, if it is negative it is directed away from the sensor
         # get the sensor information from radar.json
-        with open(file_path, "r") as f:
+        with open(radar_file_path, "r") as f:
             data = json.load(f)
             radar = data[1]
             # get the angle from the sensor to the vehicle
