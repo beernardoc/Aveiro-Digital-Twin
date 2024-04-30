@@ -12,6 +12,8 @@ import os
 import paho.mqtt.client as mqtt
 import paho.mqtt.publish as publish
 
+import multiprocessing
+
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 file_path = os.path.join(os.path.dirname(__file__), "radar.json")
 from coord_distance import calculate_bearing
@@ -28,6 +30,9 @@ def get_options():
 global step
 allVehicle = set()
 simulated_vehicles = {}
+
+randomVehiclesThread = None
+end_addRandomTraffic = False
 
 net = sumolib.net.readNet(
         "../Adapters/co_simulation/sumo_configuration/simple-map/UA.net.xml",
@@ -79,6 +84,7 @@ def checkDestination(vehicle_id, destination_coordinates):
         print("Vehicle {} not found in the list of simulated vehicles.".format(vehicle_id))
 
 def clearSimulation():
+    time.sleep(3)
     vehicles = traci.vehicle.getIDList()
     for vehicle in vehicles:
         traci.vehicle.remove(vehicle)
@@ -245,10 +251,13 @@ def addSimulatedCar(received):
 
 def addRandomTraffic(QtdCars):
     allowedEdges = [i.getID() for i in net.getEdges() if "driving" in i.getType()]
+    print("allowedEdges", allowedEdges)
     types = traci.vehicletype.getIDList()
     if len(allowedEdges) != 0:
-
         for count in range(QtdCars):
+            global end_addRandomTraffic
+            if end_addRandomTraffic:
+                break
             routeID = "route_{}".format(time.time_ns())
             vehicle_id = "random_{}".format(time.time_ns())
             typeID = random.choice(types)
@@ -259,9 +268,6 @@ def addRandomTraffic(QtdCars):
                 traci.route.add(routeID, route.edges)
                 traci.vehicle.add(vehicle_id, routeID, typeID, depart="now", departSpeed=0,
                                   departLane="best", )
-
-    def decodeRealData(data):
-        return json.loads(data.decode('utf-8'))
 
 
 def endSimulation():
@@ -306,7 +312,10 @@ def on_message(client, userdata, msg):
     if topic == "/addRandomTraffic":
         payload = json.loads(msg.payload)
         try:
-            addRandomTraffic(int(payload))
+            # create a new thread to add random traffic
+            global randomVehiclesThread
+            randomVehiclesThread = threading.Thread(target=addRandomTraffic, args=[int(payload)])
+            randomVehiclesThread.start()
         except Exception as e:
             print(e)
     if topic == "/addSimulatedCar":
@@ -317,8 +326,14 @@ def on_message(client, userdata, msg):
 
     if topic == "/clearSimulation":
         print("Clearing simulation...")
+        # stop the thread that adds random traffic
+        global end_addRandomTraffic
+        end_addRandomTraffic = True
+        if randomVehiclesThread is not None:
+            randomVehiclesThread.join()
         clearSimulation()
         print("Simulation cleared")
+        end_addRandomTraffic = False
 
     if topic == "/endSimulation":
         print("Ending simulation...")
@@ -349,7 +364,7 @@ if __name__ == "__main__":
     # Executa a função run (controle do SUMO) após o início do SUMO
     sumo_thread.join()  # Aguarda até que o SUMO esteja pronto
 
-     # Inicia a conexão MQTT
+    # Inicia a conexão MQTT
     mqtt_client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1)
     mqtt_client.on_connect = on_connect
     mqtt_client.on_publish = on_publish
