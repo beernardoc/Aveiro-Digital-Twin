@@ -84,8 +84,14 @@ def checkDestination(vehicle_id, destination_coordinates):
     else:
         print("Vehicle {} not found in the list of simulated vehicles.".format(vehicle_id))
 
-def blockRoad(edgeID):
-    traci.edge.setMaxSpeed(edgeID, 0)
+def blockRoundabout(roundabout_id):
+    with open(roundabout_file_path, "r") as f:
+        data = json.load(f)
+        roundabout = data[roundabout_id - 1]
+        f.close()
+
+    for edge in roundabout["edges"]:
+        traci.edge.setMaxSpeed(edge, 0)
 
 def clearSimulation():
     time.sleep(3)
@@ -344,9 +350,9 @@ def on_message(client, userdata, msg):
         endSimulation()
         print("Simulation ended")
 
-    if topic == "/blockRoad":
+    if topic == "/blockRoundabout":
         payload = json.loads(msg.payload)
-        blockRoad(payload["edgeID"])
+        blockRoundabout(int(payload))
 
 if __name__ == "__main__":
     options = get_options()
@@ -383,6 +389,7 @@ if __name__ == "__main__":
     mqtt_client.subscribe("/addSimulatedCar")
     mqtt_client.subscribe("/endSimulation")
     mqtt_client.subscribe("/clearSimulation")
+    mqtt_client.subscribe("/blockRoundabout")
 
     mqtt_thread = threading.Thread(target=mqtt_client.loop_start)
     mqtt_thread.start()

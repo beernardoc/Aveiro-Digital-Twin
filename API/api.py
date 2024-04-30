@@ -270,15 +270,19 @@ def clear_simulation():
     
     # curl -X GET "http://localhost:5000/api/clearSimulation"
 
-@app.route('/api/blockRoad', methods=['POST'])
-def block_road():
+@app.route('/api/blockRoundabout', methods=['POST'])
+def block_roundabout():
+    roundabout_id = request.args.get('id')
+    if roundabout_id is None:
+        return jsonify({'error': 'Parâmetro "id" é obrigatório na URL'}), 400
+    
     try:
-        data = request.json
-        print("Dados recebidos:", data)
-        publish.single("/blockRoad", payload=json.dumps(data), hostname="localhost", port=1883)
-        return jsonify({'message': 'Bloqueio de estrada adicionado com sucesso'}), 200
+        publish.single("/blockRoundabout", payload=roundabout_id, hostname="localhost", port=1883)
+        return jsonify({'message': f'Rotunda {roundabout_id} bloqueada'}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+    
+    # curl -X POST -d "" "http://localhost:5000/api/blockRoundabout?id=1"
 
 
 

@@ -42,6 +42,7 @@ function App() {
           <Route path="/simulation" element={<><Sidebar /> <SimulationPage /></>} />
           <Route path="/addRandom" element={<><Sidebar /> <AddRandom /></>} />
           <Route path="/clear" element={ <><Sidebar /> <ClearSimulation /></> }></Route>
+          <Route path="/block" element={<><Sidebar /> <h1>Block</h1></>} />
         </Routes>
       </div>
     </Router>
