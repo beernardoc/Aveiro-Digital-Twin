@@ -260,6 +260,15 @@ def cars():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/clearSimulation', methods=['GET'])
+def clear_simulation():
+    try:
+        publish.single("/clearSimulation", payload="", hostname="localhost", port=1883)
+        return jsonify({'message': 'Simulação finalizada com sucesso'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    
+    # curl -X GET "http://localhost:5000/api/clearSimulation"
 
 
 

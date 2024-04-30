@@ -78,6 +78,11 @@ def checkDestination(vehicle_id, destination_coordinates):
     else:
         print("Vehicle {} not found in the list of simulated vehicles.".format(vehicle_id))
 
+def clearSimulation():
+    vehicles = traci.vehicle.getIDList()
+    for vehicle in vehicles:
+        traci.vehicle.remove(vehicle)
+
 
 def addOrUpdateRealCar(received):
     print("received", received)
@@ -310,11 +315,15 @@ def on_message(client, userdata, msg):
         payload = msg.payload
         addSimulatedCar(payload)
 
+    if topic == "/clearSimulation":
+        print("Clearing simulation...")
+        clearSimulation()
+        print("Simulation cleared")
+
     if topic == "/endSimulation":
         print("Ending simulation...")
         endSimulation()
         print("Simulation ended")
-
 
 if __name__ == "__main__":
     options = get_options()
@@ -350,6 +359,7 @@ if __name__ == "__main__":
     mqtt_client.subscribe("/addRandomTraffic")
     mqtt_client.subscribe("/addSimulatedCar")
     mqtt_client.subscribe("/endSimulation")
+    mqtt_client.subscribe("/clearSimulation")
 
     mqtt_thread = threading.Thread(target=mqtt_client.loop_start)
     mqtt_thread.start()
