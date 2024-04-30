@@ -58,7 +58,7 @@ function Sidebar() {
             </div>
             <h2>Autonomous Vehicle</h2>
           </div>
-          <Link to="/car">
+          <Link to="/clear">
             <div className="card">
               <div className="card-icon">
                 <FontAwesomeIcon icon="broom" size="2x" />
