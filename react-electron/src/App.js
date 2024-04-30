@@ -11,6 +11,7 @@ import HomePage from "./pages/HomePage";
 import Run2D from "./pages/Run2DPage";
 import AddRandom from "./pages/AddRandom";
 import Run3DPage from './pages/Run3DPage';
+import ClearSimulation from './pages/ClearSimulation';
 
 const api = "http://localhost:5000/api";
 
@@ -31,7 +32,7 @@ function App() {
   return (
     <Router>
       <div className="App">
-<Navbar />
+        <Navbar />
         <Routes>
           <Route path="/" element={<HomePage /> } />
           <Route path="/run2D" element={ <Run2D />} />
@@ -40,6 +41,7 @@ function App() {
           <Route path="/button" element={<><Sidebar /> <button onClick={runPythonScript}>RUN</button></>} />
           <Route path="/simulation" element={<><Sidebar /> <SimulationPage /></>} />
           <Route path="/addRandom" element={<><Sidebar /> <AddRandom /></>} />
+          <Route path="/clear" element={ <><Sidebar /> <ClearSimulation /></> }></Route>
         </Routes>
       </div>
     </Router>

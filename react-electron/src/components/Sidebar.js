@@ -2,14 +2,14 @@
 
 import React from 'react';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faRandom, faRobot, faCar, faMotorcycle, faBicycle, faPersonWalking } from '@fortawesome/free-solid-svg-icons';
+import { faRandom, faRobot, faCar, faMotorcycle, faBicycle, faPersonWalking, faBroom } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from 'react-router-dom';
 import './Sidebar.css';
 import { Tooltip } from 'react-tooltip';
 
 
-library.add(faRandom, faRobot, faCar, faMotorcycle, faBicycle, faPersonWalking);
+library.add(faRandom, faRobot, faCar, faMotorcycle, faBicycle, faPersonWalking, faBroom);
 function Sidebar() {
  return (
     <div className="sidebar">
@@ -58,6 +58,14 @@ function Sidebar() {
             </div>
             <h2>Autonomous Vehicle</h2>
           </div>
+          <Link to="/clear">
+            <div className="card">
+              <div className="card-icon">
+                <FontAwesomeIcon icon="broom" size="2x" />
+              </div>
+              <h2>Clear Simulation</h2>
+            </div>
+          </Link>
         </div>
       </div>
       <Tooltip id="Firsttooltip"/>
