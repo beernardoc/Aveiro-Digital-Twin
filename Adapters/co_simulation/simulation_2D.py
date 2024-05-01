@@ -31,6 +31,7 @@ def get_options():
 global step
 allVehicle = set()
 simulated_vehicles = {}
+blocked_roundabouts = {}
 
 randomVehiclesThread = None
 end_addRandomTraffic = False
@@ -53,6 +54,10 @@ def run():
 
         data = {"vehicle": {"quantity": len(vehicles), "ids": vehicles, "types": vehicle_type}, "time": simulation_time}
         publish.single("/cars", payload=json.dumps(data), hostname="localhost", port=1883)
+
+        global blocked_roundabouts
+        data = {"blocked_roundabouts": blocked_roundabouts}
+        publish.single("/blocked_rounds", payload=json.dumps(data), hostname="localhost", port=1883)
 
         # if len(simulated_vehicles) > 0:
         #     for vehicle_id in list(simulated_vehicles.keys()):
@@ -90,7 +95,17 @@ def blockRoundabout(roundabout_id):
         roundabout = data[roundabout_id - 1]
         f.close()
 
+    global blocked_roundabouts
+    blocked_roundabouts[roundabout_id] = {}
+
     for edge in roundabout["edges"]:
+        all_lane_ids = traci.lane.getIDList()
+        lanes = [lane for lane in all_lane_ids if lane.startswith(str(edge) + "_")]
+        max_speed = 0
+        for lane in lanes:
+            if max_speed < traci.lane.getMaxSpeed(lane):
+                max_speed = traci.lane.getMaxSpeed(lane)
+        blocked_roundabouts[roundabout_id][edge] = max_speed
         traci.edge.setMaxSpeed(edge, 0)
 
 def clearSimulation():

@@ -1,13 +1,36 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './BlockRoundabout.css';
 import map from '../asset/map/roundabouts_map.png';
 import axios from 'axios';
+import socketIOClient from 'socket.io-client';
 
 export default function BlockRoundabout() {
+    const [message, setMessage] = useState('');
+    const [blockedRoundabouts, setBlockedRoundabouts] = useState(null); // Adiciona um novo estado para armazenar o objeto parseado
+
     const [showModal, setShowModal] = useState(false); // State to manage modal visibility
     const [showClearModal, setShowClearModal] = useState(false);
     const [roundabout, setRoundabout] = useState(""); // State to manage selected roundabout [1, 2, 3, 4]
-    const [blockedRoundabouts, setBlockedRoundabouts] = useState([]); // State to manage blocked roundabouts
+
+    useEffect(() => {
+        const socket = socketIOClient('http://localhost:5000'); 
+
+        socket.on('blocked_roundabouts', (data) => {
+            // Convert the ArrayBuffer message to a string
+            const decoder = new TextDecoder();
+            const decodedMessage = decoder.decode(data);
+            
+            setMessage(decodedMessage);
+
+            // Convert the JSON string to a JavaScript object
+            const parsed = JSON.parse(decodedMessage);
+            // it is a map, get the keys and convert to an array
+            const blocked_roundabouts = Object.keys(parsed.blocked_roundabouts)
+            setBlockedRoundabouts(blocked_roundabouts);
+        });
+
+        return () => socket.disconnect();
+    }, []);
 
     // Function to handle opening the modal
     const handleShow = (id) => {
@@ -38,8 +61,6 @@ export default function BlockRoundabout() {
             console.log(res.data);
         });
 
-
-        setBlockedRoundabouts([...blockedRoundabouts, roundabout]);
         handleClose();
     }
 
@@ -71,8 +92,7 @@ export default function BlockRoundabout() {
                         <span className="close" onClick={handleClose}>&times;</span>
                         <p> Block Roundabout {roundabout}?</p>
                         <div className="modal-buttons">
-                            <button className="modal-button-block" style={{ marginRight: "20px" }} onClick={block_roundabout}>Yes</button>
-                            <button className="modal-button-unblock" onClick={handleClose}>No</button>
+                            <button className="modal-button-block" style={{ marginRight: "20px" }} onClick={block_roundabout}>Block</button>
                         </div>
                     </div>
                 </div>

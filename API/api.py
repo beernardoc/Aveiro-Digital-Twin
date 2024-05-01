@@ -42,6 +42,7 @@ process2d = None
 processCarla = None
 
 number_of_vehicles = 0
+blocked_roundabouts = []
 
 @app.route('/api')
 def api():
@@ -163,6 +164,8 @@ def run_2D():
     try:
         global process2d
         process2d = subprocess.Popen(["python3", "../Adapters/co_simulation/simulation_2D.py"])
+        global blocked_roundabouts
+        blocked_roundabouts = []
         return jsonify({'message': 'Comando iniciado com sucesso'}), 200
     except subprocess.CalledProcessError as e:
         return jsonify({'error': e}), 500
@@ -292,6 +295,12 @@ def get_vehicles():
 
     # curl -X GET "http://localhost:5000/api/vehicles"
 
+@app.route('/api/blockedRoundabouts', methods=['GET'])
+def get_blocked_roundabouts():
+    return jsonify({'blocked_roundabouts': blocked_roundabouts})
+
+    # curl -X GET "http://localhost:5000/api/blockedRoundabouts"
+
 def on_connect(client, userdata, flags, rc):
     print(f"Conectado ao broker com código de resultado {rc}")
 
@@ -310,7 +319,13 @@ def on_message(client, userdata, msg):
         global number_of_vehicles
         number_of_vehicles = int(vehicle_data['vehicle']['quantity'])
 
-
+    if topic == '/blocked_rounds':
+        socketio.emit('blocked_roundabouts', msg.payload)
+        blocked_roundabouts_data = json.loads(msg.payload)
+        global blocked_roundabouts
+        for roundabout in blocked_roundabouts_data['blocked_roundabouts'].keys():
+            if roundabout not in blocked_roundabouts:
+                blocked_roundabouts.append(roundabout)
 
 def start_mqtt_connection():
     # Inicia a conexão MQTT
@@ -320,6 +335,7 @@ def start_mqtt_connection():
     mqtt_client.on_message = on_message
     mqtt_client.connect("localhost", 1883, 60)
     mqtt_client.subscribe("/cars")
+    mqtt_client.subscribe("/blocked_rounds")
 
 
     mqtt_client.loop_forever()  # Use loop_forever() para manter a conexão MQTT em execução indefinidamente
