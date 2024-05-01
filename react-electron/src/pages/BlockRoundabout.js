@@ -11,6 +11,7 @@ export default function BlockRoundabout() {
 
     const [showModal, setShowModal] = useState(false); // State to manage modal visibility
     const [showClearModal, setShowClearModal] = useState(false);
+    const [showBlockedModal, setShowBlockedModal] = useState(false);
     const [roundabout, setRoundabout] = useState(""); // State to manage selected roundabout [1, 2, 3, 4]
 
     useEffect(() => {
@@ -42,7 +43,12 @@ export default function BlockRoundabout() {
                 setShowClearModal(true);
             } else {
                 setRoundabout(id);
+                if (blockedRoundabouts.includes(id)) {
+                    setShowBlockedModal(true);
+                }
+                else {
                 setShowModal(true);
+            }
             }
         });
     };
@@ -50,6 +56,7 @@ export default function BlockRoundabout() {
     // Function to handle closing the modal
     const handleClose = (id) => {
         setShowModal(false);
+        setShowBlockedModal(false);
         setShowClearModal(false);
     };
 
@@ -103,6 +110,19 @@ export default function BlockRoundabout() {
                         <p> Block Roundabout {roundabout}?</p>
                         <div className="modal-buttons">
                             <button className="modal-button-block" style={{ marginRight: "20px" }} onClick={block_roundabout}>Block</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Blocked Modal component */}
+            {showBlockedModal && (
+                <div className="modal">
+                    <div className="modal-content">
+                        <span className="close" onClick={handleClose}>&times;</span>
+                        <p> Unblock Roundabout {roundabout}?</p>
+                        <div className="modal-buttons">
+                            <button className="modal-button-unblock" style={{ marginRight: "20px" }} onClick={block_roundabout}>Unblock</button>
                         </div>
                     </div>
                 </div>
