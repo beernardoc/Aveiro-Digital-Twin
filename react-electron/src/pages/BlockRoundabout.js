@@ -3,6 +3,7 @@ import './BlockRoundabout.css';
 import map from '../asset/map/roundabouts_map.png';
 import axios from 'axios';
 import socketIOClient from 'socket.io-client';
+import Card from '../components/BlockedCard';
 
 export default function BlockRoundabout() {
     const [message, setMessage] = useState('');
@@ -81,6 +82,15 @@ export default function BlockRoundabout() {
                             <area shape="circle" coords="627,611,10" alt="Roundabout 3" style={{ cursor: "pointer" }} onClick={() => handleShow('3')} />
                             <area shape="circle" coords="915,415,10" alt="Roundabout 4" style={{ cursor: "pointer" }} onClick={() => handleShow('4')} />
                         </map>
+                    </div>
+
+                    <div className="blocked-roundabouts">
+                        <h2 style={{ color: "black", fontSize: "30px", marginTop: "20px" }}>Blocked Roundabouts</h2>
+                        {blockedRoundabouts && blockedRoundabouts.map((roundabout, index) => (
+                            <div key={index} className="blocked-roundabout">
+                                <Card id={roundabout} type="roundabout" />
+                            </div>
+                        ))}
                     </div>
                 </div>
             </div>
