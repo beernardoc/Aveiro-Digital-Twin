@@ -5,32 +5,42 @@ import axios from 'axios';
 
 export default function BlockRoundabout() {
     const [showModal, setShowModal] = useState(false); // State to manage modal visibility
+    const [showClearModal, setShowClearModal] = useState(false);
     const [roundabout, setRoundabout] = useState(""); // State to manage selected roundabout [1, 2, 3, 4]
     const [blockedRoundabouts, setBlockedRoundabouts] = useState([]); // State to manage blocked roundabouts
 
     // Function to handle opening the modal
     const handleShow = (id) => {
-        setRoundabout(id);
-        setShowModal(true);
+        axios.get(`http://localhost:5000/api/vehicles`)
+        .then(res => {
+            const number_of_vehicles = res.data.quantity;
+            if (number_of_vehicles > 0) {
+                setShowClearModal(true);
+            } else {
+                setRoundabout(id);
+                setShowModal(true);
+            }
+        });
     };
 
     // Function to handle closing the modal
     const handleClose = (id) => {
         setShowModal(false);
+        setShowClearModal(false);
     };
 
     // Function to block a roundabout
     const block_roundabout = () => {
         // Send a POST request to the server to block the selected roundabout
-        // example: curl -X POST -d "" "http://localhost:5000/api/blockRoundabout?id=4"
-        axios.post(`http://localhost:5000/api/blockRoundabout?id=${roundabout}`)
-        .then(res => {
-            console.log(res.data);
-        });
+
+        // axios.post(`http://localhost:5000/api/blockRoundabout?id=${roundabout}`)
+        // .then(res => {
+        //     console.log(res.data);
+        // });
 
 
-        setBlockedRoundabouts([...blockedRoundabouts, roundabout]);
-        handleClose();
+        // setBlockedRoundabouts([...blockedRoundabouts, roundabout]);
+        // handleClose();
     }
 
     return (
@@ -63,6 +73,19 @@ export default function BlockRoundabout() {
                         <div className="modal-buttons">
                             <button className="modal-button-block" style={{ marginRight: "20px" }} onClick={block_roundabout}>Yes</button>
                             <button className="modal-button-unblock" onClick={handleClose}>No</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Clear Modal component */}
+            {showClearModal && (
+                <div className="modal">
+                    <div className="modal-content">
+                        <span className="close" onClick={handleClose}>&times;</span>
+                        <p> In Order to Block a Roundabout, There Should not be any Vehicles in the Simulation. Please Clear the Simulation!</p>
+                        <div className="modal-buttons">
+                            <button className="modal-button-unblock" style={{ marginRight: "20px", width: "300px" }} onClick={() => {window.location.href = '/clear'}}>Go to the Clear Simulation Tab</button>
                         </div>
                     </div>
                 </div>

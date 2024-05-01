@@ -261,7 +261,6 @@ def addSimulatedCar(received):
 
 def addRandomTraffic(QtdCars):
     allowedEdges = [i.getID() for i in net.getEdges() if "driving" in i.getType()]
-    print("allowedEdges", allowedEdges)
     types = traci.vehicletype.getIDList()
     if len(allowedEdges) != 0:
         for count in range(QtdCars):
