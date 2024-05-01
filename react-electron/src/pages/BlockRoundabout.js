@@ -33,14 +33,14 @@ export default function BlockRoundabout() {
     const block_roundabout = () => {
         // Send a POST request to the server to block the selected roundabout
 
-        // axios.post(`http://localhost:5000/api/blockRoundabout?id=${roundabout}`)
-        // .then(res => {
-        //     console.log(res.data);
-        // });
+        axios.post(`http://localhost:5000/api/blockRoundabout?id=${roundabout}`)
+        .then(res => {
+            console.log(res.data);
+        });
 
 
-        // setBlockedRoundabouts([...blockedRoundabouts, roundabout]);
-        // handleClose();
+        setBlockedRoundabouts([...blockedRoundabouts, roundabout]);
+        handleClose();
     }
 
     return (
