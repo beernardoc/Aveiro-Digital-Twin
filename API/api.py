@@ -41,6 +41,8 @@ process3d = None
 process2d = None
 processCarla = None
 
+number_of_vehicles = 0
+
 @app.route('/api')
 def api():
     return jsonify({'data': 'Hello, World!'})
@@ -284,7 +286,11 @@ def block_roundabout():
     
     # curl -X POST -d "" "http://localhost:5000/api/blockRoundabout?id=1"
 
+@app.route('/api/vehicles', methods=['GET'])
+def get_vehicles():
+    return jsonify({'quantity': number_of_vehicles})
 
+    # curl -X GET "http://localhost:5000/api/vehicles"
 
 def on_connect(client, userdata, flags, rc):
     print(f"Conectado ao broker com código de resultado {rc}")
@@ -300,6 +306,9 @@ def on_message(client, userdata, msg):
     if topic == '/cars':
         ## usar socketio para enviar a mensagem para o front
         socketio.emit('cars', msg.payload)
+        vehicle_data = json.loads(msg.payload)
+        global number_of_vehicles
+        number_of_vehicles = int(vehicle_data['vehicle']['quantity'])
 
 
 
