@@ -1,0 +1,27 @@
+.roundabout-page-container {
+    display: flex;
+    height: 100vh;
+    position: relative;
+}
+
+.roundabout-page {
+    height: calc(100%- 90px);
+    flex: 3;
+    padding: 20px;
+    padding-top: 70px;
+    padding-left: 310px;
+    background-color: #d0daf0;
+    color: #ffffff;
+    width: 100%;
+}
+
+.roundabout-page-map {
+    /* center the map */
+    display: flex;
+    justify-content: center;
+}
+
+.roundabout-page-map img {
+    /* make the map not change size */
+    min-width: 1178px;
+}

@@ -12,6 +12,8 @@ import Run2D from "./pages/Run2DPage";
 import AddRandom from "./pages/AddRandom";
 import Run3DPage from './pages/Run3DPage';
 import ClearSimulation from './pages/ClearSimulation';
+import Block from './pages/Block';
+import BlockRoundabout from './pages/BlockRoundabout';
 
 const api = "http://localhost:5000/api";
 
@@ -42,7 +44,8 @@ function App() {
           <Route path="/simulation" element={<><Sidebar /> <SimulationPage /></>} />
           <Route path="/addRandom" element={<><Sidebar /> <AddRandom /></>} />
           <Route path="/clear" element={ <><Sidebar /> <ClearSimulation /></> }></Route>
-          <Route path="/block" element={<><Sidebar /> <h1>Block</h1></>} />
+          <Route path="/block" element={<><Sidebar /> <Block /> </>} />
+          <Route path="/block-roundabout" element={<><Sidebar /> <BlockRoundabout /> </>} />
         </Routes>
       </div>
     </Router>
