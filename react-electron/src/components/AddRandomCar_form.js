@@ -37,7 +37,7 @@ const Run2D_form = () => {
 
             <div className="container mx-auto px-4 py-8 flex items-center justify-center">
                 <div className="w-full max-w-lg bg-white bg-opacity-90 rounded-lg shadow-lg p-8">
-                    <form onSubmit={handleSubmit}>
+                    <form>
                         <div className="mb-4">
                             <label htmlFor="configFile" className="text-gray-500 block mb-1">How many cars do you want to add?</label>
                             <input
@@ -57,9 +57,9 @@ const Run2D_form = () => {
                             <p className="text-sm text-gray-500">You can see the vehicles in the SUMO interface.</p>
 
                         </div>
-                        <div className="text-center">
-                            <button type="submit"
-                                    className="btn-2d-3d">Add random traffic
+                        <div className="text-center button-container">
+                            <button onClick={handleSubmit}
+                                    >Add random traffic
                             </button>
                         </div>
                     </form>

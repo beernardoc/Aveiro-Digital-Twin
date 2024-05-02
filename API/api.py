@@ -180,6 +180,19 @@ def add_random_traffic():
 
     # curl -X POST -d "" "http://localhost:5000/api/addRandomTraffic?qtd=500"
 
+@app.route('/api/addRandomPedestrian', methods=['POST'])
+def add_random_pedestrian():
+    qtd = request.args.get('qtd')
+    if qtd is None:
+        return jsonify({'error': 'Parâmetro "qtd" é obrigatório na URL'}), 400
+
+    try:
+        publish.single("/addRandomPedestrian", payload=f'{qtd}', hostname="localhost", port=1883)
+        return jsonify({'message': f'Pedestres aleatórios adicionados para {qtd} pedestres'}), 200
+    except Exception as e:
+        return jsonify({'error': e}), 500
+
+    # curl -X POST -d "" "http://localhost:5000/api/addRandomTraffic?qtd=500"
 
 @app.route('/api/testaddRealCar', methods=['POST'])
 def test_add_real_car():

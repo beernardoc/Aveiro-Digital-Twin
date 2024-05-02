@@ -49,9 +49,10 @@ def run():
         simulation_time = traci.simulation.getTime()
         vehicles = traci.vehicle.getIDList()
         vehicle_type = traci.vehicletype.getIDList()
+        person = traci.person.getIDCount()
 
-        #data = {"vehicle": {"quantity": len(vehicles), "ids": vehicles, "types": vehicle_type}, "time": simulation_time}
-        #publish.single("/cars", payload=json.dumps(data), hostname="localhost", port=1883)
+        data = {"vehicle": {"quantity": len(vehicles), "ids": vehicles}, "person": person ,"simulation": {"time": simulation_time, "vehicles_types": vehicle_type}}
+        publish.single("/cars", payload=json.dumps(data), hostname="localhost", port=1883)
 
         # if len(simulated_vehicles) > 0:
         #     for vehicle_id in list(simulated_vehicles.keys()):
@@ -251,7 +252,6 @@ def addSimulatedCar(received):
 
 def addRandomTraffic(QtdCars):
     allowedEdges = [i.getID() for i in net.getEdges() if "driving" in i.getType()]
-    print("allowedEdges", allowedEdges)
     types = traci.vehicletype.getIDList()
     if len(allowedEdges) != 0:
         for count in range(QtdCars):
@@ -259,7 +259,7 @@ def addRandomTraffic(QtdCars):
             if end_addRandomTraffic:
                 break
             routeID = "route_{}".format(time.time_ns())
-            vehicle_id = "random_{}".format(time.time_ns())
+            vehicle_id = "randomCar_{}".format(time.time_ns())
             typeID = random.choice(types)
             if typeID == "DEFAULT_PEDTYPE":
                 typeID = "DEFAULT_VEHTYPE"
@@ -268,6 +268,32 @@ def addRandomTraffic(QtdCars):
                 traci.route.add(routeID, route.edges)
                 traci.vehicle.add(vehicle_id, routeID, typeID, depart="now", departSpeed=0,
                                   departLane="best", )
+
+
+def addRandomPedestrian(QtdPerson): #TODO: melhorar o findroute
+    allowedEdges = [net.getLane(lane).getEdge() for lane in traci.lane.getIDList() if net.getLane(lane).allows("pedestrian") and ":" not in lane and net.getLane(lane).getEdge().getLaneNumber() > 1]
+
+    for count in range(QtdPerson):
+
+        try:
+            person_id = "randomPedestrian_{}".format(time.time_ns())
+            start = random.choice(allowedEdges).getID()
+            end = random.choice(allowedEdges).getID()
+            route = traci.simulation.findRoute(start, end)
+            print(route.edges)
+            if route.edges:
+                traci.person.add(person_id, start, pos=0)
+                traci.person.appendWalkingStage(person_id, route.edges, arrivalPos=0)
+
+        except Exception as e:
+            print(e)
+            continue
+
+
+
+
+
+
 
 
 def endSimulation():
@@ -316,6 +342,16 @@ def on_message(client, userdata, msg):
             global randomVehiclesThread
             randomVehiclesThread = threading.Thread(target=addRandomTraffic, args=[int(payload)])
             randomVehiclesThread.start()
+        except Exception as e:
+            print(e)
+    if topic == "/addRandomPedestrian":
+        print("entrou", topic)
+        payload = json.loads(msg.payload)
+        try:
+            # create a new thread to add random traffic
+            global randomPedestriansThread
+            randomPedestriansThread = threading.Thread(target=addRandomPedestrian, args=[int(payload)])
+            randomPedestriansThread.start()
         except Exception as e:
             print(e)
     if topic == "/addSimulatedCar":
@@ -372,6 +408,7 @@ if __name__ == "__main__":
     mqtt_client.connect("localhost", 1883, 60)
     mqtt_client.subscribe("/realDatateste")
     mqtt_client.subscribe("/addRandomTraffic")
+    mqtt_client.subscribe("/addRandomPedestrian")
     mqtt_client.subscribe("/addSimulatedCar")
     mqtt_client.subscribe("/endSimulation")
     mqtt_client.subscribe("/clearSimulation")

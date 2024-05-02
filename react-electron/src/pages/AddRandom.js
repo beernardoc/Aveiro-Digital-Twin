@@ -1,7 +1,8 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import { Tooltip } from 'react-tooltip';
 import './AddRandom.css';
-import AddRandom_form from "../components/AddRandom_form";
+import AddRandomCar_form from "../components/AddRandomCar_form";
+import AddRandomPerson_form from "../components/AddRandomPerson_form";
 
 
 const AddRandom = () => {
@@ -11,6 +12,7 @@ const AddRandom = () => {
     const [finalCoordinates, setFinalCoordinates] = useState('');
     const [speed, setSpeed] = useState('');
     const [orientationAngle, setOrientationAngle] = useState('');
+    const [activeComponent, setActiveComponent] = useState('vehicle');
 
     const handleCancel = () => {
         window.location.href = '/';
@@ -20,18 +22,50 @@ const AddRandom = () => {
         window.location.href = '/';
     };
 
+    const handleComponentChange = (component) => {
+        setActiveComponent(component);
+    };
+
     return (
         <div className="random-page-container">
             <div className="random-page">
 
-                <AddRandom_form/>
+                <div className="button-container">
+                    <button
+                        className={activeComponent === 'vehicle' ? 'active' : ''}
+                        onClick={() => handleComponentChange('vehicle')}
+                    >
+                        Car
+                    </button>
+                    <button
+                        className={activeComponent === 'motorcycle' ? 'active' : ''}
+                        onClick={() => handleComponentChange('motorcycle')}
+                    >
+                        Motorcycle
+                    </button>
+                    <button
+                        className={activeComponent === 'bicycle' ? 'active' : ''}
+                        onClick={() => handleComponentChange('bicycle')}
+                    >
+                        bicycle
+                    </button>
+
+                    <button
+                        className={activeComponent === 'person' ? 'active' : ''}
+                        onClick={() => handleComponentChange('person')}
+                    >
+                        Person
+                    </button>
+
+                </div>
+
+                {activeComponent === 'vehicle' && <AddRandomCar_form/>}
+                {activeComponent === 'person' && <AddRandomPerson_form/>}
+                {/* Adicione mais componentes conforme necessário */}
 
             </div>
         </div>
     );
-
-
-
 };
 
 export default AddRandom;
