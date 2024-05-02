@@ -72,6 +72,17 @@ export default function BlockRoundabout() {
         handleClose();
     }
 
+    const unblock_roundabout = () => {
+        // Send a POST request to the server to unblock the selected roundabout
+
+        axios.post(`http://localhost:5000/api/unblockRoundabout?id=${roundabout}`)
+        .then(res => {
+            console.log(res.data);
+        });
+
+        handleClose();
+    }
+
     return (
         <>
             <div className="roundabout-page-container">
@@ -92,7 +103,7 @@ export default function BlockRoundabout() {
                     </div>
 
                     <div className="blocked-roundabouts">
-                        <h2 style={{ color: "black", fontSize: "30px", marginTop: "20px" }}>Blocked Roundabouts</h2>
+                        <h2 style={{ color: "black", fontSize: "30px", marginTop: "20px" }}>Blocked Roundabouts:</h2>
                         {blockedRoundabouts && blockedRoundabouts.map((roundabout, index) => (
                             <div key={index} className="blocked-roundabout">
                                 <Card id={roundabout} type="roundabout" />
@@ -122,7 +133,7 @@ export default function BlockRoundabout() {
                         <span className="close" onClick={handleClose}>&times;</span>
                         <p> Unblock Roundabout {roundabout}?</p>
                         <div className="modal-buttons">
-                            <button className="modal-button-unblock" style={{ marginRight: "20px" }} onClick={block_roundabout}>Unblock</button>
+                            <button className="modal-button-unblock" style={{ marginRight: "20px" }} onClick={unblock_roundabout}>Unblock</button>
                         </div>
                     </div>
                 </div>
