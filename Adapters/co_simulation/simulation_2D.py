@@ -365,6 +365,7 @@ def on_message(client, userdata, msg):
         clearSimulation()
         print("Simulation cleared")
         end_addRandomTraffic = False
+        clearSimulation()
 
     if topic == "/endSimulation":
         print("Ending simulation...")
