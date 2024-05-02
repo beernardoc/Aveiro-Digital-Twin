@@ -289,6 +289,20 @@ def block_roundabout():
     
     # curl -X POST -d "" "http://localhost:5000/api/blockRoundabout?id=1"
 
+@app.route('/api/unblockRoundabout', methods=['POST'])
+def unblock_roundabout():
+    roundabout_id = request.args.get('id')
+    if roundabout_id is None:
+        return jsonify({'error': 'Parâmetro "id" é obrigatório na URL'}), 400
+    
+    try:
+        publish.single("/unblockRoundabout", payload=roundabout_id, hostname="localhost", port=1883)
+        return jsonify({'message': f'Rotunda {roundabout_id} desbloqueada'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    
+    # curl -X POST -d "" "http://localhost:5000/api/unblockRoundabout?id=1"
+
 @app.route('/api/vehicles', methods=['GET'])
 def get_vehicles():
     return jsonify({'quantity': number_of_vehicles})

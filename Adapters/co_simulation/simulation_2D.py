@@ -108,6 +108,13 @@ def blockRoundabout(roundabout_id):
         blocked_roundabouts[roundabout_id][edge] = max_speed
         traci.edge.setMaxSpeed(edge, 0)
 
+def unblockRoundabout(roundabout_id):
+    global blocked_roundabouts
+    for edge, speed in blocked_roundabouts[roundabout_id].items():
+        traci.edge.setMaxSpeed(edge, speed)
+    
+    del blocked_roundabouts[roundabout_id]
+
 def clearSimulation():
     time.sleep(3)
     vehicles = traci.vehicle.getIDList()
@@ -368,6 +375,10 @@ def on_message(client, userdata, msg):
         payload = json.loads(msg.payload)
         blockRoundabout(int(payload))
 
+    if topic == "/unblockRoundabout":
+        payload = json.loads(msg.payload)
+        unblockRoundabout(int(payload))
+
 if __name__ == "__main__":
     options = get_options()
     if options.nogui:
@@ -404,6 +415,7 @@ if __name__ == "__main__":
     mqtt_client.subscribe("/endSimulation")
     mqtt_client.subscribe("/clearSimulation")
     mqtt_client.subscribe("/blockRoundabout")
+    mqtt_client.subscribe("/unblockRoundabout")
 
     mqtt_thread = threading.Thread(target=mqtt_client.loop_start)
     mqtt_thread.start()
