@@ -83,6 +83,18 @@ export default function BlockRoundabout() {
         handleClose();
     }
 
+    const handle_unblock_roundabout = (id) => {
+        setRoundabout(id);
+
+        axios.post(`http://localhost:5000/api/unblockRoundabout?id=${id}`)
+        .then(res => {
+            console.log(res.data);
+        });
+
+        handleClose();
+    }
+
+
     return (
         <>
             <div className="roundabout-page-container">
@@ -106,7 +118,7 @@ export default function BlockRoundabout() {
                         <h2 style={{ color: "black", fontSize: "30px", marginTop: "20px" }}>Blocked Roundabouts:</h2>
                         {blockedRoundabouts && blockedRoundabouts.map((roundabout, index) => (
                             <div key={index} className="blocked-roundabout">
-                                <Card id={roundabout} type="roundabout" />
+                                <Card id={roundabout} type="roundabout" handleClick={() => handle_unblock_roundabout(roundabout)} />
                             </div>
                         ))}
                     </div>

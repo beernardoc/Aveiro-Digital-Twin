@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowRotateLeft, faRoad, faTrash } from '@fortawesome/free-solid-svg-icons';
 import './BlockedCard.css';
 
-const Card = ({ id, type }) => {
+const Card = ({ id, type, handleClick }) => {
     switch (type) {
         case 'road':
             return (
@@ -13,7 +13,7 @@ const Card = ({ id, type }) => {
                     </div>
                     <h2>Road {id}</h2>
                     <div className="card-buttons-vehicle">
-                        <button>
+                        <button onClick={handleClick}>
                             <FontAwesomeIcon icon={faTrash} size="lg" /> Unblock
                         </button>
                     </div>
@@ -27,7 +27,7 @@ const Card = ({ id, type }) => {
                     </div>
                     <h2>Roundabout {id}</h2>
                     <div className="card-buttons-vehicle">
-                        <button>
+                        <button onClick={handleClick}>
                             <FontAwesomeIcon icon={faTrash} size="lg" /> Unblock
                         </button>
                     </div>
