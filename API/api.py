@@ -4,7 +4,7 @@ import json
 import os
 import signal
 import subprocess
-from flask import Flask, request, jsonify, Response
+from flask import Flask, request, jsonify, Response, make_response
 from flask_pymongo import PyMongo
 from bson import json_util
 from bson.objectid import ObjectId
@@ -14,6 +14,9 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_cors import CORS
 import flask_socketio as socketio
 from flask_swagger_ui import get_swaggerui_blueprint
+from flask_jwt_extended import decode_token, JWTManager, jwt_required, create_access_token, get_jwt_identity
+from werkzeug.security import check_password_hash
+from pymongo import MongoClient
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
@@ -21,9 +24,11 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 socketio = socketio.SocketIO(app, cors_allowed_origins="*")
 
 app.secret_key = 'myawesomesecretkey'
+app.config['JWT_SECRET_KEY'] = 'mysecretkey' 
 
 app.config['MONGO_URI'] = 'mongodb://localhost:27017/digitaltwin'
 mongo = PyMongo(app)
+jwt = JWTManager(app)
 
 SWAGGER_URL="/swagger"
 API_URL="/static/swagger.json"
@@ -72,66 +77,117 @@ def create_user():
         return not_found()
 
 
-@app.route('/users', methods=['GET'])
-def get_users():
-    users = mongo.db.users.find()
-    response = json_util.dumps(users)
-    return Response(response, mimetype="application/json")
+@app.route('/user', methods=['GET'])
+def get_user():
 
+    auth_header = request.headers.get('Authorization')
+    if not auth_header:
+        return jsonify({'message': 'Access Token is missing'}), 401
 
-@app.route('/users/<id>', methods=['GET'])
-def get_user(id):
-    print(id)
-    user = mongo.db.users.find_one({'_id': ObjectId(id), })
+    token = auth_header.split(' ')[1]
+    print(f"Token: {token}")
+    try:
+        decoded_token = decode_token(token)
+        print(f"Decoded Token: {decoded_token}")
+        email = decoded_token['sub']
+        print(f"Email: {email}")
+    except Exception as e:
+        return jsonify({'message': 'Invalid token'}), 401
+
+    user = mongo.db.users.find_one({'email': email})
+    if not user:
+        return jsonify({'message': 'User not found'}), 404
+
     response = json_util.dumps(user)
     return Response(response, mimetype="application/json")
 
 
 @app.route('/api/login', methods=['POST'])
 def login():
-    # Receiving Data
+
     email = request.json['email']
     password = request.json['password']
 
-    # Find the user by email
     user = mongo.db.users.find_one({'email': email})
 
-    # If user not found, return error
     if not user:
         return jsonify({'message': 'User not found'}), 404
 
-    # Check if the password is correct
     if not check_password_hash(user['password'], password):
         return jsonify({'message': 'Incorrect password'}), 401
 
-    # If everything is correct, return a success message
-    # In a real application, you would also return a token or session ID here
-    return jsonify({'message': 'Login successful', 'username': user['username']}), 200
+    access_token = create_access_token(identity=email)
+    print(f"Access Token: {access_token}")
+
+    response = make_response(jsonify({'message': 'Login successful', 'username': user['username'], 'token': access_token}), 200)
+    response.headers['Authorization'] = f'Bearer {access_token}'
+    return response
 
 
-@app.route('/users/<id>', methods=['DELETE'])
-def delete_user(id):
-    mongo.db.users.delete_one({'_id': ObjectId(id)})
-    response = jsonify({'message': 'User' + id + ' Deleted Successfully'})
+@app.route('/user', methods=['DELETE'])
+def delete_user():
+
+    auth_header = request.headers.get('Authorization')
+    if not auth_header:
+        return jsonify({'message': 'Access Token is missing'}), 401
+
+    token = auth_header.split(' ')[1]
+
+    try:
+        decoded_token = decode_token(token)
+        email = decoded_token['sub'] 
+    except Exception as e:
+        return jsonify({'message': 'Invalid token'}), 401
+
+    user = mongo.db.users.find_one({'email': email})
+    if not user:
+        return jsonify({'message': 'User not found'}), 404
+
+    mongo.db.users.delete_one({'_id': ObjectId(user['_id'])})
+    response = jsonify({'message': 'User ' + email + ' Deleted Successfully'})
     response.status_code = 200
     return response
 
 
-@app.route('/users/<_id>', methods=['PUT'])
-def update_user(_id):
+@app.route('/user', methods=['PUT'])
+def update_user():
+
     username = request.json['username']
     email = request.json['email']
-    password = request.json['password']
-    if username and email and password and _id:
-        hashed_password = generate_password_hash(password)
-        mongo.db.users.update_one(
-            {'_id': ObjectId(_id['$oid']) if '$oid' in _id else ObjectId(_id)},
-            {'$set': {'username': username, 'email': email, 'password': hashed_password}})
-        response = jsonify({'message': 'User' + _id + 'Updated Successfuly'})
-        response.status_code = 200
-        return response
-    else:
-        return not_found()
+
+    auth_header = request.headers.get('Authorization')
+    if not auth_header:
+        return jsonify({'message': 'Access Token is missing'}), 401
+
+    token = auth_header.split(' ')[1]
+    print(f"Token: {token}")
+
+    try:
+        decoded_token = decode_token(token)
+        print(f"Decoded Token: {decoded_token}")
+
+        email = decoded_token['sub'] 
+        print(f"Email: {email}")
+    except Exception as e:
+        return jsonify({'message': 'Invalid token'}), 401
+
+    user = mongo.db.users.find_one({'email': email})
+    print(f"User: {user}")
+    if not user:
+        return jsonify({'message': 'User not found'}), 404
+
+    update_data = {}
+    if username:
+        update_data['username'] = username
+    if email:
+        update_data['email'] = email
+
+    mongo.db.users.update_one(
+        {'email': email},
+        {'$set': update_data}
+    )
+
+    return jsonify({'message': 'User updated successfully'}), 200
 
 
 @app.errorhandler(404)
