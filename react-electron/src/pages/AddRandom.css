@@ -13,3 +13,34 @@
     background-color: #d0daf0;
     color: #ffffff;
 }
+
+/* AddRandom.css */
+
+.button-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.button-container button {
+    background-color: #008CBA;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition-duration: 0.4s;
+}
+
+.button-container button:hover {
+    background-color: #1C2548;
+}
+
+.button-container button.active {
+    background-color: #1C2548;
+}

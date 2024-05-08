@@ -3,7 +3,7 @@ import Card from '../components/VehicleCard';
 import { faRandom, faCar, faMotorcycle } from '@fortawesome/free-solid-svg-icons';
 import './SimulationPage.css';
 import Navbar from "../components/Navbar";
-import AddRandom_form from "../components/AddRandom_form";
+import AddRandom_form from "../components/AddRandomCar_form";
 import socketIOClient from 'socket.io-client';
 
 const SimulationPage = () => {
