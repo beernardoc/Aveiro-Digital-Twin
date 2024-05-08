@@ -35,30 +35,30 @@ randomVehiclesThread = None
 end_addRandomTraffic = False
 
 net = sumolib.net.readNet(
-        "../Adapters/co_simulation/sumo_configuration/simple-map/UA.net.xml",
-        withInternal=True)  # Carrega a rede do SUMO atraves do sumolib para acesso estatico
+    "../Adapters/co_simulation/sumo_configuration/simple-map/UA.net.xml",
+    withInternal=True)  # Carrega a rede do SUMO atraves do sumolib para acesso estatico
 
 
 def run():
     step = 0
     while True:
-
         traci.simulationStep()
         step += 1
 
         simulation_time = traci.simulation.getTime()
         vehicles = traci.vehicle.getIDList()
         vehicle_type = traci.vehicletype.getIDList()
-        person = traci.person.getIDCount()
+        person = traci.person.getIDList()
 
-        data = {"vehicle": {"quantity": len(vehicles), "ids": vehicles}, "person": person ,"simulation": {"time": simulation_time, "vehicles_types": vehicle_type}}
+        data = {"vehicle": {"quantity": len(vehicles), "ids": vehicles},
+                "person": {"quantity": len(person), "ids": person},
+                "simulation": {"time": simulation_time, "vehicles_types": vehicle_type}}
         publish.single("/cars", payload=json.dumps(data), hostname="localhost", port=1883)
 
         # if len(simulated_vehicles) > 0:
         #     for vehicle_id in list(simulated_vehicles.keys()):
         #         if vehicle_id in traci.vehicle.getIDList():
         #             checkDestination(vehicle_id, simulated_vehicles[vehicle_id])
-
 
     traci.close()
     sys.stdout.flush()
@@ -75,7 +75,7 @@ def checkDestination(vehicle_id, destination_coordinates):
                                                                      float(vehicle_position[1]),
                                                                      float(destination_coordinates[0]),
                                                                      float(destination_coordinates[1]))
-            
+
             #print("{} - Distance to destination: {}".format(vehicle_id, distance_to_destination))
             if distance_to_destination < 6:  # 6 meters from destination (MUDAR COMO ACHARMOS MELHOR)
                 traci.vehicle.remove(vehicle_id)
@@ -83,6 +83,7 @@ def checkDestination(vehicle_id, destination_coordinates):
                 print("Vehicle {} has reached its destination.".format(vehicle_id))
     else:
         print("Vehicle {} not found in the list of simulated vehicles.".format(vehicle_id))
+
 
 def clearSimulation():
     time.sleep(3)
@@ -141,7 +142,8 @@ def addOrUpdateRealCar(received):
             f.close()
 
         traci.route.add(routeID=("route_" + vehID), edges=route)  # adiciona uma rota para o veículo
-        traci.vehicle.add(vehID, routeID=("route_" + vehID), typeID="vehicle.audi.a2", depart=traci.simulation.getTime() + 1, departSpeed=0,
+        traci.vehicle.add(vehID, routeID=("route_" + vehID), typeID="vehicle.audi.a2",
+                          depart=traci.simulation.getTime() + 1, departSpeed=0,
                           departLane="best")
         traci.vehicle.moveToXY(vehID, route[0], 0, x, y,
                                keepRoute=1)  # se a proxima for a mesma, cluster ou de junção, move com moveTOXY
@@ -165,13 +167,12 @@ def addSimulatedCar(received):
         print("End", End)
         route = traci.simulation.findRoute(Start[0], End[0], "vehicle.audi.a2")
 
-
         if route.edges:
             ts = str(time.time_ns())
             traci.route.add("route_simulated{}".format(ts), route.edges)
             traci.vehicle.add(vehID="simulated{}".format(ts), routeID="route_simulated{}".format(ts),
-                              typeID="vehicle.audi.a2", depart=traci.simulation.getTime() + 2, departSpeed=0, departLane="best")
-
+                              typeID="vehicle.audi.a2", depart=traci.simulation.getTime() + 2, departSpeed=0,
+                              departLane="best")
 
             x, y = net.convertLonLat2XY(logI, latI)
 
@@ -197,15 +198,14 @@ def addSimulatedCar(received):
 
         Start = traci.simulation.convertRoad(float(logI), float(latI), isGeo=True, vClass="passenger")
 
-
         route = traci.simulation.findRoute(Start[0], randomEdge, "vehicle.audi.a2")
 
         if route.edges:
             ts = str(time.time_ns())
             traci.route.add("route_simulated{}".format(ts), route.edges)
             traci.vehicle.add(vehID="simulated{}".format(ts), routeID="route_simulated{}".format(ts),
-                              typeID="vehicle.audi.a2", depart=traci.simulation.getTime() + 2, departSpeed=0, departLane="best")
-
+                              typeID="vehicle.audi.a2", depart=traci.simulation.getTime() + 2, departSpeed=0,
+                              departLane="best")
 
             x, y = net.convertLonLat2XY(logI, latI)
             traci.vehicle.moveToXY("simulated{}".format(ts), Start[0], 0, x, y, keepRoute=1)
@@ -228,15 +228,14 @@ def addSimulatedCar(received):
 
         End = traci.simulation.convertRoad(float(logE), float(latE), isGeo=True, vClass="passenger")
 
-
         route = traci.simulation.findRoute(randomEdge, End[0], "vehicle.audi.a2")
 
         if route.edges:
             ts = str(time.time_ns())
             traci.route.add("route_simulated{}".format(ts), route.edges)
             traci.vehicle.add(vehID="simulated{}".format(ts), routeID="route_simulated{}".format(ts),
-                              typeID="vehicle.audi.a2", depart=traci.simulation.getTime() + 2, departSpeed=0, departLane="best")
-
+                              typeID="vehicle.audi.a2", depart=traci.simulation.getTime() + 2, departSpeed=0,
+                              departLane="best")
 
             edge = net.getEdge(randomEdge)
             x, y = edge.getShape()[0]
@@ -252,7 +251,7 @@ def addSimulatedCar(received):
 
 def addRandomTraffic(QtdCars):
     allowedEdges = [i.getID() for i in net.getEdges() if "driving" in i.getType()]
-    types = traci.vehicletype.getIDList()
+    #types = traci.vehicletype.getIDList()
     if len(allowedEdges) != 0:
         for count in range(QtdCars):
             global end_addRandomTraffic
@@ -260,18 +259,21 @@ def addRandomTraffic(QtdCars):
                 break
             routeID = "route_{}".format(time.time_ns())
             vehicle_id = "randomCar_{}".format(time.time_ns())
-            typeID = random.choice(types)
-            if typeID == "DEFAULT_PEDTYPE":
-                typeID = "DEFAULT_VEHTYPE"
-            route = traci.simulation.findRoute(random.choice(allowedEdges), random.choice(allowedEdges), typeID)
+            #typeID = random.choice(types)
+            #if typeID == "DEFAULT_PEDTYPE":
+            #    typeID = "DEFAULT_VEHTYPE"
+            route = traci.simulation.findRoute(random.choice(allowedEdges), random.choice(allowedEdges),
+                                               "vehicle.dodge.charger_police_2020")
             if route.edges:
                 traci.route.add(routeID, route.edges)
-                traci.vehicle.add(vehicle_id, routeID, typeID, depart="now", departSpeed=0,
+                traci.vehicle.add(vehicle_id, routeID, "vehicle.dodge.charger_police_2020", depart="now", departSpeed=0,
                                   departLane="best", )
 
 
-def addRandomPedestrian(QtdPerson): #TODO: melhorar o findroute
-    allowedEdges = [net.getLane(lane).getEdge() for lane in traci.lane.getIDList() if net.getLane(lane).allows("pedestrian") and ":" not in lane and net.getLane(lane).getEdge().getLaneNumber() > 1]
+def addRandomPedestrian(QtdPerson):  #TODO: melhorar o findroute
+    allowedEdges = [net.getLane(lane).getEdge() for lane in traci.lane.getIDList() if
+                    net.getLane(lane).allows("pedestrian") and ":" not in lane and net.getLane(
+                        lane).getEdge().getLaneNumber() > 1]
 
     for count in range(QtdPerson):
 
@@ -279,21 +281,29 @@ def addRandomPedestrian(QtdPerson): #TODO: melhorar o findroute
             person_id = "randomPedestrian_{}".format(time.time_ns())
             start = random.choice(allowedEdges).getID()
             end = random.choice(allowedEdges).getID()
-            route = traci.simulation.findRoute(start, end)
-            print(route.edges)
-            if route.edges:
+            #route = traci.simulation.findRoute(start, end)
+            route = traci.simulation.findIntermodalRoute(start, end, pType="DEFAULT_PEDTYPE")
+            print(route[0].edges)
+            if route[0].edges:
                 traci.person.add(person_id, start, pos=0)
-                traci.person.appendWalkingStage(person_id, route.edges, arrivalPos=0)
+                traci.person.appendWalkingStage(person_id, route[0].edges, arrivalPos=0)
 
         except Exception as e:
             print(e)
             continue
 
 
-
-
-
-
+def addSimulatedMotorcycle(QtdMotorcycle):
+    allowedEdges = [i.getID() for i in net.getEdges() if "driving" in i.getType()]
+    for count in range(QtdMotorcycle):
+        routeID = "route_{}".format(time.time_ns())
+        vehicle_id = "randomMotorcycle_{}".format(time.time_ns())
+        route = traci.simulation.findRoute(random.choice(allowedEdges), random.choice(allowedEdges),
+                                           "vehicle.kawasaki.ninja")
+        if route.edges:
+            traci.route.add(routeID, route.edges)
+            traci.vehicle.add(vehicle_id, routeID, "vehicle.kawasaki.ninja", depart="now", departSpeed=0,
+                              departLane="best", )
 
 
 def endSimulation():
@@ -303,6 +313,7 @@ def endSimulation():
 
 def on_connect(client, userdata, flags, rc):
     print(f"Conectado ao broker com código de resultado {rc}")
+
 
 def on_connect_real_data(client, userdata, flags, reason_code, properties):
     print("Connected with result code " + str(reason_code))
@@ -314,7 +325,9 @@ def on_connect_real_data(client, userdata, flags, reason_code, properties):
 def on_publish(client, userdata, mid):
     print("Mensagem publicada com sucesso (simulation)")
 
+
 allCars = set()
+
 
 def on_message(client, userdata, msg):
     topic = msg.topic
@@ -354,6 +367,11 @@ def on_message(client, userdata, msg):
             randomPedestriansThread.start()
         except Exception as e:
             print(e)
+
+    if topic == "/addRandomMotorcycle":
+        payload = json.loads(msg.payload)
+        addSimulatedMotorcycle(payload)
+
     if topic == "/addSimulatedCar":
         print("entrou", topic)
         print(msg.payload)
@@ -376,6 +394,7 @@ def on_message(client, userdata, msg):
         endSimulation()
         print("Simulation ended")
 
+
 if __name__ == "__main__":
     options = get_options()
     if options.nogui:
@@ -390,7 +409,7 @@ if __name__ == "__main__":
         [sumoBinary, "-c", "../Adapters/co_simulation/sumo_configuration/simple-map/simple-map.sumocfg",
          "--tripinfo-output",
          "tripinfo.xml"
-         
+
          ]])
 
     # Simple sumo network
@@ -411,11 +430,11 @@ if __name__ == "__main__":
     mqtt_client.subscribe("/addRandomPedestrian")
     mqtt_client.subscribe("/addSimulatedCar")
     mqtt_client.subscribe("/endSimulation")
+    mqtt_client.subscribe("/addRandomMotorcycle")
     mqtt_client.subscribe("/clearSimulation")
 
     mqtt_thread = threading.Thread(target=mqtt_client.loop_start)
     mqtt_thread.start()
-
 
     # realData_mqtt_client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
 

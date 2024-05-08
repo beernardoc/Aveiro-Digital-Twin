@@ -3,6 +3,7 @@ import { Tooltip } from 'react-tooltip';
 import './AddRandom.css';
 import AddRandomCar_form from "../components/AddRandomCar_form";
 import AddRandomPerson_form from "../components/AddRandomPerson_form";
+import AddRandomMotorcycle_form from "../components/AddRandomMotorcycle_form";
 
 
 const AddRandom = () => {
@@ -61,6 +62,8 @@ const AddRandom = () => {
 
                 {activeComponent === 'vehicle' && <AddRandomCar_form/>}
                 {activeComponent === 'person' && <AddRandomPerson_form/>}
+                {activeComponent === 'motorcycle' && <AddRandomMotorcycle_form/>}
+
                 {/* Adicione mais componentes conforme necessário */}
 
             </div>
