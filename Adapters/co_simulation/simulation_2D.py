@@ -293,7 +293,7 @@ def addRandomPedestrian(QtdPerson):  #TODO: melhorar o findroute
             continue
 
 
-def addSimulatedMotorcycle(QtdMotorcycle):
+def addRandomMotorcycle(QtdMotorcycle):
     allowedEdges = [i.getID() for i in net.getEdges() if "driving" in i.getType()]
     for count in range(QtdMotorcycle):
         routeID = "route_{}".format(time.time_ns())
@@ -305,6 +305,18 @@ def addSimulatedMotorcycle(QtdMotorcycle):
             traci.vehicle.add(vehicle_id, routeID, "vehicle.kawasaki.ninja", depart="now", departSpeed=0,
                               departLane="best", )
 
+
+def addRandomBike(QtdBike):
+    allowedEdges = [i.getID() for i in net.getEdges() if "driving" in i.getType()]
+    for count in range(QtdBike):
+        routeID = "route_{}".format(time.time_ns())
+        vehicle_id = "randomBike_{}".format(time.time_ns())
+        route = traci.simulation.findRoute(random.choice(allowedEdges), random.choice(allowedEdges),
+                                           "vehicle.gazelle.omafiets")
+        if route.edges:
+            traci.route.add(routeID, route.edges)
+            traci.vehicle.add(vehicle_id, routeID, "vehicle.gazelle.omafiets", depart="now", departSpeed=0,
+                              departLane="best", )
 
 def endSimulation():
     traci.close()
@@ -370,7 +382,26 @@ def on_message(client, userdata, msg):
 
     if topic == "/addRandomMotorcycle":
         payload = json.loads(msg.payload)
-        addSimulatedMotorcycle(payload)
+        try:
+            # create a new thread to add random traffic
+            global randomMotorcycleThread
+            randomMotorcycleThread = threading.Thread(target=addRandomMotorcycle, args=[int(payload)])
+            randomMotorcycleThread.start()
+        except Exception as e:
+            print(e)
+
+
+
+    if topic == "/addRandomBike":
+        payload = json.loads(msg.payload)
+        try:
+            # create a new thread to add random traffic
+            global randomBikeThread
+            randomBikeThread = threading.Thread(target=addRandomBike, args=[int(payload)])
+            randomBikeThread.start()
+        except Exception as e:
+            print(e)
+
 
     if topic == "/addSimulatedCar":
         print("entrou", topic)
@@ -431,6 +462,7 @@ if __name__ == "__main__":
     mqtt_client.subscribe("/addSimulatedCar")
     mqtt_client.subscribe("/endSimulation")
     mqtt_client.subscribe("/addRandomMotorcycle")
+    mqtt_client.subscribe("/addRandomBike")
     mqtt_client.subscribe("/clearSimulation")
 
     mqtt_thread = threading.Thread(target=mqtt_client.loop_start)

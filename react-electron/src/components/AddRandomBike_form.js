@@ -7,7 +7,7 @@ import {renderToString} from "react-dom/server"; // Importe a imagem de fundo
 
 
 
-const AddRandomMotorcycle_form = () => {
+const AddRandomBike_form = () => {
 
     const API = "http://localhost:5000/api";
     const [Quantity, setQuantity] = useState("");
@@ -16,7 +16,7 @@ const AddRandomMotorcycle_form = () => {
         event.preventDefault();
 
         try {
-                const response = await axios.post(`${API}/addRandomMotorcycle?qtd=${Quantity}`);
+            const response = await axios.post(`${API}/addRandomBike?qtd=${Quantity}`);
             if (response.status === 200) {
                 console.log('Solicitação enviada com sucesso:', response.data);
                 window.location.href = '/simulation';
@@ -34,7 +34,7 @@ const AddRandomMotorcycle_form = () => {
             <div className="w-full max-w-lg bg-white bg-opacity-90 rounded-lg shadow-lg p-8">
                 <form>
                     <div className="mb-4">
-                        <label htmlFor="configFile" className="text-gray-500 block mb-1">How many motorcycles do you want to add?</label>
+                        <label htmlFor="configFile" className="text-gray-500 block mb-1">How many bikes do you want to add?</label>
                         <input
                             type="number"
                             id="quantity"
@@ -45,13 +45,13 @@ const AddRandomMotorcycle_form = () => {
                     </div>
 
                     <div className="mb-4">
-                        <p className="text-sm text-gray-500">You are adding motorcycle dynamically and randomly, meaning they will have random routes and behaviors.</p>
-                        <p className="text-sm text-gray-500">You can see the pedestrians in the SUMO interface.</p>
+                        <p className="text-sm text-gray-500">You are adding bikes dynamically and randomly, meaning they will have random routes and behaviors.</p>
+                        <p className="text-sm text-gray-500">You can see the bikes in the SUMO interface.</p>
 
                     </div>
                     <div className="text-center button-container">
                         <button onClick={handleSubmit}
-                        >Add random motorcycle
+                        >Add random bike
                         </button>
                     </div>
                 </form>
@@ -62,4 +62,4 @@ const AddRandomMotorcycle_form = () => {
     );
 };
 
-export default AddRandomMotorcycle_form;
+export default AddRandomBike_form;

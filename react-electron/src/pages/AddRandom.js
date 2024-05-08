@@ -4,6 +4,7 @@ import './AddRandom.css';
 import AddRandomCar_form from "../components/AddRandomCar_form";
 import AddRandomPerson_form from "../components/AddRandomPerson_form";
 import AddRandomMotorcycle_form from "../components/AddRandomMotorcycle_form";
+import AddRandomBike_form from "../components/AddRandomBike_form";
 
 
 const AddRandom = () => {
@@ -48,7 +49,7 @@ const AddRandom = () => {
                         className={activeComponent === 'bicycle' ? 'active' : ''}
                         onClick={() => handleComponentChange('bicycle')}
                     >
-                        bicycle
+                        Bicycle
                     </button>
 
                     <button
@@ -63,6 +64,8 @@ const AddRandom = () => {
                 {activeComponent === 'vehicle' && <AddRandomCar_form/>}
                 {activeComponent === 'person' && <AddRandomPerson_form/>}
                 {activeComponent === 'motorcycle' && <AddRandomMotorcycle_form/>}
+                {activeComponent === 'bicycle' && <AddRandomBike_form/>}
+
 
                 {/* Adicione mais componentes conforme necessário */}
 
