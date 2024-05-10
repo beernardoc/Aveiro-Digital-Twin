@@ -359,13 +359,6 @@ def on_connect(client, userdata, flags, rc):
     print(f"Conectado ao broker com código de resultado {rc}")
 
 
-def on_connect_real_data(client, userdata, flags, reason_code, properties):
-    print("Connected with result code " + str(reason_code))
-    # Subscribing in on_connect() means that if we lose the connection and
-    # reconnect then subscriptions will be renewed.
-    #client.subscribe("p35/jetson/radar-plus")  
-
-
 def on_publish(client, userdata, mid):
     print("Mensagem publicada com sucesso (simulation)")
 
@@ -376,22 +369,7 @@ allCars = set()
 def on_message(client, userdata, msg):
     topic = msg.topic
     print(topic)
-    # if topic == "p35/jetson/radar-plus":
-    #     print("REAL DATA")
-    #     payload = json.loads(msg.payload)
-    #     # addOrUpdateRealCar(payload)
-    #     print("id", payload["objectID"])
-    #     global allCars
-    #     if payload["objectID"] not in allCars:
-    #         allCars.add(payload["objectID"])
-    #         addOrUpdateRealCar(payload)
-    #     if len(allCars) > 20:
-    #         # remove the smallest 5 objectID
-    #         temp = list(allCars)
-    #         temp.sort()
-    #         print("allCars", allCars)
-    #         for i in range(5):
-    #             allCars.remove(temp[i])
+
     if topic == "/addRandomTraffic":
         payload = json.loads(msg.payload)
         try:
@@ -510,17 +488,6 @@ if __name__ == "__main__":
     mqtt_thread = threading.Thread(target=mqtt_client.loop_start)
     mqtt_thread.start()
 
-    # realData_mqtt_client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
 
-    # realData_mqtt_client.on_connect = on_connect_real_data
-    # realData_mqtt_client.on_message = on_message
-    # realData_mqtt_client.connect("atcll-data.nap.av.it.pt", 1884)
-
-    # realData_mqtt_client.loop_start()
-
-    #sumolib para dados estaticos da rede e traci para dados dinamicos da simulação
-    #teste = net.getEdge("-1545").getLanes()
-    #for i in teste:
-    #    print(i.getPermissions())
 
     run()
