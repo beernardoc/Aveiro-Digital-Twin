@@ -71,5 +71,5 @@ if __name__ == '__main__':
     roads.get_roads()
     
     # create a json file with the roads
-    with open('co_simulation/roads.json', 'w') as f:
+    with open('co_simulation/road.json', 'w') as f:
         json.dump(roads.all_roads, f)
