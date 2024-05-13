@@ -8,6 +8,7 @@ class Roads:
         self.seen_edges = []
         self.roads = {}
         self.road_id = 1
+        self.all_roads = {}
 
         # roundabout edges are inside the file roundabout.json
         with open('co_simulation/roundabout.json') as f:
@@ -56,20 +57,19 @@ class Roads:
 
             if edge_id not in self.seen_edges and edge_id not in self.roundabout_edges:
                 road = self.get_road(edge_id)
-                # print("RRRRRRRRRRRRRRRRRR",road)
-                # print the shape
-                print('SHAPEEEE', edge_id, edge.getShape(includeJunctions=True))
                 self.roads[self.road_id] = road
                 self.road_id += 1
                 
                 for road_edge in road:
                     self.seen_edges.append(road_edge)
+                    edge = self.net.getEdge(road_edge)
+                    self.all_roads[road_edge] = edge.getShape()
 
-        
     
-# test
-roads = Roads('co_simulation/sumo_configuration/simple-map/UA.net.xml')
-roads.get_roads()
-# print(roads.roads)
-# #print the roads size
-# print(len(roads.roads))
+if __name__ == '__main__':
+    roads = Roads('co_simulation/sumo_configuration/simple-map/UA.net.xml')
+    roads.get_roads()
+    
+    # create a json file with the roads
+    with open('co_simulation/roads.json', 'w') as f:
+        json.dump(roads.all_roads, f)
