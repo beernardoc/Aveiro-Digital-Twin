@@ -58,12 +58,19 @@ class Roads:
             if edge_id not in self.seen_edges and edge_id not in self.roundabout_edges:
                 road = self.get_road(edge_id)
                 self.roads[self.road_id] = road
-                self.road_id += 1
+                
                 
                 for road_edge in road:
                     self.seen_edges.append(road_edge)
                     edge = self.net.getEdge(road_edge)
-                    self.all_roads[road_edge] = edge.getShape()
+                    if self.road_id not in self.all_roads:
+                        self.all_roads[self.road_id] = {'shape': edge.getShape(), 'type': 'line'}
+                    else:
+                        self.all_roads[self.road_id]['shape'] += edge.getShape()
+                        self.all_roads[self.road_id]['type'] = 'polygon'
+                        print(f'{self.road_id}', self.all_roads[self.road_id])
+
+                self.road_id += 1
 
     
 if __name__ == '__main__':

@@ -17,12 +17,13 @@ with open('co_simulation/road.json') as f:
 
 # Adjust the y-coordinates to start from the bottom and convert to integer format
 adjusted_roads = []
+adjusted_roads_type = []
 all_roads = dict(all_roads)
 for road_id, road_points in all_roads.items():
-    print(road_points)
-    road_points = [(int(point[0]), int(point[1])) for point in road_points]
-    adjusted_points = [(int(x), int(height - y)) for x, y in road_points]
+    road_points_shape = [(int(point[0]), int(point[1])) for point in road_points['shape']]
+    adjusted_points = [(int(x), int(height - y)) for x, y in road_points_shape]
     adjusted_roads.append(np.array(adjusted_points, dtype=np.int32))
+    adjusted_roads_type.append(road_points['type'])
 
 # Define the color (BGR for red)
 color = (0, 0, 255)
@@ -31,10 +32,17 @@ color = (0, 0, 255)
 thickness = 2
 
 # Draw the lines on the image
-for road in adjusted_roads:
-    image = cv2.polylines(image, [road], isClosed=False, color=color, thickness=thickness)
+for i, road in enumerate(adjusted_roads):
+    if adjusted_roads_type[i] == 'line':
+        image = cv2.polylines(image, [road], isClosed=False, color=color, thickness=thickness)
+    else:
+        image = cv2.fillPoly(image, [road], color=color)
 
 # Display the image with lines
-cv2.imshow('Image with Red Lines', image)
+cv2.imshow('Image to put in the Frontend', image)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
+# Save the image with lines
+output_path = 'road_image/image_roads_outlined.png'
+cv2.imwrite(output_path, image)
+print(f'Image saved in {output_path}')
