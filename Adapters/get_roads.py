@@ -68,6 +68,7 @@ class Roads:
                     else:
                         self.all_roads[self.road_id]['shape'] += edge.getShape()
                         self.all_roads[self.road_id]['type'] = 'polygon'
+                        self.all_roads[self.road_id]['edges'] = road
                         print(f'{self.road_id}', self.all_roads[self.road_id])
 
                 self.road_id += 1
