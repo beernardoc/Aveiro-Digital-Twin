@@ -13,6 +13,10 @@ export default function Block() {
         window.location.href = '/block-roundabout';
     }
 
+    const blockRoad = () => {
+        window.location.href = '/block-road';
+    }
+
     useEffect(() => {
         const socket = socketIOClient('http://localhost:5000'); 
 
@@ -48,7 +52,7 @@ export default function Block() {
                 <div className="block-page-buttons">
                     {/* 2 buttons, one to block roundabout and another to road */}
                     <button className="block-page-button" type='submit' onClick={blockRoundabout} style={{ marginRight: "30px" }}>Block Roundabout</button>
-                    <button className="block-page-button" type='submit'>Block Road</button>
+                    <button className="block-page-button" type='submit' onClick={blockRoad}>Block Road</button>
                 </div>
 
                 <div className="block-page-blocks" style={{ marginTop: "30px" }}>

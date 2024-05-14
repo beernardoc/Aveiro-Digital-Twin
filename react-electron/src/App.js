@@ -14,6 +14,7 @@ import Run3DPage from './pages/Run3DPage';
 import ClearSimulation from './pages/ClearSimulation';
 import Block from './pages/Block';
 import BlockRoundabout from './pages/BlockRoundabout';
+import BlockRoad from './pages/BlockRoad';
 
 const api = "http://localhost:5000/api";
 
@@ -46,6 +47,7 @@ function App() {
           <Route path="/clear" element={ <><Sidebar /> <ClearSimulation /></> }></Route>
           <Route path="/block" element={<><Sidebar /> <Block /> </>} />
           <Route path="/block-roundabout" element={<><Sidebar /> <BlockRoundabout /> </>} />
+          <Route path="/block-road" element={<><Sidebar /> <BlockRoad /> </>} />
         </Routes>
       </div>
     </Router>
