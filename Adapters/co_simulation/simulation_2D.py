@@ -120,7 +120,7 @@ def blockRoundabout(roundabout_id):
 def blockRoad(road_id):
     with open(road_file_path, "r") as f:
         data = json.load(f)
-        road = data[road_id - 1]
+        road = data[str(road_id)]
         f.close()
 
     global blocked_roads
