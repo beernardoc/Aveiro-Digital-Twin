@@ -17,6 +17,7 @@ import BlockRoundabout from './pages/BlockRoundabout';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Settings from './pages/Settings';
+import EndSimulation from './pages/EndSimulation';
 
 const api = "http://localhost:5000/api";
 
@@ -52,6 +53,7 @@ function App() {
           <Route path="/clear" element={ <><Sidebar /> <ClearSimulation /></> }></Route>
           <Route path="/block" element={<><Sidebar /> <Block /> </>} />
           <Route path="/block-roundabout" element={<><Sidebar /> <BlockRoundabout /> </>} />
+          <Route path='/endSimulation' element={<><Sidebar /> <EndSimulation /></>} />
         </Routes>
       </div>
     </Router>

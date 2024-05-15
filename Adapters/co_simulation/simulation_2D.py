@@ -457,8 +457,8 @@ if __name__ == "__main__":
     sumo_thread = threading.Thread(target=traci.start, args=[
         [sumoBinary, "-c", "../Adapters/co_simulation/sumo_configuration/simple-map/simple-map.sumocfg",
          "--tripinfo-output",
-         "tripinfo.xml"
-
+         "tripinfo.xml",
+        "--quit-on-end"
          ]])
 
     # Simple sumo network
