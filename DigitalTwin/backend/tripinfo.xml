@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- generated on 2024-05-17 21:19:37 by Eclipse SUMO GUI Version 1.12.0
+<!-- generated on 2024-05-17 22:34:16 by Eclipse SUMO GUI Version 1.12.0
 <configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/sumoConfiguration.xsd">
 
     <input>
@@ -13,7 +13,7 @@
     </output>
 
     <traci_server>
-        <remote-port value="35731"/>
+        <remote-port value="45067"/>
         <num-clients value="1"/>
     </traci_server>
 
@@ -27,8 +27,6 @@
 
 <tripinfos xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/tripinfo_file.xsd">
     <tripinfo id="0" depart="3.00" departLane="-1466_1" departPos="5.34" departSpeed="0.00" departDelay="0.00" arrival="12.00" arrivalLane="-1465_1" arrivalPos="11.38" arrivalSpeed="13.75" duration="9.00" routeLength="73.18" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="3.49" rerouteNo="0" devices="tripinfo_0" vType="vehicle.dodge.charger_police_2020" speedFactor="1.06" vaporized=""/>
-    <tripinfo id="randomCar_1715977193388640870" depart="22.00" departLane="-1633_1" departPos="5.34" departSpeed="0.00" departDelay="2.00" arrival="25.00" arrivalLane="-1633_1" arrivalPos="11.38" arrivalSpeed="5.16" duration="3.00" routeLength="6.04" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="2.33" rerouteNo="0" devices="tripinfo_randomCar_1715977193388640870" vType="vehicle.dodge.charger_police_2020" speedFactor="1.10" vaporized=""/>
-    <tripinfo id="randomCar_1715977194031946560" depart="24.00" departLane="-1497_1" departPos="1.67" departSpeed="0.00" departDelay="3.00" arrival="39.00" arrivalLane="-1415_0" arrivalPos="87.23" arrivalSpeed="21.60" duration="15.00" routeLength="107.58" waitingTime="4.00" waitingCount="1" stopTime="0.00" timeLoss="10.14" rerouteNo="0" devices="tripinfo_randomCar_1715977194031946560" vType="vehicle.dodge.charger_police_2020" speedFactor="0.92" vaporized=""/>
-    <tripinfo id="randomCar_1715977193390988291" depart="28.00" departLane="-1488_0" departPos="0.20" departSpeed="0.00" departDelay="8.00" arrival="43.00" arrivalLane="-1501_0" arrivalPos="0.20" arrivalSpeed="6.43" duration="15.00" routeLength="34.58" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="11.08" rerouteNo="0" devices="tripinfo_randomCar_1715977193390988291" vType="vehicle.dodge.charger_police_2020" speedFactor="0.96" vaporized=""/>
-    <tripinfo id="randomCar_1715977194069904050" depart="25.00" departLane="-1494_1" departPos="0.20" departSpeed="0.00" departDelay="4.00" arrival="43.00" arrivalLane="-1489_0" arrivalPos="0.20" arrivalSpeed="6.82" duration="18.00" routeLength="40.00" waitingTime="3.00" waitingCount="1" stopTime="0.00" timeLoss="12.95" rerouteNo="0" devices="tripinfo_randomCar_1715977194069904050" vType="vehicle.dodge.charger_police_2020" speedFactor="0.88" vaporized=""/>
+    <tripinfo id="randomCar_1715981666334160537" depart="15.00" departLane="-1563_1" departPos="5.34" departSpeed="0.00" departDelay="0.00" arrival="18.00" arrivalLane="-1563_1" arrivalPos="14.38" arrivalSpeed="6.22" duration="3.00" routeLength="9.04" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="2.14" rerouteNo="0" devices="tripinfo_randomCar_1715981666334160537" vType="vehicle.dodge.charger_police_2020" speedFactor="1.05" vaporized=""/>
+    <tripinfo id="randomCar_1715981665777237688" depart="14.00" departLane="-1646_1" departPos="5.34" departSpeed="0.00" departDelay="0.00" arrival="34.00" arrivalLane="-1647_1" arrivalPos="0.20" arrivalSpeed="6.22" duration="20.00" routeLength="171.08" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="8.96" rerouteNo="0" devices="tripinfo_randomCar_1715981665777237688" vType="vehicle.dodge.charger_police_2020" speedFactor="0.90" vaporized=""/>
 </tripinfos>

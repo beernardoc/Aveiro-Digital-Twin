@@ -37,6 +37,10 @@ simulated_vehicles = {}
 blocked_roundabouts = {}
 all_vehicles = {}
 
+current_user = None
+if len(sys.argv) > 1:
+    current_user = sys.argv[1]
+
 randomVehiclesThread = None
 end_addRandomTraffic = False
 
@@ -377,7 +381,8 @@ def endSimulation():
         route = list(vehicle_info["route"])
         history_file.add_vehicle(vehicle, route)
 
-    print(history_file.get_result_string())
+    data = {"user": current_user, "history": history_file.get_result_string()}
+    publish.single("/history", payload=json.dumps(data), hostname="localhost", port=1883)
 
     traci.close()
     sys.stdout.flush()

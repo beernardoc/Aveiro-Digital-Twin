@@ -50,6 +50,7 @@ processCarla = None
 
 number_of_vehicles = 0
 blocked_roundabouts = []
+current_user = None
 
 @app.route('/api')
 def api():
@@ -120,6 +121,9 @@ def login():
 
     access_token = create_access_token(identity=email)
     print(f"Access Token: {access_token}")
+
+    global current_user
+    current_user = user['email']
 
     response = make_response(jsonify({'message': 'Login successful', 'username': user['username'], 'token': access_token}), 200)
     response.headers['Authorization'] = f'Bearer {access_token}'
@@ -221,9 +225,10 @@ def run_3D():
 def run_2D():
     try:
         global process2d
-        process2d = subprocess.Popen(["python3", "Adapters/co_simulation/simulation_2D.py"])
+        process2d = subprocess.Popen(["python3", "Adapters/co_simulation/simulation_2D.py", current_user])
         global blocked_roundabouts
         blocked_roundabouts = []
+
         return jsonify({'message': 'Comando iniciado com sucesso'}), 200
     except subprocess.CalledProcessError as e:
         return jsonify({'error': e}), 500
@@ -439,6 +444,14 @@ def on_message(client, userdata, msg):
             if roundabout not in blocked_roundabouts:
                 blocked_roundabouts.append(roundabout)
 
+    if topic == '/history':
+        print("Histórico recebido")
+        data = {
+            "user_email": json.loads(msg.payload)['email'],
+            "history": json.loads(msg.payload)['history']
+        }
+        mongo.db.history.insert_one(data)
+
 def start_mqtt_connection():
     # Inicia a conexão MQTT
     mqtt_client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1)
@@ -448,6 +461,7 @@ def start_mqtt_connection():
     mqtt_client.connect("localhost", 1883, 60)
     mqtt_client.subscribe("/cars")
     mqtt_client.subscribe("/blocked_rounds")
+    mqtt_client.subscribe("/history")
 
 
     mqtt_client.loop_forever()  # Use loop_forever() para manter a conexão MQTT em execução indefinidamente
