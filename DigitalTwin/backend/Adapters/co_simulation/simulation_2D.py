@@ -381,7 +381,7 @@ def endSimulation():
         route = list(vehicle_info["route"])
         history_file.add_vehicle(vehicle, route)
 
-    data = {"user": current_user, "history": history_file.get_result_string()}
+    data = {"user_email": current_user, "history": history_file.get_result_string()}
     publish.single("/history", payload=json.dumps(data), hostname="localhost", port=1883)
 
     traci.close()

@@ -1,8 +1,6 @@
 import threading
 from asyncio import sleep
 import json
-import os
-import signal
 import subprocess
 from flask import Flask, request, jsonify, Response, make_response
 from flask_pymongo import PyMongo
@@ -17,6 +15,7 @@ from flask_swagger_ui import get_swaggerui_blueprint
 from flask_jwt_extended import decode_token, JWTManager, jwt_required, create_access_token, get_jwt_identity
 from werkzeug.security import check_password_hash
 from pymongo import MongoClient
+from datetime import datetime
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
@@ -445,10 +444,10 @@ def on_message(client, userdata, msg):
                 blocked_roundabouts.append(roundabout)
 
     if topic == '/history':
-        print("Histórico recebido")
         data = {
-            "user_email": json.loads(msg.payload)['email'],
-            "history": json.loads(msg.payload)['history']
+            "user_email": json.loads(msg.payload)['user_email'],
+            "history": json.loads(msg.payload)['history'], 
+            "date": datetime.now()
         }
         mongo.db.history.insert_one(data)
 
