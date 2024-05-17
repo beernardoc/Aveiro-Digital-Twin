@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useLocation, Link } from 'react-router-dom';
+import { useLocation, Link, useNavigate } from 'react-router-dom';
 import './Navbar.css';
 
 function Navbar() {
+  const navigate = useNavigate();
   const location = useLocation();
   const [username, setUsername] = useState(localStorage.getItem('username') || 'Login');
   const [dropdownVisible, setDropdownVisible] = useState(false);
@@ -27,6 +28,7 @@ function Navbar() {
     localStorage.removeItem('username');
     setUsername('Login');
     setDropdownVisible(false);
+    navigate('/');
   };
 
   const handleClickOutside = (event) => {
