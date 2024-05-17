@@ -37,7 +37,7 @@ randomVehiclesThread = None
 end_addRandomTraffic = False
 
 net = sumolib.net.readNet(
-    "../Adapters/co_simulation/sumo_configuration/simple-map/UA.net.xml",
+    "Adapters/co_simulation/sumo_configuration/simple-map/UA.net.xml",
     withInternal=True)  # Carrega a rede do SUMO atraves do sumolib para acesso estatico
 
 
@@ -354,7 +354,6 @@ def endSimulation():
     traci.close()
     sys.stdout.flush()
 
-
 def on_connect(client, userdata, flags, rc):
     print(f"Conectado ao broker com código de resultado {rc}")
 
@@ -455,7 +454,7 @@ if __name__ == "__main__":
 
     # Aveiro sumo network
     sumo_thread = threading.Thread(target=traci.start, args=[
-        [sumoBinary, "-c", "../Adapters/co_simulation/sumo_configuration/simple-map/simple-map.sumocfg",
+        [sumoBinary, "-c", "Adapters/co_simulation/sumo_configuration/simple-map/simple-map.sumocfg",
          "--tripinfo-output",
          "tripinfo.xml",
         "--quit-on-end"

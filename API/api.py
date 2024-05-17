@@ -26,8 +26,10 @@ socketio = socketio.SocketIO(app, cors_allowed_origins="*")
 app.secret_key = 'myawesomesecretkey'
 app.config['JWT_SECRET_KEY'] = 'mysecretkey' 
 
-app.config['MONGO_URI'] = 'mongodb://localhost:27017/digitaltwin'
-mongo = PyMongo(app)
+# app.config['MONGO_URI'] = 'mongodb://localhost:27017/digitaltwin'
+# mongo = PyMongo(app)
+mongo_client = MongoClient(host='localhost', port=27017, username='admin', password='password')
+mongo = mongo_client['digitaltwin']
 jwt = JWTManager(app)
 
 SWAGGER_URL="/swagger"
@@ -205,11 +207,11 @@ def not_found(error=None):
 def run_3D():
     try:
         global processCarla
-        processCarla = subprocess.Popen(["./../Adapters/co_simulation/runCarla.sh"])
+        processCarla = subprocess.Popen(["./Adapters/co_simulation/runCarla.sh"])
         sleep(10)
 
         global process3d
-        process3d = subprocess.Popen(["python3", "../Adapters/co_simulation/simulation_3D.py"])
+        process3d = subprocess.Popen(["python3", "Adapters/co_simulation/simulation_3D.py"])
         return jsonify({'message': 'Comando executado com sucesso'}), 200
     except subprocess.CalledProcessError as e:
         return jsonify({'error': e}), 500
@@ -219,7 +221,7 @@ def run_3D():
 def run_2D():
     try:
         global process2d
-        process2d = subprocess.Popen(["python3", "../Adapters/co_simulation/simulation_2D.py"])
+        process2d = subprocess.Popen(["python3", "Adapters/co_simulation/simulation_2D.py"])
         global blocked_roundabouts
         blocked_roundabouts = []
         return jsonify({'message': 'Comando iniciado com sucesso'}), 200
@@ -334,10 +336,10 @@ def add_car():
 
 @app.route('/api/endSimulation', methods=['POST'])
 def end_simulation():
+    publish.single("/endSimulation", payload="", hostname="localhost", port=1883)
     try:
-        publish.single("/endSimulation", payload="", hostname="localhost", port=1883)
         if process2d is not None:
-            process2d.kill()
+            process2d.send_signal(signal.SIGKILL)
 
         if process3d is not None:
             process3d.kill()

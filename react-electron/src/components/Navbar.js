@@ -1,34 +1,78 @@
-// src/components/Navbar.js
-
-import React, { useContext, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useLocation, Link } from 'react-router-dom';
 import './Navbar.css';
 
 function Navbar() {
+  const location = useLocation();
+  const [username, setUsername] = useState(localStorage.getItem('username') || 'Login');
+  const [dropdownVisible, setDropdownVisible] = useState(false);
+  const dropdownRef = useRef(null);
 
   const getUserName = () => {
-    localStorage.getItem('username');
-    console.log(localStorage.getItem('username'));
-    return localStorage.getItem('username') || 'Login';
+    const storedUsername = localStorage.getItem('username');
+    console.log(storedUsername);
+    return storedUsername || 'Login';
   };
 
   useEffect(() => {
-    getUserName();
-  }
-  , []);
+    setUsername(getUserName());
+  }, [location]);
 
- return (
+  const toggleDropdown = () => {
+    setDropdownVisible(!dropdownVisible);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('username');
+    setUsername('Login');
+    setDropdownVisible(false);
+  };
+
+  const handleClickOutside = (event) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      setDropdownVisible(false);
+    }
+  };
+
+  useEffect(() => {
+    if (dropdownVisible) {
+      document.addEventListener('mousedown', handleClickOutside);
+    } else {
+      document.removeEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [dropdownVisible]);
+
+  return (
     <nav className="navbar">
-      <div className="navbar-content" >
+      <div className="navbar-content">
         <div className="navbar-logo">
-          <a href="/"><h1>Digital Twin</h1></a>
+          <Link to="/"><h1>Digital Twin</h1></Link>
         </div>
         <div className="navbar-links">
-          <a href="/login">{getUserName()}</a>
-          <a href="/settings">Settings</a>
+          {username === 'Login' ? (
+            <Link to="/login">{username}</Link>
+          ) : (
+            <div className="dropdown" ref={dropdownRef}>
+              <button onClick={toggleDropdown} className="dropdown-toggle">
+                {username}
+              </button>
+              {dropdownVisible && (
+                <div className="dropdown-menu">
+                  <Link to="/history">View History</Link>
+                  <button onClick={handleLogout} style={{ color: '#EE4E4E' }}>Log Out</button>
+                </div>
+              )}
+            </div>
+          )}
+          <Link to="/settings">Settings</Link>
         </div>
       </div>
     </nav>
- );
+  );
 }
 
 export default Navbar;
