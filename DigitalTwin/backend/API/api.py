@@ -337,19 +337,19 @@ def add_car():
 @app.route('/api/endSimulation', methods=['POST'])
 def end_simulation():
     publish.single("/endSimulation", payload="", hostname="localhost", port=1883)
-    try:
-        if process2d is not None:
-            process2d.send_signal(signal.SIGKILL)
+    # try:
+    #     if process2d is not None:
+    #         process2d.send_signal(signal.SIGKILL)
 
-        if process3d is not None:
-            process3d.kill()
+    #     if process3d is not None:
+    #         process3d.kill()
 
-        if processCarla is not None:
-            processCarla.send_signal(signal.SIGINT)
+    #     if processCarla is not None:
+    #         processCarla.send_signal(signal.SIGINT)
 
-        return jsonify({'message': 'Simulação finalizada com sucesso'}), 200
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+    return jsonify({'message': 'Simulação finalizada com sucesso'}), 200
+    # except Exception as e:
+    #     return jsonify({'error': str(e)}), 500
 
     # curl -X POST -d "" "http://localhost:5000/api/endSimulation"
 

@@ -12,7 +12,11 @@ import os
 import paho.mqtt.client as mqtt
 import paho.mqtt.publish as publish
 
-import multiprocessing
+# Determine the project root directory
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
+if project_root not in sys.path:
+    sys.path.append(project_root)
+from Adapters.history.file_composer import FileComposer
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 radar_file_path = os.path.join(os.path.dirname(__file__), "radar.json")
@@ -29,9 +33,9 @@ def get_options():
 
 
 global step
-allVehicle = set()
 simulated_vehicles = {}
 blocked_roundabouts = {}
+all_vehicles = {}
 
 randomVehiclesThread = None
 end_addRandomTraffic = False
@@ -40,35 +44,51 @@ net = sumolib.net.readNet(
     "Adapters/co_simulation/sumo_configuration/simple-map/UA.net.xml",
     withInternal=True)  # Carrega a rede do SUMO atraves do sumolib para acesso estatico
 
+history_file = FileComposer("Adapters/history/base_file.xml")
 
 def run():
     step = 0
     while True:
-        traci.simulationStep()
-        step += 1
+        try:
+            traci.simulationStep()
 
-        simulation_time = traci.simulation.getTime()
-        vehicles = traci.vehicle.getIDList()
-        vehicle_type = traci.vehicletype.getIDList()
-        person = traci.person.getIDList()
+            for vehicle_id in traci.vehicle.getIDList():
+                vehicle_type = traci.vehicle.getTypeID(vehicle_id)
+                depart = str(round(step, 1))
+                route = traci.vehicle.getRoute(vehicle_id)
+                if vehicle_id not in all_vehicles:
+                    all_vehicles[vehicle_id] = {"type": vehicle_type, "depart": depart, "route": route}
+                    print(f'Vehicle {vehicle_id} added to the list of all vehicles. Type: {vehicle_type}, Depart: {depart}, Route: {route}')
+                else:
+                    if all_vehicles[vehicle_id]["route"] != route:
+                        all_vehicles[vehicle_id]["route"] = route
+                        print(f'Vehicle {vehicle_id} changed route to {route}')
 
-        data = {"vehicle": {"quantity": len(vehicles), "ids": vehicles},
-                "person": {"quantity": len(person), "ids": person},
-                "simulation": {"time": simulation_time, "vehicles_types": vehicle_type}}
-        
-        publish.single("/cars", payload=json.dumps(data), hostname="localhost", port=1883)
+            step += 1
 
-        global blocked_roundabouts
-        data = {"blocked_roundabouts": blocked_roundabouts}
-        publish.single("/blocked_rounds", payload=json.dumps(data), hostname="localhost", port=1883)
+            simulation_time = traci.simulation.getTime()
+            vehicles = traci.vehicle.getIDList()
+            vehicle_type = traci.vehicletype.getIDList()
+            person = traci.person.getIDList()
 
-        # if len(simulated_vehicles) > 0:
-        #     for vehicle_id in list(simulated_vehicles.keys()):
-        #         if vehicle_id in traci.vehicle.getIDList():
-        #             checkDestination(vehicle_id, simulated_vehicles[vehicle_id])
+            data = {"vehicle": {"quantity": len(vehicles), "ids": vehicles},
+                    "person": {"quantity": len(person), "ids": person},
+                    "simulation": {"time": simulation_time, "vehicles_types": vehicle_type}}
+            
+            publish.single("/cars", payload=json.dumps(data), hostname="localhost", port=1883)
 
-    traci.close()
-    sys.stdout.flush()
+            global blocked_roundabouts
+            data = {"blocked_roundabouts": blocked_roundabouts}
+            publish.single("/blocked_rounds", payload=json.dumps(data), hostname="localhost", port=1883)
+
+            # if len(simulated_vehicles) > 0:
+            #     for vehicle_id in list(simulated_vehicles.keys()):
+            #         if vehicle_id in traci.vehicle.getIDList():
+            #             checkDestination(vehicle_id, simulated_vehicles[vehicle_id])
+
+        except Exception as e:
+            print(e)
+            break
 
 
 def checkDestination(vehicle_id, destination_coordinates):
@@ -179,7 +199,6 @@ def addOrUpdateRealCar(received):
                           departLane="best")
         traci.vehicle.moveToXY(vehID, route[0], 0, x, y,
                                keepRoute=1)  # se a proxima for a mesma, cluster ou de junção, move com moveTOXY
-        # allVehicle.add(vehID)
         print(traci.vehicle.getRoute(vehID))
         print("adicionado")
 
@@ -351,6 +370,15 @@ def addRandomBike(QtdBike):
                               departLane="best", )
 
 def endSimulation():
+    print("Ending simulation...")
+    
+    for vehicle_id, vehicle_info in all_vehicles.items():
+        vehicle = { "id": vehicle_id, "type": vehicle_info["type"], "depart": vehicle_info["depart"] }
+        route = list(vehicle_info["route"])
+        history_file.add_vehicle(vehicle, route)
+
+    print(history_file.get_result_string())
+
     traci.close()
     sys.stdout.flush()
 

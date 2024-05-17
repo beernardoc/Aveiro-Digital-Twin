@@ -1,9 +1,9 @@
 import pytest
-from history.file_composer import FileComposer
+from Adapters.history.file_composer import FileComposer
 
 @pytest.fixture
 def file_composer():
-    return FileComposer('history/base_file.xml')
+    return FileComposer('Adapters/history/base_file.xml')
 
 def test_add_vehicle_tag(file_composer):
     vehicle = {'id': '0', 'type': 'car', 'depart': '0'}
