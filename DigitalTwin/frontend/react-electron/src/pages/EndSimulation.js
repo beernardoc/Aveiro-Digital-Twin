@@ -5,6 +5,7 @@ import { useState } from 'react';
 export default function EndSimulation() {
     const [showModal, setShowModal] = useState(false); // State to manage modal visibility
     const [simulationName, setSimulationName] = useState('');
+    const [error, setError] = useState(''); // State to manage error message
 
     const endsimulation = () => {
         axios.post('http://localhost:5000/api/endSimulation')
@@ -22,6 +23,11 @@ export default function EndSimulation() {
     }
 
     const saveAndEndSimulation = () => {
+        if (simulationName.trim() === '') {
+            setError('Simulation name is required.');
+            return;
+        }
+
         axios.post('http://localhost:5000/api/endSimulationAndSave?name=' + simulationName)
             .then(response => {
                 if (response.status === 200) {
@@ -43,6 +49,7 @@ export default function EndSimulation() {
     // Function to handle closing the modal
     const handleClose = () => {
         setShowModal(false);
+        setError(''); // Clear error message when closing the modal
     };
 
     return (
@@ -65,7 +72,13 @@ export default function EndSimulation() {
                     <div className="modal-content">
                         <span className="close" onClick={handleClose}>&times;</span>
                         <p> Choose a Name for the Simulation </p>
-                        <input type="text" placeholder="Simulation Name" style={{ width: "100%", height: "30px", marginBottom: "20px" }} onChange={(e) => setSimulationName(e.target.value)} />
+                        <input 
+                            type="text" 
+                            placeholder="Simulation Name" 
+                            style={{ width: "100%", height: "30px", marginBottom: "20px" }} 
+                            onChange={(e) => setSimulationName(e.target.value)} 
+                        />
+                        {error && <p style={{ color: 'red' }}>{error}</p>}
                         <div className="modal-buttons">
                             <button type='submit' style={{ marginRight: "20px" }} onClick={saveAndEndSimulation}>Save Simulation</button>
                         </div>

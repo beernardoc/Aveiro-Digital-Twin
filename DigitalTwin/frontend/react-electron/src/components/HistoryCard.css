@@ -1,4 +1,4 @@
-.card-history {
+.card-vehicle {
     background-color: #1c2548;
     padding: 20px;
     border-radius: 10px;
@@ -9,12 +9,12 @@
     margin: 10px;
 }
 
-.card-history h2 {
+.card-vehicle h2 {
     margin: 0;  
     padding-left: 55px;
 }
 
-.card-icon-history {
+.card-icon-vehicle {
     position: absolute;
     top: 0;
     left: 0;
@@ -28,12 +28,12 @@
     color: white;
 }
 
-.card-icon-history i {
+.card-icon-vehicle i {
     color: #ffffff;
     size: 30px;
 }
 
-.card-history button {
+.card-vehicle button {
     background-color: #1c2548;
     border: none;
     border-radius: 50%;
@@ -45,32 +45,32 @@
     transform: translateY(-50%);
 }
    
-.card-history button:hover {
+.card-vehicle button:hover {
     background-color: #f47065;
 }
    
-.card-history button svg {
+.card-vehicle button svg {
     color: #fff;
 }
 
-.card-buttons-history {
+.card-buttons-vehicle {
     display: flex;
 }
    
-.card-buttons-history button {
+.card-buttons-vehicle button {
     border: none;
     cursor: pointer;
     padding: 10px 10px;
 }
    
-.card-buttons-history button:hover {
+.card-buttons-vehicle button:hover {
     background-color: #f47065;
 }
 
-.card-buttons-history button:first-child:hover {
+.card-buttons-vehicle button:first-child:hover {
     background-color: #7740a4;
 }
 
-.card-buttons-history button:first-child {
+.card-buttons-vehicle button:first-child {
     margin-right: 40px;
 }

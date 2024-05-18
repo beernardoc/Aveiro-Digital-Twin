@@ -428,6 +428,15 @@ def get_blocked_roundabouts():
 
     # curl -X GET "http://localhost:5000/api/blockedRoundabouts"
 
+@app.route('/api/history', methods=['GET'])
+def get_history_for_user():
+    history = mongo.db.history.find({'user_email': current_user}, {'history': 0})
+    response = json_util.dumps(history)
+
+    return Response(response, mimetype="application/json")
+
+    # curl -X GET "http://localhost:5000/api/history"
+
 def on_connect(client, userdata, flags, rc):
     print(f"Conectado ao broker com código de resultado {rc}")
 
