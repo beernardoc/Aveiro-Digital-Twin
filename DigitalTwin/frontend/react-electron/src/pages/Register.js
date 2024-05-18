@@ -19,7 +19,7 @@ function Register() {
         password
       });
       console.log(response.data);
-      navigate('/'); 
+      navigate('/login'); 
     } catch (error) {
       console.error(error);
     }

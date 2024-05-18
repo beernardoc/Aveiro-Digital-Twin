@@ -373,16 +373,16 @@ def addRandomBike(QtdBike):
             traci.vehicle.add(vehicle_id, routeID, "vehicle.gazelle.omafiets", depart="now", departSpeed=0,
                               departLane="best", )
 
-def endSimulation():
-    print("Ending simulation...")
+def endSimulation(save_history=False):
     
-    for vehicle_id, vehicle_info in all_vehicles.items():
-        vehicle = { "id": vehicle_id, "type": vehicle_info["type"], "depart": vehicle_info["depart"] }
-        route = list(vehicle_info["route"])
-        history_file.add_vehicle(vehicle, route)
+    if save_history:
+        for vehicle_id, vehicle_info in all_vehicles.items():
+            vehicle = { "id": vehicle_id, "type": vehicle_info["type"], "depart": vehicle_info["depart"] }
+            route = list(vehicle_info["route"])
+            history_file.add_vehicle(vehicle, route)
 
-    data = {"user_email": current_user, "history": history_file.get_result_string()}
-    publish.single("/history", payload=json.dumps(data), hostname="localhost", port=1883)
+        data = {"user_email": current_user, "history": history_file.get_result_string()}
+        publish.single("/history", payload=json.dumps(data), hostname="localhost", port=1883)
 
     traci.close()
     sys.stdout.flush()
@@ -465,8 +465,13 @@ def on_message(client, userdata, msg):
 
     if topic == "/endSimulation":
         print("Ending simulation...")
-        endSimulation()
+        endSimulation(False)
         print("Simulation ended")
+
+    if topic == "/endSimulationAndSave":
+        print("Ending simulation and saving history...")
+        endSimulation(True)
+        print("Simulation ended and history saved")
 
     if topic == "/blockRoundabout":
         payload = json.loads(msg.payload)
@@ -511,6 +516,7 @@ if __name__ == "__main__":
     mqtt_client.subscribe("/addRandomPedestrian")
     mqtt_client.subscribe("/addSimulatedCar")
     mqtt_client.subscribe("/endSimulation")
+    mqtt_client.subscribe("/endSimulationAndSave")
     mqtt_client.subscribe("/addRandomMotorcycle")
     mqtt_client.subscribe("/addRandomBike")
     mqtt_client.subscribe("/clearSimulation")

@@ -5,12 +5,12 @@ import './Navbar.css';
 function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [username, setUsername] = useState(localStorage.getItem('username') || 'Login');
+  const [username, setUsername] = useState(sessionStorage.getItem('username') || 'Login');
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const dropdownRef = useRef(null);
 
   const getUserName = () => {
-    const storedUsername = localStorage.getItem('username');
+    const storedUsername = sessionStorage.getItem('username');
     console.log(storedUsername);
     return storedUsername || 'Login';
   };
@@ -24,8 +24,8 @@ function Navbar() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('username');
+    sessionStorage.removeItem('access_token');
+    sessionStorage.removeItem('username');
     setUsername('Login');
     setDropdownVisible(false);
     navigate('/');

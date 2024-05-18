@@ -357,6 +357,13 @@ def end_simulation():
 
     # curl -X POST -d "" "http://localhost:5000/api/endSimulation"
 
+@app.route('/api/endSimulationAndSave', methods=['POST'])
+def end_simulation_and_save():
+    publish.single("/endSimulationAndSave", payload="", hostname="localhost", port=1883)
+    return jsonify({'message': 'Simulação finalizada e salva com sucesso'}), 200
+
+    # curl -X POST -d "" "http://localhost:5000/api/endSimulationAndSave"
+
 
 @app.route('/api/cars', methods=['POST'])
 def cars():

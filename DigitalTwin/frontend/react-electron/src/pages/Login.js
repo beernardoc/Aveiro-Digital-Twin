@@ -30,24 +30,19 @@ function Login(props) {
       if(response.data) {     
         const token = response.data.token
         console.log(token)
-        localStorage.setItem('access_token', token)
-        localStorage.setItem('username', response.data.username)
+        sessionStorage.setItem('access_token', token)
+        sessionStorage.setItem('username', response.data.username)
         // set default headers 
         // setAuthenticationHeader(token) 
         navigate('/'); 
         /* props.history.push('/accounts')
-        localStorage.setItem('email', credentials.email)
+        sessionStorage.setItem('email', credentials.email)
         props.onLoggedIn()   */ 
       }
     }).catch(error => {
       console.log(error)    
     })
 
-  }
-
-  const handleLogOut = () => {
-    localStorage.removeItem('access_token')
-    localStorage.removeItem('username')
   }
 
   return (
@@ -59,7 +54,6 @@ function Login(props) {
       </div>
       <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', gap: '10px' }}>
         <button onClick={handleLogin} style={{ padding: '10px 20px', margin: '10px 0', cursor: 'pointer', border: 'none', borderRadius: '4px', backgroundColor: '#007bff', color: 'white' }}>Login</button>
-        <button onClick={handleLogOut} style={{ padding: '10px 20px', margin: '10px 0', cursor: 'pointer', border: 'none', borderRadius: '4px', backgroundColor: '#dc3545', color: 'white' }}>Log Out</button>
       </div>
       <div style={{ textAlign: 'center', marginTop: '20px' }}>
         <Link to="/register" style={{ color: '#007bff', textDecoration: 'none' }}>Don't have an account? Sign Up</Link>
