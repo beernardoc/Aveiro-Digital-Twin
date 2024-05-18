@@ -50,6 +50,7 @@ processCarla = None
 number_of_vehicles = 0
 blocked_roundabouts = []
 current_user = None
+simulation_name = None
 
 @app.route('/api')
 def api():
@@ -359,6 +360,9 @@ def end_simulation():
 
 @app.route('/api/endSimulationAndSave', methods=['POST'])
 def end_simulation_and_save():
+    global simulation_name
+    simulation_name = request.args.get('name')
+
     publish.single("/endSimulationAndSave", payload="", hostname="localhost", port=1883)
     return jsonify({'message': 'Simulação finalizada e salva com sucesso'}), 200
 
@@ -454,7 +458,8 @@ def on_message(client, userdata, msg):
         data = {
             "user_email": json.loads(msg.payload)['user_email'],
             "history": json.loads(msg.payload)['history'], 
-            "date": datetime.now()
+            "date": datetime.now(),
+            "simulation_name": simulation_name
         }
         mongo.db.history.insert_one(data)
 
