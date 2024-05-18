@@ -4,45 +4,39 @@ import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 
 function Login(props) {
-
   const navigate = useNavigate()
-  const [credentials, setCredentials] = useState({})
-  const [username, setUsername] = useState({})
+  const [credentials, setCredentials] = useState({ email: '', password: '' })
+  const [error, setError] = useState('')
 
   const handleChange = (e) => {
     setCredentials({
       ...credentials,
       [e.target.name]: e.target.value
     })
-    setUsername({
-        ...username,
-        [e.target.name]: e.target.value
-    })
   }
 
   const handleLogin = () => {
+    if (!credentials.email || !credentials.password) {
+      setError('Both email and password are required.')
+      return;
+    }
+
     // perform the login request 
-  
-    axios.post('http://localhost:5000/api/login',{
-      email: credentials.email, 
-      password: credentials.password    
+    axios.post('http://localhost:5000/api/login', {
+      email: credentials.email,
+      password: credentials.password
     }).then(response => {
-      if(response.data) {     
+      if (response.data) {
         const token = response.data.token
         console.log(token)
         sessionStorage.setItem('access_token', token)
         sessionStorage.setItem('username', response.data.username)
-        // set default headers 
-        // setAuthenticationHeader(token) 
-        navigate('/'); 
-        /* props.history.push('/accounts')
-        sessionStorage.setItem('email', credentials.email)
-        props.onLoggedIn()   */ 
+        navigate('/');
       }
     }).catch(error => {
-      console.log(error)    
+      console.log(error)
+      setError('Login failed. Please check your credentials and try again.')
     })
-
   }
 
   return (
@@ -52,6 +46,7 @@ function Login(props) {
         <input type="text" name="email" onChange={handleChange} placeholder="Enter email" style={{ width: '45%', padding: '10px', margin: '10px 0', boxSizing: 'border-box', border: '1px solid #ccc', borderRadius: '4px' }} />
         <input type="password" name="password" onChange={handleChange} placeholder="Enter password" style={{ width: '45%', padding: '10px', margin: '10px 0', boxSizing: 'border-box', border: '1px solid #ccc', borderRadius: '4px' }} />
       </div>
+      {error && <p style={{ color: 'red', marginBottom: '20px' }}>{error}</p>}
       <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', gap: '10px' }}>
         <button onClick={handleLogin} style={{ padding: '10px 20px', margin: '10px 0', cursor: 'pointer', border: 'none', borderRadius: '4px', backgroundColor: '#007bff', color: 'white' }}>Login</button>
       </div>
