@@ -7,19 +7,22 @@ const HomePage = () => {
 
     const handleClick = () => {
         if (sessionStorage.getItem('access_token') === null) {
-            window.location.href = '/login';
+            // Pass state variable indicating login is required
+            window.location.href = '/login?required=true';
         } else {
             window.location.href = '/run2D';
         }
     }
-
+    
     const handleClick3D = () => {
         if (sessionStorage.getItem('access_token') === null) {
-            window.location.href = '/login';
+            // Pass state variable indicating login is required
+            window.location.href = '/login?required=true';
         } else {
             window.location.href = '/run2D';
         }
     }
+    
 
     return (    
 

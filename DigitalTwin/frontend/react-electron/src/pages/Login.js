@@ -1,12 +1,21 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import axios from 'axios'
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 
 function Login(props) {
   const navigate = useNavigate()
+  const location = useLocation();
   const [credentials, setCredentials] = useState({ email: '', password: '' })
   const [error, setError] = useState('')
+  const [requiredLogin, setRequiredLogin] = useState(false);
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    if (searchParams.get('required') === 'true') {
+        setRequiredLogin(true);
+    }
+}, [location]);
 
   const handleChange = (e) => {
     setCredentials({
@@ -47,6 +56,9 @@ function Login(props) {
         <input type="password" name="password" onChange={handleChange} placeholder="Enter password" style={{ width: '45%', padding: '10px', margin: '10px 0', boxSizing: 'border-box', border: '1px solid #ccc', borderRadius: '4px' }} />
       </div>
       {error && <p style={{ color: 'red', marginBottom: '20px' }}>{error}</p>}
+      {requiredLogin && (
+          <p style={{ color: 'red', marginBottom: '10px' }}>Login is required to make a Simulation.</p>
+      )}
       <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', gap: '10px' }}>
         <button onClick={handleLogin} style={{ padding: '10px 20px', margin: '10px 0', cursor: 'pointer', border: 'none', borderRadius: '4px', backgroundColor: '#007bff', color: 'white' }}>Login</button>
       </div>
