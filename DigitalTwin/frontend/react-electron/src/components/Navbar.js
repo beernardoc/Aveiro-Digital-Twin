@@ -64,7 +64,7 @@ function Navbar() {
               </button>
               {dropdownVisible && (
                 <div className="dropdown-menu">
-                  <Link to="/history">View History</Link>
+                  <Link to="/history" onClick={toggleDropdown}>History</Link>
                   <button onClick={handleLogout} style={{ color: '#EE4E4E' }}>Log Out</button>
                 </div>
               )}
