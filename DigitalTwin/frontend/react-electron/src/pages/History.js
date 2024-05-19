@@ -9,14 +9,9 @@ export default function History() {
     const [history, setHistory] = useState([]);
     const navigate = useNavigate();
 
-    const get_history = (id) => {
-
-    }
-
     useEffect(() => {
         axios.get(`http://localhost:5000/api/history`)
             .then((response) => {
-                console.log(response.data[0].date.$date);
                 setHistory(response.data);
             })
             .catch((error) => {
@@ -33,7 +28,7 @@ export default function History() {
                     <div className="history-page-history">
                         <div className="history">
                             {history.map((history) => (
-                                <Card key={history._id.$oid} id={history._id.$oid} date={history.date.$date} simulation_name={history.simulation_name} handleClick={() => get_history(history.id)} />
+                                <Card key={history._id.$oid} id={history._id.$oid} date={history.date.$date} simulation_name={history.simulation_name} _id={history._id.$oid} />
                             ))}
                             {history.length === 0 && 
                                 <>

@@ -2,11 +2,35 @@ import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faClockRotateLeft, faRoad } from '@fortawesome/free-solid-svg-icons';
 import './HistoryCard.css';
+import axios from 'axios';
 
-const Card = ({ date, simulation_name, handleClick }) => {
+const Card = ({ date, simulation_name, _id }) => {
     // date is like: "2024-05-18T23:24:56.070Z", so we need to format it
     const dateObj = new Date(date);
     const formattedDate = dateObj.toLocaleString();
+
+    const handleClick = () => {
+        // Redirect to the simulation page with the simulation id
+        axios.get(`http://localhost:5000/api/sim_running`)
+            .then((response) => {
+                if (response.data.sim_running === false) {
+                    alert('Resimulating...');
+                    // axios.post(`http://localhost:5000/api/resimulate`, { id: _id })
+                    //     .then((response) => {
+                    //         console.log('Comando executado com sucesso:', response.data);
+                    //         window.location.href = '/run2D';
+                    //     })
+                    //     .catch((error) => {
+                    //         console.error('Erro ao executar o comando:', error);
+                    //     });
+                } else {
+                    alert('There is a simulation running. Please wait until it finishes.');
+                }
+            })
+            .catch((error) => {
+                console.error('Erro ao executar o comando:', error);
+            });
+    };
 
     return (
         <div className="card-history">

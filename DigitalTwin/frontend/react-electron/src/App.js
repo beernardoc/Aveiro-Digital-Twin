@@ -29,10 +29,17 @@ function App() {
   const [showSidebar, setShowSidebar] = useState(false);
 
   useEffect(() => {
-    const user = sessionStorage.getItem('access_token');
-    if (user) {
-      setShowSidebar(true);
-    }
+    axios.get(`http://localhost:5000/api/sim_running`)
+      .then((response) => {
+          if (response.data.sim_running === false) {
+              setShowSidebar(false);
+          } else {
+              setShowSidebar(true);
+          }
+      })
+      .catch((error) => {
+          console.error('Erro ao executar o comando:', error);
+      });
   }, []);
 
   function runPythonScript() {

@@ -36,7 +36,7 @@
 .card-history button {
     background-color: #1c2548;
     border: none;
-    border-radius: 50%;
+    border-radius: 10%;
     cursor: pointer;
     padding: 10px;
     position: absolute;
@@ -68,7 +68,7 @@
 }
 
 .card-buttons-history button:first-child:hover {
-    background-color: #7740a4;
+    background-color: rgba(163, 168, 255, 0.3);
 }
 
 .card-buttons-history button:first-child {

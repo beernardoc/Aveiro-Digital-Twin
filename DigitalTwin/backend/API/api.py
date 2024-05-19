@@ -51,6 +51,7 @@ number_of_vehicles = 0
 blocked_roundabouts = []
 current_user = None
 simulation_name = None
+sim_running = False
 
 @app.route('/api')
 def api():
@@ -212,6 +213,8 @@ def run_3D():
     try:
         global processCarla
         processCarla = subprocess.Popen(["./Adapters/co_simulation/runCarla.sh"])
+        global sim_running
+        sim_running = True
         sleep(10)
 
         global process3d
@@ -228,6 +231,8 @@ def run_2D():
         process2d = subprocess.Popen(["python3", "Adapters/co_simulation/simulation_2D.py", current_user])
         global blocked_roundabouts
         blocked_roundabouts = []
+        global sim_running
+        sim_running = True
 
         return jsonify({'message': 'Comando iniciado com sucesso'}), 200
     except subprocess.CalledProcessError as e:
@@ -352,6 +357,9 @@ def end_simulation():
     #     if processCarla is not None:
     #         processCarla.send_signal(signal.SIGINT)
 
+    global sim_running
+    sim_running = False
+
     return jsonify({'message': 'Simulação finalizada com sucesso'}), 200
     # except Exception as e:
     #     return jsonify({'error': str(e)}), 500
@@ -364,6 +372,10 @@ def end_simulation_and_save():
     simulation_name = request.args.get('name')
 
     publish.single("/endSimulationAndSave", payload="", hostname="localhost", port=1883)
+
+    global sim_running
+    sim_running = False
+
     return jsonify({'message': 'Simulação finalizada e salva com sucesso'}), 200
 
     # curl -X POST -d "" "http://localhost:5000/api/endSimulationAndSave"
@@ -436,6 +448,12 @@ def get_history_for_user():
     return Response(response, mimetype="application/json")
 
     # curl -X GET "http://localhost:5000/api/history"
+
+@app.route('/api/sim_running', methods=['GET'])
+def is_simulation_running():
+    return jsonify({'sim_running': sim_running})
+
+    # curl -X GET "http://localhost:5000/api/sim_running"
 
 def on_connect(client, userdata, flags, rc):
     print(f"Conectado ao broker com código de resultado {rc}")
