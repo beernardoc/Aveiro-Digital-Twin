@@ -449,6 +449,21 @@ def get_history_for_user():
 
     # curl -X GET "http://localhost:5000/api/history"
 
+@app.route('/api/history', methods=['DELETE'])
+def delete_history_for_user():
+    _id = request.args.get('id')
+    if _id is None:
+        return jsonify({'error': 'Parâmetro "id" é obrigatório na URL'}), 400
+    
+    try:
+        mongo.db.history.delete_one({'_id': ObjectId(_id)})
+        return jsonify({'message': 'Histórico deletado com sucesso'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    
+    # curl -X DELETE "http://localhost:5000/api/history?id=1"
+    
+
 @app.route('/api/sim_running', methods=['GET'])
 def is_simulation_running():
     return jsonify({'sim_running': sim_running})
@@ -472,6 +487,8 @@ def resimulation():
         return jsonify({'message': 'Comando iniciado com sucesso'}), 200
     except subprocess.CalledProcessError as e:
         return jsonify({'error': e}), 500
+
+    # curl -X POST -d "" "http://localhost:5000/api/resimulation?id=1"
     
 
 def on_connect(client, userdata, flags, rc):
