@@ -455,6 +455,25 @@ def is_simulation_running():
 
     # curl -X GET "http://localhost:5000/api/sim_running"
 
+@app.route('/api/resimulation', methods=['POST'])
+def resimulation():
+    # get the simulation id
+    simulation_id = request.args.get('id')
+
+    try:
+        global process2d
+        process2d = subprocess.Popen(["python3", "Adapters/co_simulation/simulation_2D.py", current_user,
+                                      "--resimulation", simulation_id])
+        global blocked_roundabouts
+        blocked_roundabouts = []
+        global sim_running
+        sim_running = True
+
+        return jsonify({'message': 'Comando iniciado com sucesso'}), 200
+    except subprocess.CalledProcessError as e:
+        return jsonify({'error': e}), 500
+    
+
 def on_connect(client, userdata, flags, rc):
     print(f"Conectado ao broker com código de resultado {rc}")
 

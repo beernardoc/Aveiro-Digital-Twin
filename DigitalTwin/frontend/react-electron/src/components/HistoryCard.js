@@ -14,15 +14,14 @@ const Card = ({ date, simulation_name, _id }) => {
         axios.get(`http://localhost:5000/api/sim_running`)
             .then((response) => {
                 if (response.data.sim_running === false) {
-                    alert('Resimulating...');
-                    // axios.post(`http://localhost:5000/api/resimulate`, { id: _id })
-                    //     .then((response) => {
-                    //         console.log('Comando executado com sucesso:', response.data);
-                    //         window.location.href = '/run2D';
-                    //     })
-                    //     .catch((error) => {
-                    //         console.error('Erro ao executar o comando:', error);
-                    //     });
+                    axios.post(`http://localhost:5000/api/resimulation?id=${_id}`)
+                        .then((response) => {
+                            console.log('Comando executado com sucesso:', response.data);
+                            window.location.href = '/simulation';
+                        })
+                        .catch((error) => {
+                            console.error('Erro ao executar o comando:', error);
+                        });
                 } else {
                     alert('There is a simulation running. Please wait until it finishes.');
                 }

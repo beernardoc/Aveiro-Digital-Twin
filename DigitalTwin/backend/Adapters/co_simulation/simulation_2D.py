@@ -7,10 +7,14 @@ import time
 import sumolib
 import traci
 import sys
+import getopt
 import os
 
 import paho.mqtt.client as mqtt
 import paho.mqtt.publish as publish
+
+from pymongo import MongoClient
+from bson import ObjectId
 
 # Determine the project root directory
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
@@ -23,11 +27,15 @@ radar_file_path = os.path.join(os.path.dirname(__file__), "radar.json")
 roundabout_file_path = os.path.join(os.path.dirname(__file__), "roundabout.json")
 from coord_distance import calculate_bearing
 
+mongo_client = MongoClient(host='localhost', port=27017, username='admin', password='password')
+mongo = mongo_client['digitaltwin']
 
 def get_options():
     opt_parser = optparse.OptionParser()
     opt_parser.add_option("--nogui", action="store_true",
                           default=False, help="run the commandline version of sumo")
+    opt_parser.add_option("--resimulation", action="store", type="string",
+                          help="run a resimulation with the given history id")
     options, args = opt_parser.parse_args()
     return options
 
@@ -488,15 +496,29 @@ if __name__ == "__main__":
     else:
         sumoBinary = sumolib.checkBinary('sumo-gui')
 
-    # Inicia o SUMO em uma thread separada
-
-    # Aveiro sumo network
-    sumo_thread = threading.Thread(target=traci.start, args=[
-        [sumoBinary, "-c", "Adapters/co_simulation/sumo_configuration/simple-map/simple-map.sumocfg",
-         "--tripinfo-output",
-         "tripinfo.xml",
-        "--quit-on-end"
-         ]])
+    if options.resimulation:
+        _id = options.resimulation
+        simulation = mongo.db.history.find_one({'_id': ObjectId(_id)})
+        sim_xml = simulation["history"]
+        # write to new rou file
+        with open("Adapters/co_simulation/sumo_configuration/simple-map/resimulation.rou.xml", "w") as f:
+            f.write(sim_xml)
+            f.close()
+        
+        sumo_thread = threading.Thread(target=traci.start, args=[
+            [sumoBinary, "-c", "Adapters/co_simulation/sumo_configuration/simple-map/resimulation.sumocfg",
+            "--tripinfo-output",
+            "tripinfo.xml",
+            "--quit-on-end"
+            ]])
+        
+    else:
+        sumo_thread = threading.Thread(target=traci.start, args=[
+            [sumoBinary, "-c", "Adapters/co_simulation/sumo_configuration/simple-map/simple-map.sumocfg",
+            "--tripinfo-output",
+            "tripinfo.xml",
+            "--quit-on-end"
+            ]])
 
     # Simple sumo network
     # sumo_thread = threading.Thread(target=traci.start, args=[
