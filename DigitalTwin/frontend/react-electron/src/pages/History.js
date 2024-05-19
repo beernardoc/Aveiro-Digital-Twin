@@ -12,7 +12,10 @@ export default function History() {
     useEffect(() => {
         axios.get(`http://localhost:5000/api/history`)
             .then((response) => {
-                setHistory(response.data);
+                const result = response.data;
+                // flip the array to show the most recent simulations first
+                result.reverse();
+                setHistory(result);
             })
             .catch((error) => {
                 console.error('Erro ao executar o comando:', error);
