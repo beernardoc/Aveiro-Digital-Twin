@@ -17,6 +17,7 @@ import multiprocessing
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 radar_file_path = os.path.join(os.path.dirname(__file__), "radar.json")
 roundabout_file_path = os.path.join(os.path.dirname(__file__), "roundabout.json")
+road_file_path = os.path.join(os.path.dirname(__file__), "road.json")
 from coord_distance import calculate_bearing
 
 
@@ -32,6 +33,7 @@ global step
 allVehicle = set()
 simulated_vehicles = {}
 blocked_roundabouts = {}
+blocked_roads = {}
 
 randomVehiclesThread = None
 end_addRandomTraffic = False
@@ -59,8 +61,13 @@ def run():
         publish.single("/cars", payload=json.dumps(data), hostname="localhost", port=1883)
 
         global blocked_roundabouts
+        global blocked_roads
+
         data = {"blocked_roundabouts": blocked_roundabouts}
         publish.single("/blocked_rounds", payload=json.dumps(data), hostname="localhost", port=1883)
+
+        data = {"blocked_roads": blocked_roads}
+        publish.single("/blocked_roads", payload=json.dumps(data), hostname="localhost", port=1883)
 
         # if len(simulated_vehicles) > 0:
         #     for vehicle_id in list(simulated_vehicles.keys()):
@@ -110,12 +117,38 @@ def blockRoundabout(roundabout_id):
         blocked_roundabouts[roundabout_id][edge] = max_speed
         traci.edge.setMaxSpeed(edge, 0)
 
+def blockRoad(road_id):
+    with open(road_file_path, "r") as f:
+        data = json.load(f)
+        road = data[str(road_id)]
+        f.close()
+
+    global blocked_roads
+    blocked_roads[road_id] = {}
+    
+    for edge in road["edges"]:
+        all_lane_ids = traci.lane.getIDList()
+        lanes = [lane for lane in all_lane_ids if lane.startswith(str(edge) + "_")]
+        max_speed = 0
+        for lane in lanes:
+            if max_speed < traci.lane.getMaxSpeed(lane):
+                max_speed = traci.lane.getMaxSpeed(lane)
+        blocked_roads[road_id][edge] = max_speed
+        traci.edge.setMaxSpeed(edge, 0)
+
 def unblockRoundabout(roundabout_id):
     global blocked_roundabouts
     for edge, speed in blocked_roundabouts[roundabout_id].items():
         traci.edge.setMaxSpeed(edge, speed)
     
     del blocked_roundabouts[roundabout_id]
+
+def unblockRoad(road_id):
+    global blocked_roads
+    for edge, speed in blocked_roads[road_id].items():
+        traci.edge.setMaxSpeed(edge, speed)
+    
+    del blocked_roads[road_id]
 
 def clearSimulation():
     time.sleep(3)
@@ -440,9 +473,17 @@ def on_message(client, userdata, msg):
         payload = json.loads(msg.payload)
         blockRoundabout(int(payload))
 
+    if topic == "/blockRoad":
+        payload = json.loads(msg.payload)
+        blockRoad(int(payload))
+
     if topic == "/unblockRoundabout":
         payload = json.loads(msg.payload)
         unblockRoundabout(int(payload))
+
+    if topic == "/unblockRoad":
+        payload = json.loads(msg.payload)
+        unblockRoad(int(payload))
 
 if __name__ == "__main__":
     options = get_options()
@@ -483,7 +524,9 @@ if __name__ == "__main__":
     mqtt_client.subscribe("/addRandomBike")
     mqtt_client.subscribe("/clearSimulation")
     mqtt_client.subscribe("/blockRoundabout")
+    mqtt_client.subscribe("/blockRoad")
     mqtt_client.subscribe("/unblockRoundabout")
+    mqtt_client.subscribe("/unblockRoad")
 
     mqtt_thread = threading.Thread(target=mqtt_client.loop_start)
     mqtt_thread.start()

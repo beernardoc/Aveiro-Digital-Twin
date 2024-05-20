@@ -1,0 +1,99 @@
+.road-page-container {
+    display: flex;
+    height: 100vh;
+    position: relative;
+}
+
+.road-page {
+    height: calc(100%- 90px);
+    flex: 3;
+    padding: 20px;
+    padding-top: 70px;
+    padding-left: 310px;
+    background-color: #d0daf0;
+    color: #ffffff;
+    width: 100%;
+}
+
+.road-page-map {
+    /* center the map */
+    display: flex;
+    justify-content: center;
+}
+
+.road-page-map img {
+    /* make the map not change size */
+    min-width: 1178px;
+}
+
+.modal {
+    position: fixed; /* Position relative to the viewport */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width of the viewport */
+    height: 100%; /* Full height of the viewport */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(0, 0, 0, 0.4); /* Black with opacity */
+}
+
+/* Modal Content/Box */
+.modal-content {
+    background-color: #fefefe;
+    margin: 10% auto; /* 10% from the top and centered horizontally */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 60%; /* Set the width of the modal */
+    max-width: 800px; /* Max width to avoid being too large on large screens */
+    border-radius: 8px;
+    position: relative;
+}
+
+/* The Close Button */
+.close {
+    color: #aaa;
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+}
+
+.modal-button-block {
+    width: 200px;
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    border-radius: 4px;
+    background-color: #ff0000;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.modal-button-block:hover {
+    background-color: #a71101;
+}
+
+.modal-button-unblock {
+    width: 200px;
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    border-radius: 4px;
+    background-color: #007bff;;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.modal-button-unblock:hover {
+    background-color: #0056b3;
+}

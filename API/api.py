@@ -48,6 +48,7 @@ processCarla = None
 
 number_of_vehicles = 0
 blocked_roundabouts = []
+blocked_roads = []
 
 @app.route('/api')
 def api():
@@ -219,9 +220,13 @@ def run_3D():
 def run_2D():
     try:
         global process2d
-        process2d = subprocess.Popen(["python3", "../Adapters/co_simulation/simulation_2D.py"])
         global blocked_roundabouts
+        global blocked_roads
+
+        process2d = subprocess.Popen(["python3", "../Adapters/co_simulation/simulation_2D.py"])
         blocked_roundabouts = []
+        blocked_roads = []
+
         return jsonify({'message': 'Comando iniciado com sucesso'}), 200
     except subprocess.CalledProcessError as e:
         return jsonify({'error': e}), 500
@@ -385,6 +390,20 @@ def block_roundabout():
     
     # curl -X POST -d "" "http://localhost:5000/api/blockRoundabout?id=1"
 
+@app.route('/api/blockRoad', methods=['POST'])
+def block_road():
+    road_id = request.args.get('id')
+    if road_id is None:
+        return jsonify({'error': 'Parâmetro "id" é obrigatório na URL'}), 400
+    
+    try:
+        publish.single("/blockRoad", payload=road_id, hostname="localhost", port=1883)
+        return jsonify({'message': f'Estrada {road_id} bloqueada'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    
+    # curl -X POST -d "" "http://localhost:5000/api/blockRoad?id=1"
+
 @app.route('/api/unblockRoundabout', methods=['POST'])
 def unblock_roundabout():
     roundabout_id = request.args.get('id')
@@ -399,6 +418,20 @@ def unblock_roundabout():
     
     # curl -X POST -d "" "http://localhost:5000/api/unblockRoundabout?id=1"
 
+@app.route('/api/unblockRoad', methods=['POST'])
+def unblock_road():
+    road_id = request.args.get('id')
+    if road_id is None:
+        return jsonify({'error': 'Parâmetro "id" é obrigatório na URL'}), 400
+    
+    try:
+        publish.single("/unblockRoad", payload=road_id, hostname="localhost", port=1883)
+        return jsonify({'message': f'Estrada {road_id} desbloqueada'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    
+    # curl -X POST -d "" "http://localhost:5000/api/unblockRoad?id=1"
+
 @app.route('/api/vehicles', methods=['GET'])
 def get_vehicles():
     return jsonify({'quantity': number_of_vehicles})
@@ -410,6 +443,12 @@ def get_blocked_roundabouts():
     return jsonify({'blocked_roundabouts': blocked_roundabouts})
 
     # curl -X GET "http://localhost:5000/api/blockedRoundabouts"
+
+@app.route('/api/blockedRoads', methods=['GET'])
+def get_blocked_roads():
+    return jsonify({'blocked_roads': blocked_roads})
+
+    # curl -X GET "http://localhost:5000/api/blockedRoads"
 
 def on_connect(client, userdata, flags, rc):
     print(f"Conectado ao broker com código de resultado {rc}")
@@ -437,6 +476,14 @@ def on_message(client, userdata, msg):
             if roundabout not in blocked_roundabouts:
                 blocked_roundabouts.append(roundabout)
 
+    if topic == '/blocked_roads':
+        socketio.emit('blocked_roads', msg.payload)
+        blocked_roads_data = json.loads(msg.payload)
+        global blocked_roads
+        for road in blocked_roads_data['blocked_roads'].keys():
+            if road not in blocked_roads:
+                blocked_roads.append(road)
+
 def start_mqtt_connection():
     # Inicia a conexão MQTT
     mqtt_client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1)
@@ -446,6 +493,7 @@ def start_mqtt_connection():
     mqtt_client.connect("localhost", 1883, 60)
     mqtt_client.subscribe("/cars")
     mqtt_client.subscribe("/blocked_rounds")
+    mqtt_client.subscribe("/blocked_roads")
 
 
     mqtt_client.loop_forever()  # Use loop_forever() para manter a conexão MQTT em execução indefinidamente
