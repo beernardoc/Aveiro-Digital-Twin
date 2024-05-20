@@ -19,7 +19,7 @@ const HomePage = () => {
             // Pass state variable indicating login is required
             window.location.href = '/login?required=true';
         } else {
-            window.location.href = '/run2D';
+            window.location.href = '/run3D';
         }
     }
     

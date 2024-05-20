@@ -8,6 +8,7 @@ from bson import json_util
 from bson.objectid import ObjectId
 import paho.mqtt.publish as publish
 import paho.mqtt.client as mqtt
+import requests
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_cors import CORS
 import flask_socketio as socketio
@@ -16,6 +17,9 @@ from flask_jwt_extended import decode_token, JWTManager, jwt_required, create_ac
 from werkzeug.security import check_password_hash
 from pymongo import MongoClient
 from datetime import datetime
+
+from create_sumocgf import parse_json_to_xml
+
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
@@ -211,37 +215,118 @@ def not_found(error=None):
 
 @app.route('/api/run3D', methods=['POST'])
 def run_3D():
+    print("chegou no 3d 1")
     try:
-        global processCarla
-        processCarla = subprocess.Popen(["./Adapters/co_simulation/runCarla.sh"])
-        global sim_running
-        sim_running = True
-        sleep(10)
 
+        live = request.args.get('live', default=False)
+        real_data = request.args.get('realdata', default=False)
+        global processCarla
         global process3d
-        process3d = subprocess.Popen(["python3", "Adapters/co_simulation/simulation_3D.py"])
-        return jsonify({'message': 'Comando executado com sucesso'}), 200
+        print("chegou no 3d 2")
+
+        if live == "True":
+            print("chegou no 3d")
+            processCarla = subprocess.Popen(["Adapters/co_simulation/runCarlaLive.sh"])
+            sleep(10)
+            process3d = subprocess.Popen(["python3", "Adapters/co_simulation/live_simulation3D.py"])
+            return jsonify({'message': 'Comando executado com sucesso'}), 200
+
+        if real_data == "True":
+            data = request.json
+            entities = data.get('entities', [])
+            day = data.get('day')
+            start_time = data.get('startTime')
+            end_time = data.get('endTime')
+
+            # Aqui você pode usar os dados recebidos como desejar
+            print(f"Recebido os seguintes dados: entities={entities}, day={day}, startTime={start_time}, endTime={end_time}")
+
+            results = []
+
+            if real_data:
+                # Fazer requisições individuais para cada tipo de entidade
+                for entity in entities:
+                    response = fetch_sth_comet_data(entity, day, start_time, end_time)
+                    if response.status_code == 200:
+                        results.append(response.json())
+                    else:
+                        print(f"Falha ao obter dados para {entity}: {response.text}")
+
+                return jsonify({'message': 'Dados históricos obtidos com sucesso', 'data': results}), 200
+            
+            processCarla = subprocess.Popen(["Adapters/co_simulation/runCarla.sh"])
+            sleep(10)
+
+            process3d = subprocess.Popen(["python3", "Adapters/co_simulation/simulation_3D.py"])
+            return jsonify({'message': 'Comando executado com sucesso'}), 200
+
     except subprocess.CalledProcessError as e:
         return jsonify({'error': e}), 500
-
-
+    
 @app.route('/api/run2D', methods=['POST'])
 def run_2D():
     try:
+        live = request.args.get('live', default=False)
+        real_data = request.args.get('realdata', default=False)
         global process2d
         global blocked_roundabouts
-        global blocked_roads
 
-        process2d = subprocess.Popen(["python3", "Adapters/co_simulation/simulation_2D.py", current_user])
+        if live == "True":
+            process2d = subprocess.Popen(["python3", "Adapters/co_simulation/live_simulation2D.py"])
+            blocked_roundabouts = []
+            return jsonify({'message': 'Comando iniciado com sucesso'}), 200
+
+
+        elif real_data == "True":
+            data = request.json
+            entities = data.get('entities', [])
+            #day = data.get('day')
+            start_time = data.get('startTime')
+            end_time = data.get('endTime')
+
+            #print(f" DENTRO DO RUN2D: Recebido os seguintes dados: entities={entities}, day={day}, startTime={start_time}, endTime={end_time}")
+
+            results = []
+
+            #for entity in entities:
+            #    response = fetch_sth_comet_data(entity, day, start_time, end_time)
+            #    if response.status_code == 200:
+            #        results.append(response.json())
+            #    else:
+            #        print(f"Falha ao obter dados para {entity}: {response.text}")
+
+            #parse_json_to_xml(response.json())
+            parse_json_to_xml(start_time)
+
+            #return jsonify({'message': 'Dados históricos obtidos com sucesso', 'data': results}), 200
+
+        process2d = subprocess.Popen(["python3", "Adapters/co_simulation/simulation_2D.py"])
         blocked_roundabouts = []
-        blocked_roads = []
-
-        global sim_running
-        sim_running = True
 
         return jsonify({'message': 'Comando iniciado com sucesso'}), 200
+    
     except subprocess.CalledProcessError as e:
-        return jsonify({'error': e}), 500
+        return jsonify({'error': str(e)}), 500
+    
+
+def fetch_sth_comet_data(entity, day, start_time, end_time, lastN=10):
+    base_url = 'http://10.0.23.112:30866/STH/v2/entities/all/attrs/all'
+    headers = {
+        'fiware-service': 'default',
+        'fiware-servicepath': '/atcll'
+    }
+    params = {
+        'type': entity,
+        'lastN': lastN,
+        'dateFrom': f"{day}T{start_time}:00.000Z",
+        'dateTo': f"{day}T{end_time}:59.999Z"
+    }
+    response = requests.get(base_url, headers=headers, params=params)
+
+    print(f"DENTRO DO FETCH: Requisição para {entity} retornou {response.text}")
+
+    return response
+
 
 
 @app.route('/api/addRandomTraffic', methods=['POST'])
