@@ -18,11 +18,30 @@ import BlockRoad from './pages/BlockRoad';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Settings from './pages/Settings';
+import EndSimulation from './pages/EndSimulation';
+import History from './pages/History';
+import { useState } from 'react';
+import { useEffect } from 'react';
 
 const api = "http://localhost:5000/api";
 
 function App() {
 
+  const [showSidebar, setShowSidebar] = useState(false);
+
+  useEffect(() => {
+    axios.get(`http://localhost:5000/api/sim_running`)
+      .then((response) => {
+          if (response.data.sim_running === false) {
+              setShowSidebar(false);
+          } else {
+              setShowSidebar(true);
+          }
+      })
+      .catch((error) => {
+          console.error('Erro ao executar o comando:', error);
+      });
+  }, []);
 
   function runPythonScript() {
     axios.post(`${api}/run`)
@@ -54,6 +73,13 @@ function App() {
           <Route path="/block" element={<><Sidebar /> <Block /> </>} />
           <Route path="/block-roundabout" element={<><Sidebar /> <BlockRoundabout /> </>} />
           <Route path="/block-road" element={<><Sidebar /> <BlockRoad /> </>} />
+          <Route path='/endSimulation' element={<><Sidebar /> <EndSimulation /></>} />
+          <Route path="/history" element={
+            <>
+              {showSidebar && <Sidebar />}
+              <History />
+            </>
+          } />
         </Routes>
       </div>
     </Router>

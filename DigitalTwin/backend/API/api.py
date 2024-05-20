@@ -1,8 +1,6 @@
 import threading
 from asyncio import sleep
 import json
-import os
-import signal
 import subprocess
 from flask import Flask, request, jsonify, Response, make_response
 from flask_pymongo import PyMongo
@@ -17,6 +15,7 @@ from flask_swagger_ui import get_swaggerui_blueprint
 from flask_jwt_extended import decode_token, JWTManager, jwt_required, create_access_token, get_jwt_identity
 from werkzeug.security import check_password_hash
 from pymongo import MongoClient
+from datetime import datetime
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
@@ -26,8 +25,10 @@ socketio = socketio.SocketIO(app, cors_allowed_origins="*")
 app.secret_key = 'myawesomesecretkey'
 app.config['JWT_SECRET_KEY'] = 'mysecretkey' 
 
-app.config['MONGO_URI'] = 'mongodb://localhost:27017/digitaltwin'
-mongo = PyMongo(app)
+# app.config['MONGO_URI'] = 'mongodb://localhost:27017/digitaltwin'
+# mongo = PyMongo(app)
+mongo_client = MongoClient(host='localhost', port=27017, username='admin', password='password')
+mongo = mongo_client['digitaltwin']
 jwt = JWTManager(app)
 
 SWAGGER_URL="/swagger"
@@ -49,6 +50,9 @@ processCarla = None
 number_of_vehicles = 0
 blocked_roundabouts = []
 blocked_roads = []
+current_user = None
+simulation_name = None
+sim_running = False
 
 @app.route('/api')
 def api():
@@ -119,6 +123,9 @@ def login():
 
     access_token = create_access_token(identity=email)
     print(f"Access Token: {access_token}")
+
+    global current_user
+    current_user = user['email']
 
     response = make_response(jsonify({'message': 'Login successful', 'username': user['username'], 'token': access_token}), 200)
     response.headers['Authorization'] = f'Bearer {access_token}'
@@ -206,11 +213,13 @@ def not_found(error=None):
 def run_3D():
     try:
         global processCarla
-        processCarla = subprocess.Popen(["./../Adapters/co_simulation/runCarla.sh"])
+        processCarla = subprocess.Popen(["./Adapters/co_simulation/runCarla.sh"])
+        global sim_running
+        sim_running = True
         sleep(10)
 
         global process3d
-        process3d = subprocess.Popen(["python3", "../Adapters/co_simulation/simulation_3D.py"])
+        process3d = subprocess.Popen(["python3", "Adapters/co_simulation/simulation_3D.py"])
         return jsonify({'message': 'Comando executado com sucesso'}), 200
     except subprocess.CalledProcessError as e:
         return jsonify({'error': e}), 500
@@ -223,9 +232,12 @@ def run_2D():
         global blocked_roundabouts
         global blocked_roads
 
-        process2d = subprocess.Popen(["python3", "../Adapters/co_simulation/simulation_2D.py"])
+        process2d = subprocess.Popen(["python3", "Adapters/co_simulation/simulation_2D.py", current_user])
         blocked_roundabouts = []
         blocked_roads = []
+
+        global sim_running
+        sim_running = True
 
         return jsonify({'message': 'Comando iniciado com sucesso'}), 200
     except subprocess.CalledProcessError as e:
@@ -339,22 +351,39 @@ def add_car():
 
 @app.route('/api/endSimulation', methods=['POST'])
 def end_simulation():
-    try:
-        publish.single("/endSimulation", payload="", hostname="localhost", port=1883)
-        if process2d is not None:
-            process2d.kill()
+    publish.single("/endSimulation", payload="", hostname="localhost", port=1883)
+    # try:
+    #     if process2d is not None:
+    #         process2d.send_signal(signal.SIGKILL)
 
-        if process3d is not None:
-            process3d.kill()
+    #     if process3d is not None:
+    #         process3d.kill()
 
-        if processCarla is not None:
-            processCarla.send_signal(signal.SIGINT)
+    #     if processCarla is not None:
+    #         processCarla.send_signal(signal.SIGINT)
 
-        return jsonify({'message': 'Simulação finalizada com sucesso'}), 200
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+    global sim_running
+    sim_running = False
+
+    return jsonify({'message': 'Simulação finalizada com sucesso'}), 200
+    # except Exception as e:
+    #     return jsonify({'error': str(e)}), 500
 
     # curl -X POST -d "" "http://localhost:5000/api/endSimulation"
+
+@app.route('/api/endSimulationAndSave', methods=['POST'])
+def end_simulation_and_save():
+    global simulation_name
+    simulation_name = request.args.get('name')
+
+    publish.single("/endSimulationAndSave", payload="", hostname="localhost", port=1883)
+
+    global sim_running
+    sim_running = False
+
+    return jsonify({'message': 'Simulação finalizada e salva com sucesso'}), 200
+
+    # curl -X POST -d "" "http://localhost:5000/api/endSimulationAndSave"
 
 
 @app.route('/api/cars', methods=['POST'])
@@ -450,6 +479,57 @@ def get_blocked_roads():
 
     # curl -X GET "http://localhost:5000/api/blockedRoads"
 
+@app.route('/api/history', methods=['GET'])
+def get_history_for_user():
+    history = mongo.db.history.find({'user_email': current_user}, {'history': 0})
+    response = json_util.dumps(history)
+
+    return Response(response, mimetype="application/json")
+
+    # curl -X GET "http://localhost:5000/api/history"
+
+@app.route('/api/history', methods=['DELETE'])
+def delete_history_for_user():
+    _id = request.args.get('id')
+    if _id is None:
+        return jsonify({'error': 'Parâmetro "id" é obrigatório na URL'}), 400
+    
+    try:
+        mongo.db.history.delete_one({'_id': ObjectId(_id)})
+        return jsonify({'message': 'Histórico deletado com sucesso'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    
+    # curl -X DELETE "http://localhost:5000/api/history?id=1"
+    
+
+@app.route('/api/sim_running', methods=['GET'])
+def is_simulation_running():
+    return jsonify({'sim_running': sim_running})
+
+    # curl -X GET "http://localhost:5000/api/sim_running"
+
+@app.route('/api/resimulation', methods=['POST'])
+def resimulation():
+    # get the simulation id
+    simulation_id = request.args.get('id')
+
+    try:
+        global process2d
+        process2d = subprocess.Popen(["python3", "Adapters/co_simulation/simulation_2D.py", current_user,
+                                      "--resimulation", simulation_id])
+        global blocked_roundabouts
+        blocked_roundabouts = []
+        global sim_running
+        sim_running = True
+
+        return jsonify({'message': 'Comando iniciado com sucesso'}), 200
+    except subprocess.CalledProcessError as e:
+        return jsonify({'error': e}), 500
+
+    # curl -X POST -d "" "http://localhost:5000/api/resimulation?id=1"
+    
+
 def on_connect(client, userdata, flags, rc):
     print(f"Conectado ao broker com código de resultado {rc}")
 
@@ -484,6 +564,15 @@ def on_message(client, userdata, msg):
             if road not in blocked_roads:
                 blocked_roads.append(road)
 
+    if topic == '/history':
+        data = {
+            "user_email": json.loads(msg.payload)['user_email'],
+            "history": json.loads(msg.payload)['history'], 
+            "date": datetime.now(),
+            "simulation_name": simulation_name
+        }
+        mongo.db.history.insert_one(data)
+
 def start_mqtt_connection():
     # Inicia a conexão MQTT
     mqtt_client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1)
@@ -494,6 +583,7 @@ def start_mqtt_connection():
     mqtt_client.subscribe("/cars")
     mqtt_client.subscribe("/blocked_rounds")
     mqtt_client.subscribe("/blocked_roads")
+    mqtt_client.subscribe("/history")
 
 
     mqtt_client.loop_forever()  # Use loop_forever() para manter a conexão MQTT em execução indefinidamente

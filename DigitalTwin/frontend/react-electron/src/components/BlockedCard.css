@@ -1,0 +1,76 @@
+.card-history {
+    background-color: #1c2548;
+    padding: 20px;
+    border-radius: 10px;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    position: relative;
+    margin: 10px;
+}
+
+.card-history h2 {
+    margin: 0;  
+    padding-left: 55px;
+}
+
+.card-icon-history {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 60px;
+    height: 100%;
+    background-color: #7191d2;
+    border-radius: 10px 50% 50% 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+}
+
+.card-icon-history i {
+    color: #ffffff;
+    size: 30px;
+}
+
+.card-history button {
+    background-color: #1c2548;
+    border: none;
+    border-radius: 10%;
+    cursor: pointer;
+    padding: 10px;
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+   
+.card-history button:hover {
+    background-color: #f47065;
+}
+   
+.card-history button svg {
+    color: #fff;
+}
+
+.card-buttons-history {
+    display: flex;
+}
+   
+.card-buttons-history button {
+    border: none;
+    cursor: pointer;
+    padding: 10px 10px;
+}
+   
+.card-buttons-history button:hover {
+    background-color: #f47065;
+}
+
+.card-buttons-history button:first-child:hover {
+    background-color: rgba(163, 168, 255, 0.3);
+}
+
+.card-buttons-history button:first-child {
+    margin-right: 40px;
+}

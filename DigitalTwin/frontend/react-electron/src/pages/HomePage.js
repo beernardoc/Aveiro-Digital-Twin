@@ -6,12 +6,23 @@ import './Homepage.css';
 const HomePage = () => {
 
     const handleClick = () => {
-        window.location.href = '/run2D';
+        if (sessionStorage.getItem('access_token') === null) {
+            // Pass state variable indicating login is required
+            window.location.href = '/login?required=true';
+        } else {
+            window.location.href = '/run2D';
+        }
     }
-
+    
     const handleClick3D = () => {
-        window.location.href = '/run3D';
+        if (sessionStorage.getItem('access_token') === null) {
+            // Pass state variable indicating login is required
+            window.location.href = '/login?required=true';
+        } else {
+            window.location.href = '/run2D';
+        }
     }
+    
 
     return (    
 

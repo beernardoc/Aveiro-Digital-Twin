@@ -20,7 +20,7 @@ const Settings = () => {
         try {
             const response = await axios.get('http://localhost:5000/user', {
             headers: {
-                Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+                Authorization: `Bearer ${sessionStorage.getItem('access_token')}`,
             },
             });
             setUser(response.data);
@@ -50,7 +50,7 @@ const Settings = () => {
             email: newUserData.email,
         }, {
             headers: {
-            Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+            Authorization: `Bearer ${sessionStorage.getItem('access_token')}`,
             },
         });
     
@@ -71,15 +71,15 @@ const Settings = () => {
     };
 
 /*   const getUserName = () => {
-    localStorage.getItem('username');
-    console.log(localStorage.getItem('username'));
-    return localStorage.getItem('username') || 'Login';
+    sessionStorage.getItem('username');
+    console.log(sessionStorage.getItem('username'));
+    return sessionStorage.getItem('username') || 'Login';
   };
 
   const getMail = () => {
-    localStorage.getItem('email');
-    console.log(localStorage.getItem('email'));
-    return localStorage.getItem('email') || 'Email';
+    sessionStorage.getItem('email');
+    console.log(sessionStorage.getItem('email'));
+    return sessionStorage.getItem('email') || 'Email';
   }
  */
   return (
