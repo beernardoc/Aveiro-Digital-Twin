@@ -14,6 +14,7 @@ import Run3DPage from './pages/Run3DPage';
 import ClearSimulation from './pages/ClearSimulation';
 import Block from './pages/Block';
 import BlockRoundabout from './pages/BlockRoundabout';
+import BlockRoad from './pages/BlockRoad';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Settings from './pages/Settings';
@@ -71,6 +72,7 @@ function App() {
           <Route path="/clear" element={ <><Sidebar /> <ClearSimulation /></> }></Route>
           <Route path="/block" element={<><Sidebar /> <Block /> </>} />
           <Route path="/block-roundabout" element={<><Sidebar /> <BlockRoundabout /> </>} />
+          <Route path="/block-road" element={<><Sidebar /> <BlockRoad /> </>} />
           <Route path='/endSimulation' element={<><Sidebar /> <EndSimulation /></>} />
           <Route path="/history" element={
             <>
