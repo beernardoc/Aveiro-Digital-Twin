@@ -42,6 +42,8 @@
   <vType id="vehicle.nissan.patrol" length="4.6045098304748535" width="1.9315929412841797" height="1.8548461198806763" vClass="passenger"/>
   <vType id="vehicle.nissan.micra" length="3.633375883102417" width="1.845113754272461" height="1.5012825727462769" vClass="passenger"/>
   <vType id="vehicle.mini.cooper_s" length="3.805800199508667" width="1.970275640487671" height="1.4750301837921143" vClass="passenger"/>
+  <vType id="walker.pedestrian.0001" length="0.21" width="0.48" height="1.72" vClass="pedestrian"/>
+  
 </routes>
 
 

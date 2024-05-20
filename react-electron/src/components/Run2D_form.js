@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from "axios";
 import './Run2D_3D_form.css';
 
@@ -20,8 +20,40 @@ const Run2D_form = () => {
         }
     };
 
+    const [selectedOption, setSelectedOption] = useState(null);
+    const [selectedDay, setSelectedDay] = useState('');
+    const [startTime, setStartTime] = useState('');
+    const [endTime, setEndTime] = useState('');
+    const [maxDate, setmaxDate] = useState('');
+
+    useEffect(() => {
+        const currentDate = new Date();
+        const formattedDate = currentDate.toISOString().split('T')[0];
+        setmaxDate(formattedDate);
+      }, []);
+
+    const handleOptionChange = (event) => {
+        const value = event.target.value;
+        if (selectedOption === value) {
+            setSelectedOption(null);
+        } else {
+            setSelectedOption(value);
+        }
+    };
+
+    const handleDayChange = (event) => {
+        setSelectedDay(event.target.value);
+    };
+
+    const handleTimeChange = (event) => {
+        if (event.target.name === 'startTime') {
+            setStartTime(event.target.value);
+        } else {
+            setEndTime(event.target.value);
+        }
+    };
+
     return (
-        
         <div className='run2d-background'>
             <div className="overlay-run"></div> 
             <div className="content-above-overlay py-8 flex justify-center">
@@ -39,19 +71,75 @@ const Run2D_form = () => {
                                 className="w-full px-4 py-2 border rounded-md"
                             />
                         </div>
-                        <div
-                            className="mb-4 flex"> {/* Adicionado flex e items-center para alinhar o checkbox à esquerda */}
-                            <div
-                                className="inline-flex items-center"> {/* Adicionado para envolver o checkbox e o texto */}
+                        
+                        <div className="mb-4 flex">
+                            <div className="inline-flex items-center">
                                 <input
-                                    type="checkbox"
-                                    id="addRealData"
-                                    name="addRealData"
+                                    type="radio"
+                                    id="liveData"
+                                    name="dataOption"
+                                    value="liveData"
+                                    checked={selectedOption === 'liveData'}
+                                    onClick={handleOptionChange}
                                     className="form-checkbox text-blue-500 h-5 w-5"
                                 />
-                                <span className="ml-2 text-sm">Add real data?</span>
+                                <label htmlFor="liveData" className="ml-2 text-sm">Live Data</label>
+                            </div>
+                            <div className="inline-flex items-center ml-4">
+                                <input
+                                    type="radio"
+                                    id="realData"
+                                    name="dataOption"
+                                    value="realData"
+                                    checked={selectedOption === 'realData'}
+                                    onClick={handleOptionChange}
+                                    className="form-checkbox text-blue-500 h-5 w-5"
+                                />
+                                <label htmlFor="realData" className="ml-2 text-sm">Real Data</label>
                             </div>
                         </div>
+
+                        {selectedOption === 'realData' && (
+                            <div>
+                                <div className="mb-4">
+                                    <label htmlFor="day" className="block text-sm font-medium text-gray-700">Day:</label>
+                                    <input
+                                        type="date"
+                                        id="day"
+                                        name="day"
+                                        max={maxDate}
+                                        value={selectedDay}
+                                        onChange={handleDayChange}
+                                        className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                    />
+                                </div>
+                                <div className="mb-4 flex">
+                                    <div className="w-1/2">
+                                        <label htmlFor="startTime" className="block text-sm font-medium text-gray-700">Start Time:</label>
+                                        <input
+                                            type="time"
+                                            id="startTime"
+                                            name="startTime"
+                                            value={startTime}
+                                            onChange={handleTimeChange}
+                                            className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                        />
+                                    </div>
+                                    <div className="w-1/2 ml-4">
+                                        <label htmlFor="endTime" className="block text-sm font-medium text-gray-700">End Time:</label>
+                                        <input
+                                            type="time"
+                                            id="endTime"
+                                            name="endTime"
+                                            value={endTime}
+                                            onChange={handleTimeChange}
+                                            className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
                         <div className="mb-4">
                             <p className="text-sm text-gray-500 text-run">Now you will start the 2D digital twin of Aveiro city.
                                 For this, it's necessary that you have Sumo properly installed on your computer.

@@ -15,6 +15,9 @@ import ClearSimulation from './pages/ClearSimulation';
 import Block from './pages/Block';
 import BlockRoundabout from './pages/BlockRoundabout';
 import BlockRoad from './pages/BlockRoad';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import Settings from './pages/Settings';
 
 const api = "http://localhost:5000/api";
 
@@ -38,6 +41,9 @@ function App() {
         <Navbar />
         <Routes>
           <Route path="/" element={<HomePage /> } />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/settings" element={<Settings />} />
           <Route path="/run2D" element={ <Run2D />} />
           <Route path="/run3D" element={<Run3DPage />} />
           <Route path="/car" element={<><Sidebar /> <CarPage /></>} />

@@ -25,6 +25,8 @@
 -->
 
 <tripinfos xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/tripinfo_file.xsd">
+<<<<<<< Updated upstream
+=======
     <tripinfo id="0" depart="3.00" departLane="-1466_1" departPos="5.34" departSpeed="0.00" departDelay="0.00" arrival="12.00" arrivalLane="-1465_1" arrivalPos="11.38" arrivalSpeed="13.75" duration="9.00" routeLength="73.18" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="3.49" rerouteNo="0" devices="tripinfo_0" vType="vehicle.dodge.charger_police_2020" speedFactor="1.06" vaporized=""/>
     <tripinfo id="randomCar_1715732204922840496" depart="449.00" departLane="-1408_1" departPos="0.20" departSpeed="0.00" departDelay="0.00" arrival="469.00" arrivalLane="-1474_1" arrivalPos="118.69" arrivalSpeed="20.95" duration="20.00" routeLength="221.94" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="6.38" rerouteNo="0" devices="tripinfo_randomCar_1715732204922840496" vType="vehicle.dodge.charger_police_2020" speedFactor="1.01" vaporized=""/>
     <tripinfo id="randomCar_1715732209262797073" depart="456.00" departLane="-1529_1" departPos="5.34" departSpeed="0.00" departDelay="0.00" arrival="480.00" arrivalLane="-1614_1" arrivalPos="110.20" arrivalSpeed="8.25" duration="24.00" routeLength="184.12" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="4.80" rerouteNo="0" devices="tripinfo_randomCar_1715732209262797073" vType="vehicle.dodge.charger_police_2020" speedFactor="1.00" vaporized=""/>
