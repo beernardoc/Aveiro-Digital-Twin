@@ -208,7 +208,7 @@ def addOrUpdateRealCar(received):
         # get the sensor information from radar.json
         with open(radar_file_path, "r") as f:
             data = json.load(f)
-            radar = data[1]
+            radar = data[2]
             # get the angle from the sensor to the vehicle
             angle = calculate_bearing((radar['coord']['lat'], radar['coord']['lng']), (lat, log))
             if radar['angle_type'] == 0:
