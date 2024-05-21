@@ -20,7 +20,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: Adapters
+        working-directory: DigitalTwin/backend
 
     steps:
     - uses: actions/checkout@v3
