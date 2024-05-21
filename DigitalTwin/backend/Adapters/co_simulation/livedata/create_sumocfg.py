@@ -3,7 +3,7 @@ import json
 from math import atan2, cos, pi, radians, sin
 import xml.etree.ElementTree as ET
 from datetime import datetime
-import rtree
+# import rtree
 import pyproj
 import sumolib
 import os
@@ -438,7 +438,7 @@ json_data = json.dumps(json_data)
 
 
 
-class create_sumocfg:
+class Livedata:
     def __init__(self, start_time): #, input_data):
         self.start_time = start_time
         self.input_data = json_data
@@ -447,22 +447,19 @@ class create_sumocfg:
         self.root = self.tree.getroot()
         self.temp_file = io.StringIO()
         self.output_file = "Adapters/co_simulation/sumo_configuration/simple-map/livedata.rou.xml"
+        self.tree.write(self.output_file)
         self.known_vehicle = {}
 
-        self.int_data()
-        print(self.get_route("554123756"))
-
-
     def json_converter(self): #converter o valor do json que vem como parametro, se estiver errado
-      
+
         data =  json.loads(self.input_data)
         #print(data["value"])
         return data["value"]
-    
-    def int_data(self):
-        
+
+    def iterate_data(self):
+
         for data in self.json_converter():
-            
+
             vehicle_id = data["entityId"].split(":")[-1]
 
             if data["attrName"] == "detectedID" and vehicle_id not in self.known_vehicle.keys():
@@ -474,9 +471,14 @@ class create_sumocfg:
 
             elif data["attrName"] == "location" and "location" not in self.known_vehicle[vehicle_id]:
                 self.known_vehicle[vehicle_id]["location"] = [data["attrValue"]["coordinates"][1], data["attrValue"]["coordinates"][0]]
-                  
+
             elif data["attrName"] == "observedBy" and "observedBy" not in self.known_vehicle[vehicle_id]:
                 self.known_vehicle[vehicle_id]["observedBy"] = "p" + data["attrValue"].split(":")[-1][1:]
+
+            elif data["attrName"] == "speed" and "speed" not in self.known_vehicle[vehicle_id]:
+                # data["attrValue"] is in m/s, we need to convert it to km/h
+                speed_kmh = data["attrValue"] * 3.6
+                self.known_vehicle[vehicle_id]["speed"] = speed_kmh
 
 
         print(self.known_vehicle)
@@ -491,7 +493,7 @@ class create_sumocfg:
 
         if radar is None:
             return
-        
+
         radar_location = [radar["coord"]["lat"], radar["coord"]["lng"]]
         vehicle_location = self.known_vehicle[vehicle_id]["location"]
 
@@ -526,10 +528,35 @@ class create_sumocfg:
 
         else:
             return
-        
+
         return route
 
-                    
+    def create_vehicle(self, vehicle_id):
+        route = self.get_route(vehicle_id)
+        if route is None:
+            return
+
+        vehicle = ET.SubElement(self.root, "vehicle")
+        vehicle.set("id", "livedata_" + vehicle_id)
+        vehicle.set("departLane", "best")
+        vehicle.set("departSpeed", str(self.known_vehicle[vehicle_id]["speed"]))
+        vehicle.set("type", "vehicle.dodge.charger_police_2020")
+        vehicle.set("color", "1,0,0") # red
+        # depart missing TODO
+
+    def create_vehicle_route(self, vehicle_id):
+        route = self.get_route(vehicle_id)
+        if route is None:
+            return
+
+        # route must be inside the vehicle element
+        vehicle = self.root.find("vehicle[@id='livedata_" + vehicle_id + "']")
+        vehicle_route = ET.SubElement(vehicle, "route")
+        route = [str(r) for r in route]
+        route = " ".join(route)
+        vehicle_route.set("edges", route)
+
+
     def calculate_bearing(self, coord1, coord2):
       """
       Function to calculate the bearing between two
@@ -543,7 +570,7 @@ class create_sumocfg:
       Angle Type '0':
           0deg - 90deg and 270deg - 360deg => The vehicle is moving in the North of the radar
           90deg - 180deg and 180deg - 270deg => The vehicle is moving in the South of the radar
-      
+
       Angle Type '1':
           0deg - 180deg => The vehicle is moving in the East of the radar
           180deg - 360deg => The vehicle is moving in the West of the radar
@@ -567,4 +594,10 @@ class create_sumocfg:
 
 if __name__ == '__main__':
     start_time = "2024-05-20T14:37:52.772Z"
-    create_sumocfg(start_time)
+    livedata = Livedata(start_time)
+    livedata.iterate_data()
+    print(livedata.get_route("554123756"))
+    livedata.create_vehicle("554123756")
+    livedata.tree.write(livedata.output_file)
+    livedata.create_vehicle_route("554123756")
+    livedata.tree.write(livedata.output_file)
