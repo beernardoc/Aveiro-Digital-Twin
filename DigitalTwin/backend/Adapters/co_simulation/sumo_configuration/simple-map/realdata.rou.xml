@@ -1,5 +1,1 @@
-<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
-    <vehicle id="livedata_554123756" departLane="best" departSpeed="12.24" type="vehicle.dodge.charger_police_2020" color="1,0,0">
-        <route edges="-1606" />
-    </vehicle>
-</routes>
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd"><vehicle id="realdata_568870567" depart="13993.906" departLane="best" departSpeed="20.88" type="vehicle.dodge.charger_police_2020" color="1,0,0"><route edges="-1606" /></vehicle><vehicle id="realdata_553913859" depart="13993.933" departLane="best" departSpeed="16.92" type="vehicle.dodge.charger_police_2020" color="1,0,0"><route edges="-1606" /></vehicle><vehicle id="realdata_566329293" depart="14022.208" departLane="best" departSpeed="28.8" type="vehicle.dodge.charger_police_2020" color="1,0,0"><route edges="-1447" /></vehicle></routes>

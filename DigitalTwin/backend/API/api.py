@@ -1,3 +1,5 @@
+import os
+import sys
 import threading
 from asyncio import sleep
 import json
@@ -18,8 +20,10 @@ from werkzeug.security import check_password_hash
 from pymongo import MongoClient
 from datetime import datetime
 
-from create_sumocgf import parse_json_to_xml
+# Adicione o diretório raiz do projeto ao PYTHONPATH
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
+from Adapters.co_simulation.realdata.create_sumocfg import RealData
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
@@ -27,7 +31,7 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 socketio = socketio.SocketIO(app, cors_allowed_origins="*")
 
 app.secret_key = 'myawesomesecretkey'
-app.config['JWT_SECRET_KEY'] = 'mysecretkey' 
+app.config['JWT_SECRET_KEY'] = 'mysecretkey'
 
 # app.config['MONGO_URI'] = 'mongodb://localhost:27017/digitaltwin'
 # mongo = PyMongo(app)
@@ -35,8 +39,8 @@ mongo_client = MongoClient(host='localhost', port=27017, username='admin', passw
 mongo = mongo_client['digitaltwin']
 jwt = JWTManager(app)
 
-SWAGGER_URL="/swagger"
-API_URL="/static/swagger.json"
+SWAGGER_URL = "/swagger"
+API_URL = "/static/swagger.json"
 
 swagger_ui_blueprint = get_swaggerui_blueprint(
     SWAGGER_URL,
@@ -57,6 +61,7 @@ blocked_roads = []
 current_user = None
 simulation_name = None
 sim_running = False
+
 
 @app.route('/api')
 def api():
@@ -88,7 +93,6 @@ def create_user():
 
 @app.route('/user', methods=['GET'])
 def get_user():
-
     auth_header = request.headers.get('Authorization')
     if not auth_header:
         return jsonify({'message': 'Access Token is missing'}), 401
@@ -113,7 +117,6 @@ def get_user():
 
 @app.route('/api/login', methods=['POST'])
 def login():
-
     email = request.json['email']
     password = request.json['password']
 
@@ -131,14 +134,14 @@ def login():
     global current_user
     current_user = user['email']
 
-    response = make_response(jsonify({'message': 'Login successful', 'username': user['username'], 'token': access_token}), 200)
+    response = make_response(
+        jsonify({'message': 'Login successful', 'username': user['username'], 'token': access_token}), 200)
     response.headers['Authorization'] = f'Bearer {access_token}'
     return response
 
 
 @app.route('/user', methods=['DELETE'])
 def delete_user():
-
     auth_header = request.headers.get('Authorization')
     if not auth_header:
         return jsonify({'message': 'Access Token is missing'}), 401
@@ -147,7 +150,7 @@ def delete_user():
 
     try:
         decoded_token = decode_token(token)
-        email = decoded_token['sub'] 
+        email = decoded_token['sub']
     except Exception as e:
         return jsonify({'message': 'Invalid token'}), 401
 
@@ -163,7 +166,6 @@ def delete_user():
 
 @app.route('/user', methods=['PUT'])
 def update_user():
-
     username = request.json['username']
     email = request.json['email']
 
@@ -178,7 +180,7 @@ def update_user():
         decoded_token = decode_token(token)
         print(f"Decoded Token: {decoded_token}")
 
-        email = decoded_token['sub'] 
+        email = decoded_token['sub']
         print(f"Email: {email}")
     except Exception as e:
         return jsonify({'message': 'Invalid token'}), 401
@@ -239,33 +241,49 @@ def run_3D():
             end_time = data.get('endTime')
 
             # Aqui você pode usar os dados recebidos como desejar
-            print(f"Recebido os seguintes dados: entities={entities}, day={day}, startTime={start_time}, endTime={end_time}")
+            print(
+                f"Recebido os seguintes dados: entities={entities}, day={day}, startTime={start_time}, endTime={end_time}")
 
             results = []
 
-            if real_data:
-                # Fazer requisições individuais para cada tipo de entidade
-                for entity in entities:
-                    response = fetch_sth_comet_data(entity, day, start_time, end_time)
-                    if response.status_code == 200:
-                        results.append(response.json())
-                    else:
-                        print(f"Falha ao obter dados para {entity}: {response.text}")
+            for entity in entities:
+                response = fetch_sth_comet_data(entity, start_time, end_time)
+                if response.status_code == 200:
+                    results.append(response.json())
+                else:
+                    print(f"Falha ao obter dados para {entity}: {response.text}")
+            # print(results)
+            realdata = RealData(start_time, results)
+            realdata.iterate_data()
+            for x in realdata.known_vehicle.keys():
+                print("v:", x)
+                realdata.create_vehicle(x)
+                realdata.create_vehicle_route(x)
 
-                return jsonify({'message': 'Dados históricos obtidos com sucesso', 'data': results}), 200
-            
+            realdata.tree.write(realdata.output_file)
+
             processCarla = subprocess.Popen(["Adapters/co_simulation/runCarla.sh"])
             sleep(10)
 
-            process3d = subprocess.Popen(["python3", "Adapters/co_simulation/simulation_3D.py"])
+            process3d = subprocess.Popen(["python3", "Adapters/co_simulation/RealSimulation_3D.py"])
             return jsonify({'message': 'Comando executado com sucesso'}), 200
+
+        processCarla = subprocess.Popen(["Adapters/co_simulation/runCarla.sh"])
+        sleep(10)
+
+        process3d = subprocess.Popen(["python3", "Adapters/co_simulation/simulation_3D.py"])
+        return jsonify({'message': 'Comando executado com sucesso'}), 200
+
+
 
     except subprocess.CalledProcessError as e:
         return jsonify({'error': e}), 500
-    
+
+
 @app.route('/api/run2D', methods=['POST'])
 def run_2D():
     try:
+        print("entrou 2d")
         live = request.args.get('live', default=False)
         real_data = request.args.get('realdata', default=False)
         global process2d
@@ -280,36 +298,44 @@ def run_2D():
         elif real_data == "True":
             data = request.json
             entities = data.get('entities', [])
-            #day = data.get('day')
             start_time = data.get('startTime')
             end_time = data.get('endTime')
-
-            #print(f" DENTRO DO RUN2D: Recebido os seguintes dados: entities={entities}, day={day}, startTime={start_time}, endTime={end_time}")
+            print(
+                f" DENTRO DO RUN2D: Recebido os seguintes dados: entities={entities}, startTime={start_time}, endTime={end_time}")
 
             results = []
 
-            #for entity in entities:
-            #    response = fetch_sth_comet_data(entity, day, start_time, end_time)
-            #    if response.status_code == 200:
-            #        results.append(response.json())
-            #    else:
-            #        print(f"Falha ao obter dados para {entity}: {response.text}")
+            for entity in entities:
+                response = fetch_sth_comet_data(entity, start_time, end_time)
+                if response.status_code == 200:
+                    results.append(response.json())
+                else:
+                    print(f"Falha ao obter dados para {entity}: {response.text}")
+            #print(results)
+            realdata = RealData(start_time, results)
+            realdata.iterate_data()
+            for x in realdata.known_vehicle.keys():
+                print("v:", x)
+                realdata.create_vehicle(x)
+                realdata.create_vehicle_route(x)
 
-            #parse_json_to_xml(response.json())
-            parse_json_to_xml(start_time)
+            realdata.tree.write(realdata.output_file)
+            process2d = subprocess.Popen(["python3", "Adapters/co_simulation/RealSimulation_2D.py"])
 
-            #return jsonify({'message': 'Dados históricos obtidos com sucesso', 'data': results}), 200
+            return jsonify({'message': 'Dados históricos obtidos com sucesso'}), 200
+
+        print("chamou 2d limpo")
 
         process2d = subprocess.Popen(["python3", "Adapters/co_simulation/simulation_2D.py"])
         blocked_roundabouts = []
 
         return jsonify({'message': 'Comando iniciado com sucesso'}), 200
-    
+
     except subprocess.CalledProcessError as e:
         return jsonify({'error': str(e)}), 500
-    
 
-def fetch_sth_comet_data(entity, day, start_time, end_time, lastN=10):
+
+def fetch_sth_comet_data(entity, start_time, end_time, lastN=1000):
     base_url = 'http://10.0.23.112:30866/STH/v2/entities/all/attrs/all'
     headers = {
         'fiware-service': 'default',
@@ -318,14 +344,18 @@ def fetch_sth_comet_data(entity, day, start_time, end_time, lastN=10):
     params = {
         'type': entity,
         'lastN': lastN,
-        'dateFrom': f"{day}T{start_time}:00.000Z",
-        'dateTo': f"{day}T{end_time}:59.999Z"
+        'dateFrom': f"{start_time}",
+        'dateTo': f"{end_time}"
     }
     response = requests.get(base_url, headers=headers, params=params)
-
-    print(f"DENTRO DO FETCH: Requisição para {entity} retornou {response.text}")
+    #print(params)
+    if response.status_code == 200:
+        print(f"DENTRO DO FETCH: Requisição para {entity} retornou com sucesso")
+    else:
+        print(f"Falha ao obter dados para {entity}:")
 
     return response
+
 
 
 
@@ -342,6 +372,7 @@ def add_random_traffic():
         return jsonify({'error': e}), 500
 
     # curl -X POST -d "" "http://localhost:5000/api/addRandomTraffic?qtd=500"
+
 
 @app.route('/api/addRandomPedestrian', methods=['POST'])
 def add_random_pedestrian():
@@ -456,6 +487,7 @@ def end_simulation():
 
     # curl -X POST -d "" "http://localhost:5000/api/endSimulation"
 
+
 @app.route('/api/endSimulationAndSave', methods=['POST'])
 def end_simulation_and_save():
     global simulation_name
@@ -480,6 +512,7 @@ def cars():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+
 @app.route('/api/clearSimulation', methods=['GET'])
 def clear_simulation():
     try:
@@ -487,64 +520,69 @@ def clear_simulation():
         return jsonify({'message': 'Simulação finalizada com sucesso'}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-    
+
     # curl -X GET "http://localhost:5000/api/clearSimulation"
+
 
 @app.route('/api/blockRoundabout', methods=['POST'])
 def block_roundabout():
     roundabout_id = request.args.get('id')
     if roundabout_id is None:
         return jsonify({'error': 'Parâmetro "id" é obrigatório na URL'}), 400
-    
+
     try:
         publish.single("/blockRoundabout", payload=roundabout_id, hostname="localhost", port=1883)
         return jsonify({'message': f'Rotunda {roundabout_id} bloqueada'}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-    
+
     # curl -X POST -d "" "http://localhost:5000/api/blockRoundabout?id=1"
+
 
 @app.route('/api/blockRoad', methods=['POST'])
 def block_road():
     road_id = request.args.get('id')
     if road_id is None:
         return jsonify({'error': 'Parâmetro "id" é obrigatório na URL'}), 400
-    
+
     try:
         publish.single("/blockRoad", payload=road_id, hostname="localhost", port=1883)
         return jsonify({'message': f'Estrada {road_id} bloqueada'}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-    
+
     # curl -X POST -d "" "http://localhost:5000/api/blockRoad?id=1"
+
 
 @app.route('/api/unblockRoundabout', methods=['POST'])
 def unblock_roundabout():
     roundabout_id = request.args.get('id')
     if roundabout_id is None:
         return jsonify({'error': 'Parâmetro "id" é obrigatório na URL'}), 400
-    
+
     try:
         publish.single("/unblockRoundabout", payload=roundabout_id, hostname="localhost", port=1883)
         return jsonify({'message': f'Rotunda {roundabout_id} desbloqueada'}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-    
+
     # curl -X POST -d "" "http://localhost:5000/api/unblockRoundabout?id=1"
+
 
 @app.route('/api/unblockRoad', methods=['POST'])
 def unblock_road():
     road_id = request.args.get('id')
     if road_id is None:
         return jsonify({'error': 'Parâmetro "id" é obrigatório na URL'}), 400
-    
+
     try:
         publish.single("/unblockRoad", payload=road_id, hostname="localhost", port=1883)
         return jsonify({'message': f'Estrada {road_id} desbloqueada'}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-    
+
     # curl -X POST -d "" "http://localhost:5000/api/unblockRoad?id=1"
+
 
 @app.route('/api/vehicles', methods=['GET'])
 def get_vehicles():
@@ -552,17 +590,20 @@ def get_vehicles():
 
     # curl -X GET "http://localhost:5000/api/vehicles"
 
+
 @app.route('/api/blockedRoundabouts', methods=['GET'])
 def get_blocked_roundabouts():
     return jsonify({'blocked_roundabouts': blocked_roundabouts})
 
     # curl -X GET "http://localhost:5000/api/blockedRoundabouts"
 
+
 @app.route('/api/blockedRoads', methods=['GET'])
 def get_blocked_roads():
     return jsonify({'blocked_roads': blocked_roads})
 
     # curl -X GET "http://localhost:5000/api/blockedRoads"
+
 
 @app.route('/api/history', methods=['GET'])
 def get_history_for_user():
@@ -573,26 +614,28 @@ def get_history_for_user():
 
     # curl -X GET "http://localhost:5000/api/history"
 
+
 @app.route('/api/history', methods=['DELETE'])
 def delete_history_for_user():
     _id = request.args.get('id')
     if _id is None:
         return jsonify({'error': 'Parâmetro "id" é obrigatório na URL'}), 400
-    
+
     try:
         mongo.db.history.delete_one({'_id': ObjectId(_id)})
         return jsonify({'message': 'Histórico deletado com sucesso'}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-    
+
     # curl -X DELETE "http://localhost:5000/api/history?id=1"
-    
+
 
 @app.route('/api/sim_running', methods=['GET'])
 def is_simulation_running():
     return jsonify({'sim_running': sim_running})
 
     # curl -X GET "http://localhost:5000/api/sim_running"
+
 
 @app.route('/api/resimulation', methods=['POST'])
 def resimulation():
@@ -601,7 +644,7 @@ def resimulation():
 
     try:
         global process2d
-        process2d = subprocess.Popen(["python3", "Adapters/co_simulation/simulation_2D.py", current_user,
+        process2d = subprocess.Popen(["python3", "Adapters/co_simulation/RealSimulation_2D.py", current_user,
                                       "--resimulation", simulation_id])
         global blocked_roundabouts
         blocked_roundabouts = []
@@ -613,7 +656,7 @@ def resimulation():
         return jsonify({'error': e}), 500
 
     # curl -X POST -d "" "http://localhost:5000/api/resimulation?id=1"
-    
+
 
 def on_connect(client, userdata, flags, rc):
     print(f"Conectado ao broker com código de resultado {rc}")
@@ -652,11 +695,12 @@ def on_message(client, userdata, msg):
     if topic == '/history':
         data = {
             "user_email": json.loads(msg.payload)['user_email'],
-            "history": json.loads(msg.payload)['history'], 
+            "history": json.loads(msg.payload)['history'],
             "date": datetime.now(),
             "simulation_name": simulation_name
         }
         mongo.db.history.insert_one(data)
+
 
 def start_mqtt_connection():
     # Inicia a conexão MQTT
@@ -670,11 +714,12 @@ def start_mqtt_connection():
     mqtt_client.subscribe("/blocked_roads")
     mqtt_client.subscribe("/history")
 
-
     mqtt_client.loop_forever()  # Use loop_forever() para manter a conexão MQTT em execução indefinidamente
+
 
 def start_flask():
     app.run(host='0.0.0.0')
+
 
 if __name__ == '__main__':
     # Inicie a conexão MQTT em uma nova thread

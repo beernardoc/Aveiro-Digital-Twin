@@ -48,7 +48,7 @@ from modules.simulation_synchronization import SimulationSynchronization
 
 
 net = sumolib.net.readNet(
-    "../Adapters/co_simulation/sumo_configuration/simple-map/UA.net.xml",
+    "Adapters/co_simulation/sumo_configuration/simple-map/UA.net.xml",
     withInternal=True)  # Carrega a rede do SUMO atraves do sumolib para acesso estatico
 
 
@@ -492,7 +492,7 @@ def synchronization_loop_wrapper(arguments):
 if __name__ == "__main__":
     class StaticArguments:
         def __init__(self):
-            self.sumo_cfg_file = "../Adapters/co_simulation/sumo_configuration/simple-map/simple-map.sumocfg"
+            self.sumo_cfg_file = "Adapters/co_simulation/sumo_configuration/simple-map/simple-map.sumocfg"
             self.carla_host = '127.0.0.1'
             self.carla_port = 2000
             self.sumo_host = None
