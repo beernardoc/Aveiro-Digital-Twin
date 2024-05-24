@@ -69,3 +69,34 @@ button[type="submit"]:hover {
     background-color: #0056b3;
 }
 
+.instructions {
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.instructions h2 {
+    color: black;
+    font-size: 1.2em;
+    margin-bottom: 10px;
+}
+
+.step {
+    color: black;
+    margin-bottom: 10px;
+    display: flex;
+}
+
+.step-number {
+    color: black;
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.step span {
+    font-size: 0.9em;
+}
+
+
