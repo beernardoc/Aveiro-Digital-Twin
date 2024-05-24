@@ -76,3 +76,7 @@ input {
 .btn-clear:hover {
     background-color: #1C2548;
 }
+
+.map {
+    z-index: 0;
+}
