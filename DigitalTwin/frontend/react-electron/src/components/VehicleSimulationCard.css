@@ -1,0 +1,82 @@
+.card-simulation-vehicle {
+    background-color: #1c2548;
+    padding: 20px;
+    border-radius: 10px;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    position: relative;
+    margin: 10px;
+    height: 100%;
+    width: 30%;
+}
+
+.card-simulation-vehicle h2 {
+    margin: 0;  
+    padding-left: 55px;
+}
+
+.card-simulation-icon-vehicle {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 80px;
+    height: 100%;
+    background-color: #7191d2;
+    border-radius: 10px 50% 50% 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+}
+
+.card-simulation-icon-vehicle i {
+    color: #ffffff;
+    size: 30px;
+}
+
+.card-simulation-vehicle button {
+    background-color: #1c2548;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    padding: 10px;
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+   
+.card-simulation-vehicle button:hover {
+    background-color: #f47065;
+}
+   
+.card-simulation-vehicle button svg {
+    color: #fff;
+}
+
+.card-simulation-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Alinha os itens à esquerda */
+    margin-left: 55px; /* Ajuste conforme necessário */
+}
+
+.card-simulation-text b {
+    font-weight: bold;
+}
+
+
+@media screen and (max-width: 1200px) {
+    .card-simulation-vehicle {
+        width: 45%;
+    }
+ }
+
+ 
+ /* Estilo para telas pequenas (menor que 600px) */
+ @media screen and (max-width: 800px) {
+    .card-simulation-vehicle {
+        width: 100%;
+    }
+ }

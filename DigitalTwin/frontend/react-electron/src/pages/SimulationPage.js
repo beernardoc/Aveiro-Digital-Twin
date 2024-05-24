@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Card from '../components/VehicleCard';
-import { faRandom, faCar, faMotorcycle } from '@fortawesome/free-solid-svg-icons';
+import VehicleCard from '../components/VehicleSimulationCard';
+import { faRandom, faCar, faMotorcycle, faClock } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'; // Importe o componente FontAwesomeIcon
 import './SimulationPage.css';
 import Navbar from "../components/Navbar";
 import AddRandom_form from "../components/AddRandomCar_form";
@@ -35,11 +37,17 @@ const SimulationPage = () => {
             <div className="simulation-page">
                 {parsedMessage && (
                     <>
-                        <h2>Time: {parsedMessage.time} segundos</h2>
-                        <h2>Quantity: {parsedMessage.vehicle && parsedMessage.vehicle.quantity}</h2>
+                        <div className="time-quantity-card">
+                            <div className={`time-card ${faClock}`}>
+                                <b><FontAwesomeIcon icon={faClock} /> Time</b>{parsedMessage.time} seconds
+                            </div>
+                            <div className={`quantity-card ${faCar}`}> 
+                                <b> <FontAwesomeIcon icon={faCar} /> Quantity</b> {parsedMessage.vehicle && parsedMessage.vehicle.quantity}
+                            </div>
+                        </div>
                         <div className="vehicle-cards">
                             {parsedMessage.vehicle && parsedMessage.vehicle.ids && parsedMessage.vehicle.ids.map((id, index) => (
-                                <Card key={index} id={id} />
+                                <VehicleCard key={index} id={id} />
                             ))}
                         </div>
                     </>

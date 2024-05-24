@@ -32,8 +32,6 @@
     background-color: #f47065;
 }
 
-
-
 .simulation-page {
     height: calc(100%- 90px);
     flex: 3;
@@ -43,3 +41,54 @@
     background-color: #d0daf0;
     color: #ffffff;
 }
+
+.time-quantity-card {
+    display: flex; /* Garante que os itens filhos sejam dispostos em linha */
+    flex-direction: row; /* Alinha os itens filhos horizontalmente */
+    align-items: center; /* Centraliza os itens verticalmente */
+    background-color: #d0daf0;
+    color: #ffffff;
+    align-items: center; /* Centraliza os itens internos horizontalmente */
+    justify-content: center; /* Centraliza os itens internos verticalmente */
+}
+
+.time-card,.quantity-card {
+    display: flex;
+    flex-direction: column; /* Organiza os itens internos em coluna */
+    justify-content: center; /* Centraliza os itens internos verticalmente */
+    align-items: center; /* Centraliza os itens internos horizontalmente */
+    width: 25%; /* Ajuste conforme necessário */
+    height: 100px; /* Ajuste conforme necessário */
+    background-color: #1c2548;
+    color: white;
+    border-radius: 5px; /* Bordas arredondadas */
+    padding: 5px; /* Padrão interno para melhor visualização do texto */
+    text-align: center; /* Centraliza o texto dentro do card */
+    margin: 10px;
+    font-size: 20px;
+}
+
+.time-card b,.quantity-card b {
+    font-size: 25px; /* Aumenta o tamanho do texto */
+    font-weight: bold; /* Mantém o texto em negrito */
+}
+
+.vehicle-cards {
+    display: flex; /* Faz com que os cards sejam dispostos em linha */
+    flex-wrap: wrap; /* Permite que os cards passem para a próxima linha se não houver espaço suficiente */
+    padding: 10px; /* Adiciona algum preenchimento ao redor dos cards para melhor visualização */
+}
+
+@media screen and (max-width: 1200px) {
+    .time-card,.quantity-card {
+         width: 100%; /* Largura máxima de 100% para telas pequenas */
+     }
+ }
+
+ 
+ /* Estilo para telas pequenas (menor que 600px) */
+ @media screen and (max-width: 599px) {
+    .vehicle-cards {
+         justify-content: center; /* Centraliza os cards na linha */
+     }
+ }

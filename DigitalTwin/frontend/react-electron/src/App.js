@@ -59,7 +59,7 @@ function App() {
       <div className="App">
         <Navbar />
         <Routes>
-          <Route path="/" element={<HomePage /> } />
+          <Route path="/simulation" element={<HomePage /> } />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/settings" element={<Settings />} />
@@ -67,7 +67,7 @@ function App() {
           <Route path="/run3D" element={<Run3DPage />} />
           <Route path="/car" element={<><Sidebar /> <CarPage /></>} />
           <Route path="/button" element={<><Sidebar /> <button onClick={runPythonScript}>RUN</button></>} />
-          <Route path="/simulation" element={<><Sidebar /> <SimulationPage /></>} />
+          <Route path="/" element={<><Sidebar /> <SimulationPage /></>} />
           <Route path="/addRandom" element={<><Sidebar /> <AddRandom /></>} />
           <Route path="/clear" element={ <><Sidebar /> <ClearSimulation /></> }></Route>
           <Route path="/block" element={<><Sidebar /> <Block /> </>} />
