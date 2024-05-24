@@ -446,7 +446,7 @@ class Livedata:
         self.tree = ET.parse(self.base_file)
         self.root = self.tree.getroot()
         self.temp_file = io.StringIO()
-        self.output_file = "Adapters/co_simulation/sumo_configuration/simple-map/livedata.rou.xml"
+        self.output_file = "Adapters/co_simulation/sumo_configuration/simple-map/realdata.rou.xml"
         self.tree.write(self.output_file)
         self.known_vehicle = {}
 
