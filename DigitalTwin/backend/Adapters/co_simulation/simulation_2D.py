@@ -184,10 +184,20 @@ def unblockRoad(road_id):
     del blocked_roads[road_id]
 
 def clearSimulation():
+    print("Starting to clear the simulation...")
     time.sleep(3)
+    traci.simulationStep()
+    print("Simulation step executed.")
     vehicles = traci.vehicle.getIDList()
+    print(f"Found {len(vehicles)} vehicles to remove.")
+    
     for vehicle in vehicles:
-        traci.vehicle.remove(vehicle)
+        try:
+            if vehicle in traci.vehicle.getIDList():  # Check if the vehicle still exists
+                traci.vehicle.remove(vehicle)
+                print(f"Vehicle {vehicle} removed.")
+        except traci.exceptions.TraCIException as e:
+            print(f"Error removing vehicle {vehicle}: {e}")
 
 
 def addOrUpdateRealCar(received):
@@ -501,8 +511,8 @@ def on_message(client, userdata, msg):
         if randomVehiclesThread is not None:
             randomVehiclesThread.join()
         clearSimulation()
-        print("Simulation cleared")
         end_addRandomTraffic = False
+        print("Simulation cleared")
 
     if topic == "/endSimulation":
         print("Ending simulation...")
