@@ -49,8 +49,8 @@ function Register() {
   };
 
   return (
-    <div className="App" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', padding: '20px', boxSizing: 'border-box' }}>
-      <h1 style={{ fontSize: '2em', color: '#007bff', marginBottom: '20px' }}>Register</h1>
+    <div className="App" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', padding: '20px', boxSizing: 'border-box', backgroundColor: "#7191d2" }}>
+      <h1 style={{ fontSize: '2em', color: '#1C2548', marginBottom: '20px' }}>Register</h1>
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
         <input 
           type="text" 
@@ -80,10 +80,10 @@ function Register() {
           required 
         />
         {error && <p style={{ color: 'red', marginBottom: '10px' }}>{error}</p>}
-        <button type="submit" style={{ padding: '10px 20px', margin: '10px 0', cursor: 'pointer', border: 'none', borderRadius: '4px', backgroundColor: '#007bff', color: 'white' }}>Register</button>
+        <button type="submit" style={{ padding: '10px 20px', margin: '10px 0', cursor: 'pointer', border: 'none', borderRadius: '4px', backgroundColor: '#1C2548', color: 'white' }}>Register</button>
       </form>
       <div style={{ textAlign: 'center', marginTop: '20px' }}>
-        <Link to="/login" style={{ color: '#007bff', textDecoration: 'none' }}>Already have an account? Login</Link>
+        <Link to="/login" style={{ color: '#1C2548', textDecoration: 'none' }}>Already have an account? Login</Link>
       </div>
     </div>
   );

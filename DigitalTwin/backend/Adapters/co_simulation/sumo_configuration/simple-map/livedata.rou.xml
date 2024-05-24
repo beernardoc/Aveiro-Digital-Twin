@@ -1,5 +1,0 @@
-<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
-    <vehicle id="livedata_554123756" departLane="best" departSpeed="12.24" type="vehicle.dodge.charger_police_2020" color="1,0,0">
-        <route edges="-1606" />
-    </vehicle>
-</routes>

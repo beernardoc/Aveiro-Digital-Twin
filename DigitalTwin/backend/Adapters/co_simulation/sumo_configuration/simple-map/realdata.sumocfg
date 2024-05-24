@@ -5,7 +5,7 @@
 <configuration>
   <input>
     <net-file value="UA.net.xml"/>
-    <route-files value="carlavtypes.rou.xml,livedata.rou.xml"/>
+    <route-files value="carlavtypes.rou.xml,realdata.rou.xml"/>
   </input>
   <gui_only>
     <gui-settings-file value="simple-map.view.xml"/>
