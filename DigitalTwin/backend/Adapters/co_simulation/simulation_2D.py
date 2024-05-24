@@ -55,6 +55,8 @@ if len(sys.argv) > 1:
 randomVehiclesThread = None
 end_addRandomTraffic = False
 
+pause_to_clear = False
+
 net = sumolib.net.readNet(
     "Adapters/co_simulation/sumo_configuration/simple-map/UA.net.xml",
     withInternal=True)  # Carrega a rede do SUMO atraves do sumolib para acesso estatico
@@ -66,19 +68,21 @@ def run():
     while True:
         try:
             traci.simulationStep()
+            global pause_to_clear
+            if not pause_to_clear:
+                for vehicle_id in traci.vehicle.getIDList():
+                    vehicle_type = traci.vehicle.getTypeID(vehicle_id)
+                    depart = str(round(step, 1))
+                    route = traci.vehicle.getRoute(vehicle_id)
+                    if vehicle_id not in all_vehicles:
+                        all_vehicles[vehicle_id] = {"type": vehicle_type, "depart": depart, "route": route}
+                        # print(f'Vehicle {vehicle_id} added to the list of all vehicles. Type: {vehicle_type}, Depart: {depart}, Route: {route}')
+                    else:
+                        if all_vehicles[vehicle_id]["route"] != route:
+                            all_vehicles[vehicle_id]["route"] = route
+                            # print(f'Vehicle {vehicle_id} changed route to {route}')
 
-            for vehicle_id in traci.vehicle.getIDList():
-                vehicle_type = traci.vehicle.getTypeID(vehicle_id)
-                depart = str(round(step, 1))
-                route = traci.vehicle.getRoute(vehicle_id)
-                if vehicle_id not in all_vehicles:
-                    all_vehicles[vehicle_id] = {"type": vehicle_type, "depart": depart, "route": route}
-                    # print(f'Vehicle {vehicle_id} added to the list of all vehicles. Type: {vehicle_type}, Depart: {depart}, Route: {route}')
-                else:
-                    if all_vehicles[vehicle_id]["route"] != route:
-                        all_vehicles[vehicle_id]["route"] = route
-                        # print(f'Vehicle {vehicle_id} changed route to {route}')
-
+            
             step += 1
 
             simulation_time = traci.simulation.getTime()
@@ -184,20 +188,14 @@ def unblockRoad(road_id):
     del blocked_roads[road_id]
 
 def clearSimulation():
-    print("Starting to clear the simulation...")
+    global pause_to_clear
+    pause_to_clear = True
     time.sleep(3)
-    traci.simulationStep()
-    print("Simulation step executed.")
     vehicles = traci.vehicle.getIDList()
-    print(f"Found {len(vehicles)} vehicles to remove.")
-    
     for vehicle in vehicles:
-        try:
-            if vehicle in traci.vehicle.getIDList():  # Check if the vehicle still exists
-                traci.vehicle.remove(vehicle)
-                print(f"Vehicle {vehicle} removed.")
-        except traci.exceptions.TraCIException as e:
-            print(f"Error removing vehicle {vehicle}: {e}")
+        traci.vehicle.remove(vehicle)
+
+    pause_to_clear = False
 
 
 def addOrUpdateRealCar(received):
@@ -511,8 +509,9 @@ def on_message(client, userdata, msg):
         if randomVehiclesThread is not None:
             randomVehiclesThread.join()
         clearSimulation()
-        end_addRandomTraffic = False
         print("Simulation cleared")
+        end_addRandomTraffic = False
+        clearSimulation()
 
     if topic == "/endSimulation":
         print("Ending simulation...")
