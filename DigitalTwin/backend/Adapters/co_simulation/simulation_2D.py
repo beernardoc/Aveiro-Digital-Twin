@@ -15,6 +15,7 @@ import paho.mqtt.publish as publish
 
 from pymongo import MongoClient
 from bson import ObjectId
+from traci.exceptions import TraCIException
 
 # Determine the project root directory
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
@@ -72,11 +73,11 @@ def run():
                 route = traci.vehicle.getRoute(vehicle_id)
                 if vehicle_id not in all_vehicles:
                     all_vehicles[vehicle_id] = {"type": vehicle_type, "depart": depart, "route": route}
-                    print(f'Vehicle {vehicle_id} added to the list of all vehicles. Type: {vehicle_type}, Depart: {depart}, Route: {route}')
+                    # print(f'Vehicle {vehicle_id} added to the list of all vehicles. Type: {vehicle_type}, Depart: {depart}, Route: {route}')
                 else:
                     if all_vehicles[vehicle_id]["route"] != route:
                         all_vehicles[vehicle_id]["route"] = route
-                        print(f'Vehicle {vehicle_id} changed route to {route}')
+                        # print(f'Vehicle {vehicle_id} changed route to {route}')
 
             step += 1
 
@@ -502,7 +503,6 @@ def on_message(client, userdata, msg):
         clearSimulation()
         print("Simulation cleared")
         end_addRandomTraffic = False
-        clearSimulation()
 
     if topic == "/endSimulation":
         print("Ending simulation...")
