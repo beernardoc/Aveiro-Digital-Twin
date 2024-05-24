@@ -230,7 +230,7 @@ def run_3D():
             print("chegou no 3d")
             processCarla = subprocess.Popen(["Adapters/co_simulation/runCarlaLive.sh"])
             sleep(10)
-            process3d = subprocess.Popen(["python3", "Adapters/co_simulation/live_simulation3D.py"])
+            process3d = subprocess.Popen(["python3", "Adapters/co_simulation/live_simulation3D.py", current_user])
             return jsonify({'message': 'Comando executado com sucesso'}), 200
 
         if real_data == "True":
@@ -265,13 +265,13 @@ def run_3D():
             processCarla = subprocess.Popen(["Adapters/co_simulation/runCarla.sh"])
             sleep(10)
 
-            process3d = subprocess.Popen(["python3", "Adapters/co_simulation/RealSimulation_3D.py"])
+            process3d = subprocess.Popen(["python3", "Adapters/co_simulation/RealSimulation_3D.py", current_user])
             return jsonify({'message': 'Comando executado com sucesso'}), 200
 
         processCarla = subprocess.Popen(["Adapters/co_simulation/runCarla.sh"])
         sleep(10)
 
-        process3d = subprocess.Popen(["python3", "Adapters/co_simulation/simulation_3D.py"])
+        process3d = subprocess.Popen(["python3", "Adapters/co_simulation/simulation_3D.py", current_user])
         return jsonify({'message': 'Comando executado com sucesso'}), 200
 
 
@@ -290,7 +290,7 @@ def run_2D():
         global blocked_roundabouts
 
         if live == "True":
-            process2d = subprocess.Popen(["python3", "Adapters/co_simulation/live_simulation2D.py"])
+            process2d = subprocess.Popen(["python3", "Adapters/co_simulation/live_simulation2D.py", current_user])
             blocked_roundabouts = []
             return jsonify({'message': 'Comando iniciado com sucesso'}), 200
 
@@ -320,13 +320,13 @@ def run_2D():
                 realdata.create_vehicle_route(x)
 
             realdata.tree.write(realdata.output_file)
-            process2d = subprocess.Popen(["python3", "Adapters/co_simulation/RealSimulation_2D.py"])
+            process2d = subprocess.Popen(["python3", "Adapters/co_simulation/RealSimulation_2D.py", current_user])
 
             return jsonify({'message': 'Dados históricos obtidos com sucesso'}), 200
 
         print("chamou 2d limpo")
 
-        process2d = subprocess.Popen(["python3", "Adapters/co_simulation/simulation_2D.py"])
+        process2d = subprocess.Popen(["python3", "Adapters/co_simulation/simulation_2D.py", current_user])
         blocked_roundabouts = []
 
         return jsonify({'message': 'Comando iniciado com sucesso'}), 200
@@ -644,7 +644,7 @@ def resimulation():
 
     try:
         global process2d
-        process2d = subprocess.Popen(["python3", "Adapters/co_simulation/RealSimulation_2D.py", current_user,
+        process2d = subprocess.Popen(["python3", "Adapters/co_simulation/simulation_2D.py", current_user,
                                       "--resimulation", simulation_id])
         global blocked_roundabouts
         blocked_roundabouts = []
