@@ -1,55 +1,63 @@
+/* Apply background color to the entire page */
+html, body {
+    background-color: #d0daf0;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow-x: hidden; /* Prevent horizontal scroll */
+}
+
+/* Ensure the container covers the full viewport height */
 .roundabout-page-container {
     display: flex;
-    height: 100vh;
+    min-height: 100vh; /* Ensure it covers at least the full viewport height */
     position: relative;
 }
 
+/* Adjust the padding to avoid overflow */
 .roundabout-page {
-    height: calc(100%- 90px);
     flex: 3;
     padding: 20px;
     padding-top: 70px;
     padding-left: 310px;
-    background-color: #d0daf0;
-    color: #ffffff;
     width: 100%;
+    box-sizing: border-box; /* Ensure padding does not cause overflow */
 }
 
+/* Center the map */
 .roundabout-page-map {
-    /* center the map */
     display: flex;
     justify-content: center;
 }
 
+/* Ensure the map does not resize */
 .roundabout-page-map img {
-    /* make the map not change size */
     min-width: 1178px;
 }
 
+/* Modal styles */
 .modal {
-    position: fixed; /* Position relative to the viewport */
-    z-index: 1; /* Sit on top */
+    position: fixed;
+    z-index: 1;
     left: 0;
     top: 0;
-    width: 100%; /* Full width of the viewport */
-    height: 100%; /* Full height of the viewport */
-    overflow: auto; /* Enable scroll if needed */
-    background-color: rgba(0, 0, 0, 0.4); /* Black with opacity */
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
 }
 
-/* Modal Content/Box */
 .modal-content {
     background-color: #fefefe;
-    margin: 10% auto; /* 10% from the top and centered horizontally */
+    margin: 10% auto;
     padding: 20px;
     border: 1px solid #888;
-    width: 60%; /* Set the width of the modal */
-    max-width: 800px; /* Max width to avoid being too large on large screens */
+    width: 60%;
+    max-width: 800px;
     border-radius: 8px;
     position: relative;
 }
 
-/* The Close Button */
 .close {
     color: #aaa;
     position: absolute;
@@ -88,7 +96,7 @@
     font-size: 16px;
     border: none;
     border-radius: 4px;
-    background-color: #007bff;;
+    background-color: #007bff;
     color: #fff;
     cursor: pointer;
     transition: background-color 0.3s ease;
