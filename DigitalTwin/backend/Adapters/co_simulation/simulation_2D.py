@@ -155,6 +155,7 @@ def blockRoundabout(roundabout_id):
         traci.edge.setMaxSpeed(edge, 0)
 
 def blockRoad(road_id):
+    print("Blocking road", road_id)
     with open(road_file_path, "r") as f:
         data = json.load(f)
         road = data[str(road_id)]
