@@ -23,12 +23,28 @@
     justify-content: center;
 }
 
-.time-card, .quantity-card {
+.quantity-card {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     width: 48%; /* Adjust for two per row */
+    height: 100px;
+    background-color: #7191D2;
+    color: white;
+    border-radius: 5px;
+    padding: 5px;
+    text-align: center;
+    margin: 10px;
+    font-size: 20px;
+}
+
+.vehicles-type-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 30%; /* Adjust for 3 per row */
     height: 100px;
     background-color: #7191D2;
     color: white;
@@ -134,7 +150,7 @@
 }
 
 @media screen and (max-width: 1200px) {
-    .time-card, .quantity-card {
+    .time-card, .quantity-card, .vehicles-type-card {
          width: 100%;
      }
 }
