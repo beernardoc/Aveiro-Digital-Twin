@@ -448,13 +448,13 @@ def test_add_real_car():
     #"timestamp": 1710954013.329629 }'   http://localhost:5000/api/testaddRealCar
 
 
-@app.route('/api/addSimulatedCar', methods=['POST'])
-def add_car():
+@app.route('/api/addSimulated', methods=['POST'])
+def add_simulated():
     try:
         data = request.json  # Acessa o JSON enviado no corpo da solicitação
         # Aqui você pode manipular os dados como desejar
         print("Dados recebidos:", data)
-        publish.single("/addSimulatedCar", payload=json.dumps(data), hostname="localhost", port=1883)
+        publish.single("/addSimulated", payload=json.dumps(data), hostname="localhost", port=1883)
         return jsonify({'message': 'Veículo adicionado com sucesso'}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -463,6 +463,18 @@ def add_car():
     #"end": {"lng": "-8.655386132941464", "lat": "40.63525392116133"},
     #"start": {"lng": "-8.660106693274248", "lat": "40.635327506990194"}
     #}' http://localhost:5000/api/addSimulatedCar
+
+@app.route('/api/addSimulatedPedestrian', methods=['POST'])
+def add_simualtedPedestrian():
+    try:
+        data = request.json  # Acessa o JSON enviado no corpo da solicitação
+        # Aqui você pode manipular os dados como desejar
+        print("Dados recebidos:", data)
+        publish.single("/addSimulatedPedestrian", payload=json.dumps(data), hostname="localhost", port=1883)
+        return jsonify({'message': 'pedestre adicionado com sucesso'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 
 
 @app.route('/api/endSimulation', methods=['POST'])

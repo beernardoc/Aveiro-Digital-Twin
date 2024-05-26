@@ -46,7 +46,7 @@ const SimulationPage = () => {
                 <div className="simulation-info-card">
                     <h1><b> Simulation Info</b></h1>
                     <br />
-                    <p className='quantity-card'><h4><FontAwesomeIcon icon={faClock} /> Time (s)</h4> {parsedMessage.time}</p>
+                    <p className='quantity-card'><h4><FontAwesomeIcon icon={faClock} /> Time (s)</h4> {parsedMessage.simulation.time}</p>
                     <p className='quantity-card'><h4><FontAwesomeIcon icon={faCar} /> Total Vehicles</h4> {parsedMessage.vehicle && parsedMessage.vehicle.quantity}</p>
                     <p className="vehicles-type-card">
                         <h4>Simulated Vehicles</h4> 

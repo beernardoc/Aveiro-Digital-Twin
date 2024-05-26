@@ -22,6 +22,9 @@ import EndSimulation from './pages/EndSimulation';
 import History from './pages/History';
 import { useState } from 'react';
 import { useEffect } from 'react';
+import MotorcyclePage from "./pages/MotorcyclePage";
+import BikePage from "./pages/BikePage";
+import PedestrianPage from "./pages/PedestrianPage";
 
 const api = "http://localhost:5000/api";
 
@@ -66,6 +69,9 @@ function App() {
           <Route path="/run2D" element={ <Run2D />} />
           <Route path="/run3D" element={<Run3DPage />} />
           <Route path="/car" element={<><Sidebar /> <CarPage /></>} />
+          <Route path="/motorcycle" element={<><Sidebar /> <MotorcyclePage /></>} />
+          <Route path="/bike" element={<><Sidebar /> <BikePage /></>} />
+            <Route path="/pedestrian" element={<><Sidebar /> <PedestrianPage /></>} />
           <Route path="/button" element={<><Sidebar /> <button onClick={runPythonScript}>RUN</button></>} />
           <Route path="/" element={<HomePage />} />
           <Route path="/addRandom" element={<><Sidebar /> <AddRandom /></>} />

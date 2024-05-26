@@ -41,6 +41,30 @@ function Sidebar() {
               <h2>Car</h2>
             </div>
           </Link>
+          <Link to="/motorcycle">
+          <div className="card">
+            <div className="card-icon">
+              <FontAwesomeIcon icon="motorcycle" size="2x" />
+            </div>
+            <h2>Motorcycle</h2>
+          </div>
+          </Link>
+          <Link to="/bike">
+          <div className="card">
+            <div className="card-icon">
+              <FontAwesomeIcon icon="bicycle" size="2x" />
+            </div>
+            <h2>Bicycle</h2>
+          </div>
+          </Link>
+          <Link to="/pedestrian">
+          <div className="card">
+            <div className="card-icon">
+              <FontAwesomeIcon icon="person-walking" size="2x" />
+            </div>
+            <h2>Pedestrian</h2>
+          </div>
+          </Link>
           <Link to="/block">
             <div className="card">
               <div className="card-icon">
@@ -49,24 +73,6 @@ function Sidebar() {
               <h2>Block</h2>
             </div>
           </Link>
-          <div className="card">
-            <div className="card-icon">
-              <FontAwesomeIcon icon="motorcycle" size="2x" />
-            </div>
-            <h2>Motorcycle</h2>
-          </div>
-          <div className="card">
-            <div className="card-icon">
-              <FontAwesomeIcon icon="bicycle" size="2x" />
-            </div>
-            <h2>Bicycle</h2>
-          </div>
-          <div className="card">
-            <div className="card-icon">
-              <FontAwesomeIcon icon="person-walking" size="2x" />
-            </div>
-            <h2>Pedestrian</h2>
-          </div>
           <Link to="/clear">
             <div className="card">
               <div className="card-icon">

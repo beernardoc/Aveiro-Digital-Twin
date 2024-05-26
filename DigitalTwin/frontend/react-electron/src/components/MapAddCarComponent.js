@@ -22,7 +22,7 @@ const finalMarkerIcon = new L.icon({
     shadowSize: [41, 41],
 });
 
-const MapComponent = () => {
+const MapAddCarComponent = () => {
     const [clickCount, setClickCount] = useState(0);
     const [initialPosition, setInitialPosition] = useState(null);
     const [finalPosition, setFinalPosition] = useState(null);
@@ -69,6 +69,7 @@ const MapComponent = () => {
         var car = {};
         if (initialPosition && finalPosition) {
             car = {
+                "type": "car",
                 "start": {
                     "lng": initialPosition.lng,
                     "lat": initialPosition.lat
@@ -84,6 +85,7 @@ const MapComponent = () => {
 
          else if (initialPosition) {
             car = {
+                "type": "car",
                 "start": {
                     "lng": initialPosition.lng,
                     "lat": initialPosition.lat
@@ -94,6 +96,7 @@ const MapComponent = () => {
         }
          else {
             car = {
+                "type": "car",
                 "end": {
                     "lng": finalPosition.lng,
                     "lat": finalPosition.lat
@@ -102,7 +105,7 @@ const MapComponent = () => {
         }
 
         console.log('Car:', car);
-        axios.post('http://localhost:5000/api/addSimulatedCar', car)
+        axios.post('http://localhost:5000/api/addSimulated', car)
                     .then(response => {
                         // Lida com a resposta da solicitação
                         console.log(response.data);
@@ -211,4 +214,4 @@ const MapEventsHandler = ({handleMapClick}) => {
     return null;
 };
 
-export default MapComponent;
+export default MapAddCarComponent;

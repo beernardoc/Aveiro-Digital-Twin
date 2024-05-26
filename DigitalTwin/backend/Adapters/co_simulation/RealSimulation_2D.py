@@ -248,12 +248,12 @@ def addOrUpdateRealCar(received):
         print("adicionado")
 
 
-def addSimulatedCar(received):
+def addSimulated(received):
     print(type(received))
     data = json.loads(received.decode('utf-8'))
     print("data", data.keys())
 
-    if data.keys() == {"start", "end"}:
+    if "start" in data.keys() and "end" in data.keys():
         logI, latI = data["start"]["lng"], data["start"]["lat"]
         logE, latE = data["end"]["lng"], data["end"]["lat"]
 
@@ -261,13 +261,13 @@ def addSimulatedCar(received):
         End = traci.simulation.convertRoad(float(logE), float(latE), isGeo=True, vClass="passenger")
         print("Start", Start)
         print("End", End)
-        route = traci.simulation.findRoute(Start[0], End[0], "vehicle.audi.a2")
+        route = traci.simulation.findRoute(Start[0], End[0], getVtype(data["type"]))
 
         if route.edges:
             ts = str(time.time_ns())
             traci.route.add("route_simulated{}".format(ts), route.edges)
             traci.vehicle.add(vehID="simulated{}".format(ts), routeID="route_simulated{}".format(ts),
-                              typeID="vehicle.audi.a2", depart=traci.simulation.getTime() + 2, departSpeed=0,
+                              typeID=getVtype(data["type"]), depart=traci.simulation.getTime() + 2, departSpeed=0,
                               departLane="best")
 
             x, y = net.convertLonLat2XY(logI, latI)
@@ -282,9 +282,7 @@ def addSimulatedCar(received):
 
 
 
-
-
-    elif data.keys() == {"start"}:
+    elif "start" in data.keys():
         allowedEdges = [i.getID() for i in net.getEdges() if "driving" in i.getType()]
         randomEdge = random.choice(allowedEdges)
         print("random", randomEdge)
@@ -294,13 +292,13 @@ def addSimulatedCar(received):
 
         Start = traci.simulation.convertRoad(float(logI), float(latI), isGeo=True, vClass="passenger")
 
-        route = traci.simulation.findRoute(Start[0], randomEdge, "vehicle.audi.a2")
+        route = traci.simulation.findRoute(Start[0], randomEdge, getVtype(data["type"]))
 
         if route.edges:
             ts = str(time.time_ns())
             traci.route.add("route_simulated{}".format(ts), route.edges)
             traci.vehicle.add(vehID="simulated{}".format(ts), routeID="route_simulated{}".format(ts),
-                              typeID="vehicle.audi.a2", depart=traci.simulation.getTime() + 2, departSpeed=0,
+                              typeID=getVtype(data["type"]), depart=traci.simulation.getTime() + 2, departSpeed=0,
                               departLane="best")
 
             x, y = net.convertLonLat2XY(logI, latI)
@@ -315,7 +313,7 @@ def addSimulatedCar(received):
             return "Não foi possível encontrar uma rota válida"
 
 
-    elif data.keys() == {"end"}:
+    elif "end" in data.keys():
         allowedEdges = [i.getID() for i in net.getEdges() if "driving" in i.getType()]
         randomEdge = random.choice(allowedEdges)
         logE, latE = data["end"]["lng"], data["end"]["lat"]
@@ -324,13 +322,13 @@ def addSimulatedCar(received):
 
         End = traci.simulation.convertRoad(float(logE), float(latE), isGeo=True, vClass="passenger")
 
-        route = traci.simulation.findRoute(randomEdge, End[0], "vehicle.audi.a2")
+        route = traci.simulation.findRoute(randomEdge, End[0], getVtype(data["type"]))
 
         if route.edges:
             ts = str(time.time_ns())
             traci.route.add("route_simulated{}".format(ts), route.edges)
             traci.vehicle.add(vehID="simulated{}".format(ts), routeID="route_simulated{}".format(ts),
-                              typeID="vehicle.audi.a2", depart=traci.simulation.getTime() + 2, departSpeed=0,
+                              typeID=getVtype(data["type"]), depart=traci.simulation.getTime() + 2, departSpeed=0,
                               departLane="best")
 
             edge = net.getEdge(randomEdge)
@@ -344,6 +342,68 @@ def addSimulatedCar(received):
         else:
             return "Não foi possível encontrar uma rota válida"
 
+def getVtype(vClass):
+    if vClass == "car":
+        return "vehicle.audi.a2"
+    elif vClass == "motorcycle":
+        return "vehicle.kawasaki.ninja"
+    elif vClass == "bike":
+        return "vehicle.bh.crossbike"
+
+def addSimulatedPedestrian(received):
+    print(type(received))
+    data = json.loads(received.decode('utf-8'))
+    print("data", data.keys())
+
+    allowedEdges = [net.getLane(lane).getEdge() for lane in traci.lane.getIDList() if
+                    net.getLane(lane).allows("pedestrian") and ":" not in lane and net.getLane(
+                        lane).getEdge().getLaneNumber() > 1]
+
+
+
+    if "start" in data.keys() and "end" in data.keys():
+        logI, latI = data["start"]["lng"], data["start"]["lat"]
+        logE, latE = data["end"]["lng"], data["end"]["lat"]
+
+        person_id = "randomPedestrian_{}".format(time.time_ns())
+        Start = traci.simulation.convertRoad(float(logI), float(latI), isGeo=True, vClass="pedestrian")
+        End = traci.simulation.convertRoad(float(logE), float(latE), isGeo=True, vClass="pedestrian")
+        print("Start", Start)
+        print("End", End)
+        route = traci.simulation.findIntermodalRoute(Start[0], End[0], pType="DEFAULT_PEDTYPE")
+
+        if route[0].edges:
+            traci.person.add(person_id, Start[0], pos=0)
+            traci.person.appendWalkingStage(person_id, route[0].edges, arrivalPos=0)
+        else:
+            return "Não foi possível encontrar uma rota válida"
+
+    elif "start" in data.keys():
+        logI, latI = data["start"]["lng"], data["start"]["lat"]
+        print("logI: {}, latI: {}".format(logI, latI))
+
+        person_id = "randomPedestrian_{}".format(time.time_ns())
+        Start = traci.simulation.convertRoad(float(logI), float(latI), isGeo=True, vClass="pedestrian")
+        route = traci.simulation.findIntermodalRoute(Start[0], random.choice(allowedEdges), pType="DEFAULT_PEDTYPE")
+
+        if route[0].edges:
+            traci.person.add(person_id, Start[0], pos=0)
+            traci.person.appendWalkingStage(person_id, route[0].edges, arrivalPos=0)
+        else:
+            return "Não foi possível encontrar uma rota válida"
+
+    elif "end" in data.keys():
+        logE, latE = data["end"]["lng"], data["end"]["lat"]
+
+        person_id = "randomPedestrian_{}".format(time.time_ns())
+        End = traci.simulation.convertRoad(float(logE), float(latE), isGeo=True, vClass="pedestrian")
+        route = traci.simulation.findIntermodalRoute(random.choice(allowedEdges), End[0], pType="DEFAULT_PEDTYPE")
+
+        if route[0].edges:
+            traci.person.add(person_id, random.choice(allowedEdges), pos=0)
+            traci.person.appendWalkingStage(person_id, route[0].edges, arrivalPos=0)
+        else:
+            return "Não foi possível encontrar uma rota válida"
 
 def addRandomTraffic(QtdCars):
     allowedEdges = [i.getID() for i in net.getEdges() if "driving" in i.getType()]
@@ -486,11 +546,17 @@ def on_message(client, userdata, msg):
             print(e)
 
 
-    if topic == "/addSimulatedCar":
+    if topic == "/addSimulated":
         print("entrou", topic)
         print(msg.payload)
         payload = msg.payload
-        addSimulatedCar(payload)
+        addSimulated(payload)
+
+    if topic == "/addSimulatedPedestrian":
+        print("entrou", topic)
+        print(msg.payload)
+        payload = msg.payload
+        addSimulatedPedestrian(payload)
 
     if topic == "/clearSimulation":
         print("Clearing simulation...")
@@ -577,7 +643,8 @@ if __name__ == "__main__":
     mqtt_client.subscribe("/realDatateste")
     mqtt_client.subscribe("/addRandomTraffic")
     mqtt_client.subscribe("/addRandomPedestrian")
-    mqtt_client.subscribe("/addSimulatedCar")
+    mqtt_client.subscribe("/addSimulated")
+    mqtt_client.subscribe("/addSimulatedPedestrian")
     mqtt_client.subscribe("/endSimulation")
     mqtt_client.subscribe("/endSimulationAndSave")
     mqtt_client.subscribe("/addRandomMotorcycle")
