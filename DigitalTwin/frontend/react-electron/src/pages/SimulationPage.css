@@ -4,14 +4,115 @@
     position: relative;
 }
 
-.main-content {
-    height: calc(100%- 90px); 
-    flex: 3; 
+.simulation-page {
+    height: calc(100% - 90px);
+    flex: 3;
     padding: 20px;
-    padding-top: 110px; 
+    padding-top: 110px;
     padding-left: 310px;
     background-color: #d0daf0;
-    position: relative;
+    color: #ffffff;
+}
+
+.time-quantity-card {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    background-color: #d0daf0;
+    color: #ffffff;
+    justify-content: center;
+}
+
+.time-card, .quantity-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 48%; /* Adjust for two per row */
+    height: 100px;
+    background-color: #7191D2;
+    color: white;
+    border-radius: 5px;
+    padding: 5px;
+    text-align: center;
+    margin: 10px;
+    font-size: 20px;
+}
+
+.time-card b, .quantity-card b {
+    font-size: 25px;
+    font-weight: bold;
+}
+
+.simulation-info-card {
+    padding: 20px;
+    background-color: #1c2548;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    color: white;
+    margin-bottom: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.simulation-info-card h1 {
+    width: 100%;
+    color: white;
+    font-size: 1.2em;
+    margin-bottom: 10px;
+}
+
+.simulation-info-card h4 {
+    color: white;
+    font-weight: bold;
+    margin-right: 10px;
+    width: 100%;
+}
+
+.simulation-info-card ul {
+    list-style-type: none;
+    padding: 0;
+    width: 100%;
+}
+
+.simulation-info-card ul li {
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.legend-color {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    margin-right: 8px;
+}
+
+.vehicle-cards {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 10px;
+}
+
+.simulation-methods-info {
+    padding: 20px;
+    background-color: #1c2548;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    color: white;
+}
+
+.simulation-methods-info h3 {
+    margin-top: 0;
+}
+
+.simulation-methods-info ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.simulation-methods-info ul li {
+    margin-bottom: 10px;
 }
 
 .simulate-button {
@@ -32,63 +133,14 @@
     background-color: #f47065;
 }
 
-.simulation-page {
-    height: calc(100%- 90px);
-    flex: 3;
-    padding: 20px;
-    padding-top: 110px;
-    padding-left: 310px;
-    background-color: #d0daf0;
-    color: #ffffff;
-}
-
-.time-quantity-card {
-    display: flex; /* Garante que os itens filhos sejam dispostos em linha */
-    flex-direction: row; /* Alinha os itens filhos horizontalmente */
-    align-items: center; /* Centraliza os itens verticalmente */
-    background-color: #d0daf0;
-    color: #ffffff;
-    align-items: center; /* Centraliza os itens internos horizontalmente */
-    justify-content: center; /* Centraliza os itens internos verticalmente */
-}
-
-.time-card,.quantity-card {
-    display: flex;
-    flex-direction: column; /* Organiza os itens internos em coluna */
-    justify-content: center; /* Centraliza os itens internos verticalmente */
-    align-items: center; /* Centraliza os itens internos horizontalmente */
-    width: 25%; /* Ajuste conforme necessário */
-    height: 100px; /* Ajuste conforme necessário */
-    background-color: #1c2548;
-    color: white;
-    border-radius: 5px; /* Bordas arredondadas */
-    padding: 5px; /* Padrão interno para melhor visualização do texto */
-    text-align: center; /* Centraliza o texto dentro do card */
-    margin: 10px;
-    font-size: 20px;
-}
-
-.time-card b,.quantity-card b {
-    font-size: 25px; /* Aumenta o tamanho do texto */
-    font-weight: bold; /* Mantém o texto em negrito */
-}
-
-.vehicle-cards {
-    display: flex; /* Faz com que os cards sejam dispostos em linha */
-    flex-wrap: wrap; /* Permite que os cards passem para a próxima linha se não houver espaço suficiente */
-    padding: 10px; /* Adiciona algum preenchimento ao redor dos cards para melhor visualização */
-}
-
 @media screen and (max-width: 1200px) {
-    .time-card,.quantity-card {
-         width: 100%; /* Largura máxima de 100% para telas pequenas */
+    .time-card, .quantity-card {
+         width: 100%;
      }
- }
+}
 
- 
- /* Estilo para telas pequenas (menor que 600px) */
- @media screen and (max-width: 599px) {
+@media screen and (max-width: 599px) {
     .vehicle-cards {
-         justify-content: center; /* Centraliza os cards na linha */
+         justify-content: center;
      }
- }
+}
