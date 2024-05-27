@@ -71,7 +71,7 @@ function App() {
           <Route path="/car" element={<><Sidebar /> <CarPage /></>} />
           <Route path="/motorcycle" element={<><Sidebar /> <MotorcyclePage /></>} />
           <Route path="/bike" element={<><Sidebar /> <BikePage /></>} />
-            <Route path="/pedestrian" element={<><Sidebar /> <PedestrianPage /></>} />
+          <Route path="/pedestrian" element={<><Sidebar /> <PedestrianPage /></>} />
           <Route path="/button" element={<><Sidebar /> <button onClick={runPythonScript}>RUN</button></>} />
           <Route path="/" element={<HomePage />} />
           <Route path="/addRandom" element={<><Sidebar /> <AddRandom /></>} />

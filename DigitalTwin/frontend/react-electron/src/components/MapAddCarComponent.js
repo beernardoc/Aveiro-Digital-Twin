@@ -143,15 +143,14 @@ const MapAddCarComponent = () => {
             </MapContainer>
             <div className="mt-5">
                 <button className="btn-clear rounded" 
-                        style={{width: '150px', backgroundColor: markerStart ? 'green' : '#F47065'}} 
+                        style={{backgroundColor: markerStart ? 'green' : '#F47065'}} 
                         onClick={handleAddStart}>Start Position
                 </button>
                 <button className="btn-clear rounded"
-                        style={{width: '150px', backgroundColor: markerStart ?  '#F47065' : 'green' }} 
+                        style={{backgroundColor: markerStart ?  '#F47065' : 'green' }} 
                         onClick={handleAddFinish}>Finish Position
                 </button>
-                <button className="btn-clear rounded"
-                        style={{marginLeft: '200px'}} 
+                <button className="btn-clear rounded btn-margin-clear"
                         onClick={handleRemoveMarkers}>Clear markers
                 </button>
                 <button
@@ -160,6 +159,7 @@ const MapAddCarComponent = () => {
                     data-tooltip-content="You need to select at least one initial position"
                     data-tooltip-place="bottom"
                     onClick={handleSubmit}
+                    style={{width: '150px'}} 
                     disabled={!initialPosition} // Desativa o botão se initialPosition for null
                 >
                     Add car
@@ -169,7 +169,7 @@ const MapAddCarComponent = () => {
 
 
             {isModalOpen && (
-                <div className="modal">
+                <div className="modal modal-add">
                     <div className="modal-content text-gray-500">
                         <span className="close" onClick={closeModal}>&times;</span>
                         <h2 className="mb-5 ">You are adding a car with the following parameters:</h2>
@@ -195,7 +195,7 @@ const MapAddCarComponent = () => {
 
 
                         </form>
-                        <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
                                 onClick={insertCar}>Submit
                         </button>
 

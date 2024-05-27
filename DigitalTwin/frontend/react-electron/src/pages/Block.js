@@ -75,7 +75,7 @@ export default function Block() {
                 
                 <div className="block-page-buttons">
                     {/* 2 buttons, one to block roundabout and another to road */}
-                    <button className="block-page-button" type='submit' onClick={blockRoundabout} style={{ marginRight: "30px" }}>Block Roundabout</button>
+                    <button className="block-page-button" type='submit' onClick={blockRoundabout} style={{ marginRight: "30px"}}>Block Roundabout</button>
                     <button className="block-page-button" type='submit' onClick={blockRoad}>Block Road</button>
                 </div>
 

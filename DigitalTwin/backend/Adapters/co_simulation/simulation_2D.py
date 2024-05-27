@@ -7,7 +7,6 @@ import time
 import sumolib
 import traci
 import sys
-import getopt
 import os
 
 import paho.mqtt.client as mqtt
@@ -15,7 +14,6 @@ import paho.mqtt.publish as publish
 
 from pymongo import MongoClient
 from bson import ObjectId
-from traci.exceptions import TraCIException
 
 # Determine the project root directory
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
