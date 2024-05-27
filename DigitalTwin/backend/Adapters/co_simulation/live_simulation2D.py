@@ -178,9 +178,11 @@ def addOrUpdateRealCar(received):
         print("route", route)
         traci.route.add(routeID=("route_" + vehID), edges=route)  # adiciona uma rota para o veículo
         print("route", traci.route.getEdges("route_" + vehID))
-        traci.vehicle.add(vehID, routeID=("route_" + vehID), typeID="vehicle.dodge.charger_police",
+        traci.vehicle.add(vehID, routeID=("route_" + vehID), typeID="vehicle.ford.mustang",
                           depart=traci.simulation.getTime() + 1, departSpeed=0,
                           departLane="best")
+        traci.vehicle.setColor(vehID, (0, 204, 0))
+
         print("vehicle added")
         traci.vehicle.moveToXY(vehID, route[0], 0, x, y,
                                keepRoute=1)  # se a proxima for a mesma, cluster ou de junção, move com moveTOXY

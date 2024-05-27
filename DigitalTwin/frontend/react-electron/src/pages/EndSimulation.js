@@ -68,7 +68,7 @@ export default function EndSimulation() {
             </div>
 
             {showModal && (
-                <div className="modal">
+                <div className="modal modal-end">
                     <div className="modal-content">
                         <span className="close" onClick={handleClose}>&times;</span>
                         <p> Choose a Name for the Simulation </p>
