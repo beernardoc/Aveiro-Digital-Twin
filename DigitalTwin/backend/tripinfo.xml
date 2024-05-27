@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2024-05-27 18:30:08 by Eclipse SUMO GUI Version 1.19.0
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/sumoConfiguration.xsd">
+
+    <input>
+        <net-file value="Adapters/co_simulation/sumo_configuration/ruadapega/output.net.xml"/>
+        <route-files value="Adapters/co_simulation/sumo_configuration/ruadapega/carlavtypes.rou.xml,Adapters/co_simulation/sumo_configuration/ruadapega/ruadapega.rou.xml"/>
+    </input>
+
+    <output>
+        <tripinfo-output value="tripinfo.xml"/>
+    </output>
+
+    <traci_server>
+        <remote-port value="58027"/>
+        <num-clients value="1"/>
+    </traci_server>
+
+    <gui_only>
+        <gui-settings-file value="Adapters/co_simulation/sumo_configuration/ruadapega/ruadapega.view.xml"/>
+    </gui_only>
+
+</configuration>
+-->
+
+<tripinfos xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/tripinfo_file.xsd">
+    <tripinfo id="96723365" depart="4.00" departLane="-462_1" departPos="719.46" departSpeed="0.00" departDelay="-1.00" arrival="40.00" arrivalLane="-462_1" arrivalPos="1025.51" arrivalSpeed="8.80" duration="36.00" routeLength="306.05" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="13.97" rerouteNo="0" devices="tripinfo_96723365" vType="vehicle.dodge.charger_police" speedFactor="1.00" vaporized=""/>
+    <tripinfo id="94430152" depart="3.00" departLane="-462_1" departPos="686.16" departSpeed="0.00" departDelay="-1.00" arrival="42.00" arrivalLane="-462_1" arrivalPos="1025.51" arrivalSpeed="9.80" duration="39.00" routeLength="339.35" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="14.33" rerouteNo="0" devices="tripinfo_94430152" vType="vehicle.dodge.charger_police" speedFactor="1.00" vaporized=""/>
+    <tripinfo id="87534462" depart="10.00" departLane="-462_1" departPos="661.55" departSpeed="0.00" departDelay="-1.00" arrival="52.00" arrivalLane="-462_1" arrivalPos="1025.51" arrivalSpeed="9.50" duration="42.00" routeLength="363.96" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="15.79" rerouteNo="0" devices="tripinfo_87534462" vType="vehicle.dodge.charger_police" speedFactor="1.00" vaporized=""/>
+    <tripinfo id="96463283" depart="26.00" departLane="-462_1" departPos="653.47" departSpeed="0.00" departDelay="-1.00" arrival="74.00" arrivalLane="-462_1" arrivalPos="1025.51" arrivalSpeed="8.10" duration="48.00" routeLength="372.04" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="20.82" rerouteNo="0" devices="tripinfo_96463283" vType="vehicle.dodge.charger_police" speedFactor="1.00" vaporized=""/>
+    <tripinfo id="0" depart="3.00" departLane="-478_1" departPos="6.47" departSpeed="0.00" departDelay="0.00" arrival="83.00" arrivalLane="-462_1" arrivalPos="1025.51" arrivalSpeed="14.17" duration="80.00" routeLength="1076.23" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="6.63" rerouteNo="0" devices="tripinfo_0" vType="vehicle.ford.ambulance" speedFactor="1.06" vaporized=""/>
+    <tripinfo id="86987749" depart="2.00" departLane="-514_1" departPos="384.04" departSpeed="0.00" departDelay="-1.00" arrival="117.00" arrivalLane="-514_1" arrivalPos="1033.04" arrivalSpeed="5.70" duration="115.00" routeLength="649.00" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="68.24" rerouteNo="0" devices="tripinfo_86987749" vType="vehicle.dodge.charger_police" speedFactor="1.00" vaporized=""/>
+    <tripinfo id="87223096" depart="5.00" departLane="-514_1" departPos="308.60" departSpeed="0.00" departDelay="-1.00" arrival="119.00" arrivalLane="-514_1" arrivalPos="1033.04" arrivalSpeed="10.90" duration="114.00" routeLength="724.44" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="61.37" rerouteNo="0" devices="tripinfo_87223096" vType="vehicle.dodge.charger_police" speedFactor="1.00" vaporized=""/>
+    <tripinfo id="randomMotorcycle_1716831128539313680" depart="175.00" departLane="-486_1" departPos="2.14" departSpeed="0.00" departDelay="0.00" arrival="183.00" arrivalLane="-494_0" arrivalPos="0.20" arrivalSpeed="3.45" duration="8.00" routeLength="37.80" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="3.41" rerouteNo="0" devices="tripinfo_randomMotorcycle_1716831128539313680" vType="vehicle.kawasaki.ninja" speedFactor="1.06" vaporized=""/>
+    <tripinfo id="randomMotorcycle_1716831128764510768" depart="175.00" departLane="-489_1" departPos="2.14" departSpeed="0.00" departDelay="0.00" arrival="183.00" arrivalLane="-486_1" arrivalPos="3.65" arrivalSpeed="11.28" duration="8.00" routeLength="50.91" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="2.61" rerouteNo="0" devices="tripinfo_randomMotorcycle_1716831128764510768" vType="vehicle.kawasaki.ninja" speedFactor="1.08" vaporized=""/>
+    <tripinfo id="randomMotorcycle_1716831128762798117" depart="175.00" departLane="-500_1" departPos="2.14" departSpeed="0.00" departDelay="0.00" arrival="192.00" arrivalLane="-495_0" arrivalPos="0.20" arrivalSpeed="7.79" duration="17.00" routeLength="118.84" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="8.17" rerouteNo="0" devices="tripinfo_randomMotorcycle_1716831128762798117" vType="vehicle.kawasaki.ninja" speedFactor="0.94" vaporized=""/>
+    <tripinfo id="randomMotorcycle_1716831128763722468" depart="175.00" departLane="-490_1" departPos="1.43" departSpeed="0.00" departDelay="0.00" arrival="192.00" arrivalLane="-487_1" arrivalPos="1.43" arrivalSpeed="8.36" duration="17.00" routeLength="52.26" waitingTime="5.00" waitingCount="1" stopTime="0.00" timeLoss="10.77" rerouteNo="0" devices="tripinfo_randomMotorcycle_1716831128763722468" vType="vehicle.kawasaki.ninja" speedFactor="1.01" vaporized=""/>
+    <tripinfo id="simulated1716831170929752396" depart="243.00" departLane="-514_1" departPos="34.32" departSpeed="0.00" departDelay="-2.00" arrival="341.00" arrivalLane="-513_1" arrivalPos="61.35" arrivalSpeed="14.27" duration="98.00" routeLength="1217.22" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="11.65" rerouteNo="0" devices="tripinfo_simulated1716831170929752396" vType="vehicle.audi.a2" speedFactor="1.03" vaporized=""/>
+</tripinfos>

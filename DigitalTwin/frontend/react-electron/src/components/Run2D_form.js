@@ -117,6 +117,9 @@ const Run2D_form = () => {
                 <div className="mt-9 max-w-lg bg-white bg-opacity-80 rounded-lg p-8">
                     <form onSubmit={handleSubmit}>
                         <div className="mb-4">
+                            <h1 className="text-2xl font-semibold text-center">2D Simulation</h1>
+                        </div>
+                        {/* <div className="mb-4">
                             <label htmlFor="configFile" className="mb-1">Would you like to add a default
                                 configuration file (.xml)?
                             </label>
@@ -127,7 +130,7 @@ const Run2D_form = () => {
                                 accept=".xml"
                                 className="w-full px-4 py-2 border rounded-md"
                             />
-                        </div>
+                        </div> */}
                         
                         <div className="mb-4 flex">
                             <div className="inline-flex items-center">
