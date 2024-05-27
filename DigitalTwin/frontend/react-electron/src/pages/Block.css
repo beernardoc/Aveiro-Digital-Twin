@@ -21,11 +21,11 @@
     font-size: 16px;
     border: none;
     border-radius: 4px;
-    background-color: #007bff;
+    background-color: #7191D2 !important;
     color: #fff;
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
 .block-page-button:hover {
-    background-color: #0056b3;
+    background-color: #1c2548 !important;
 }

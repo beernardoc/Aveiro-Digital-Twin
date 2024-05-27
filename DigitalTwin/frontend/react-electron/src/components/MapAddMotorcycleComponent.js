@@ -150,8 +150,7 @@ const MapAddCarComponent = () => {
                         style={{width: '150px', backgroundColor: markerStart ?  '#F47065' : 'green' }} 
                         onClick={handleAddFinish}>Finish Position
                 </button>
-                <button className="btn-clear rounded"
-                        style={{marginLeft: '200px'}} 
+                <button className="btn-clear rounded btn-margin-clear"
                         onClick={handleRemoveMarkers}>Clear markers
                 </button>
                 <button
@@ -169,7 +168,7 @@ const MapAddCarComponent = () => {
 
 
             {isModalOpen && (
-                <div className="modal">
+                <div className="modal modal-add">
                     <div className="modal-content text-gray-500">
                         <span className="close" onClick={closeModal}>&times;</span>
                         <h2 className="mb-5 ">You are adding a car with the following parameters:</h2>
@@ -195,7 +194,7 @@ const MapAddCarComponent = () => {
 
 
                         </form>
-                        <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
                                 onClick={insertMotorcycle}>Submit
                         </button>
 
