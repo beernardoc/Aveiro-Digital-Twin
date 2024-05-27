@@ -1,15 +1,15 @@
 .run2d-background {
-    background-image: url('../asset/teste.png');
-    position: absolute;
-    top: 50px;
+    position: fixed;
+    top: 30px;
     left: 0;
-    right: 0;
-    bottom: 0;
-    background-repeat: no-repeat;
+    width: 100%;
+    height: 100vh;
+    background-image: url('../asset/teste.png'); /* Atualize com o caminho da sua imagem */
     background-size: cover;
     background-position: center;
-    height: calc(100vh - 50px);
-    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .run3d-background {
