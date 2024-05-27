@@ -14,11 +14,24 @@ import threading
 import sumolib
 import traci    
 import paho.mqtt.client as mqtt
+import paho.mqtt.publish as publish
+from pymongo import MongoClient
+from bson import ObjectId
 
-file_path = os.path.join(os.path.dirname(__file__), "radar.json")
+# Determine the project root directory
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
+if project_root not in sys.path:
+    sys.path.append(project_root)
+from Adapters.history.file_composer import FileComposer
+
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 radar_file_path = os.path.join(os.path.dirname(__file__), "radar.json")
-from coord_distance import calculate_bearing
 roundabout_file_path = os.path.join(os.path.dirname(__file__), "roundabout.json")
+road_file_path = os.path.join(os.path.dirname(__file__), "road.json")
+from coord_distance import calculate_bearing
+
+mongo_client = MongoClient(host='localhost', port=27017, username='admin', password='password')
+mongo = mongo_client['digitaltwin']
 
 
 # ==================================================================================================
@@ -28,7 +41,7 @@ roundabout_file_path = os.path.join(os.path.dirname(__file__), "roundabout.json"
 import glob
 import os
 import sys
-
+## isto não pode ser assim
 try:
     sys.path.append(
         glob.glob('/home/pi-digitaltwin/Desktop/CARLA/PythonAPI/carla/dist/carla-*%d.%d-%s.egg' %
@@ -50,9 +63,6 @@ from modules.simulation_synchronization import SimulationSynchronization
 net = sumolib.net.readNet(
     "Adapters/co_simulation/sumo_configuration/simple-map/UA.net.xml",
     withInternal=True)  # Carrega a rede do SUMO atraves do sumolib para acesso estatico
-
-
-
 
 def synchronization_loop(args):
     """
@@ -98,17 +108,28 @@ def synchronization_loop(args):
 
 
 global step
-allVehicle = set()
 simulated_vehicles = {}
 blocked_roundabouts = {}
+blocked_roads = {}
+all_vehicles = {}
+
+current_user = None
+if len(sys.argv) > 1:
+    current_user = sys.argv[1]
 
 randomVehiclesThread = None
 end_addRandomTraffic = False
+
+pause_to_clear = False
+
+history_file = FileComposer("Adapters/history/base_file.xml")
 
 def get_options():
     opt_parser = optparse.OptionParser()
     opt_parser.add_option("--nogui", action="store_true",
                           default=False, help="run the commandline version of sumo")
+    opt_parser.add_option("--resimulation", action="store", type="string",
+                          help="run a resimulation with the given history id")
     options, args = opt_parser.parse_args()
     return options
 
@@ -152,6 +173,26 @@ def blockRoundabout(roundabout_id):
         blocked_roundabouts[roundabout_id][edge] = max_speed
         traci.edge.setMaxSpeed(edge, 0)
 
+def blockRoad(road_id):
+    print("Blocking road", road_id)
+    with open(road_file_path, "r") as f:
+        data = json.load(f)
+        road = data[str(road_id)]
+        f.close()
+
+    global blocked_roads
+    blocked_roads[road_id] = {}
+    
+    for edge in road["edges"]:
+        all_lane_ids = traci.lane.getIDList()
+        lanes = [lane for lane in all_lane_ids if lane.startswith(str(edge) + "_")]
+        max_speed = 0
+        for lane in lanes:
+            if max_speed < traci.lane.getMaxSpeed(lane):
+                max_speed = traci.lane.getMaxSpeed(lane)
+        blocked_roads[road_id][edge] = max_speed
+        traci.edge.setMaxSpeed(edge, 0)
+
 def unblockRoundabout(roundabout_id):
     global blocked_roundabouts
     for edge, speed in blocked_roundabouts[roundabout_id].items():
@@ -159,11 +200,22 @@ def unblockRoundabout(roundabout_id):
     
     del blocked_roundabouts[roundabout_id]
 
+def unblockRoad(road_id):
+    global blocked_roads
+    for edge, speed in blocked_roads[road_id].items():
+        traci.edge.setMaxSpeed(edge, speed)
+    
+    del blocked_roads[road_id]
+
 def clearSimulation():
+    global pause_to_clear
+    pause_to_clear = True
     time.sleep(3)
     vehicles = traci.vehicle.getIDList()
     for vehicle in vehicles:
         traci.vehicle.remove(vehicle)
+
+    pause_to_clear = False
 
 
 def addOrUpdateRealCar(received):
@@ -185,7 +237,7 @@ def addOrUpdateRealCar(received):
         # get the sensor information from radar.json
         with open(radar_file_path, "r") as f:
             data = json.load(f)
-            radar = data[1]
+            radar = data[2]
             # get the angle from the sensor to the vehicle
             angle = calculate_bearing((radar['coord']['lat'], radar['coord']['lng']), (lat, log))
             if radar['angle_type'] == 0:
@@ -221,7 +273,6 @@ def addOrUpdateRealCar(received):
                           departLane="best")
         traci.vehicle.moveToXY(vehID, route[0], 0, x, y,
                                keepRoute=1)  # se a proxima for a mesma, cluster ou de junção, move com moveTOXY
-        # allVehicle.add(vehID)
         print(traci.vehicle.getRoute(vehID))
         print("adicionado")
 
@@ -384,6 +435,7 @@ def addSimulatedPedestrian(received):
             return "Não foi possível encontrar uma rota válida"
 
 
+
 def addRandomTraffic(QtdCars):
     allowedEdges = [i.getID() for i in net.getEdges() if "driving" in i.getType()]
     types = traci.vehicletype.getIDList()
@@ -405,7 +457,7 @@ def addRandomTraffic(QtdCars):
                                   departLane="best", )
 
 
-def addRandomPedestrian(QtdPerson):  #TODO: melhorar o findroute
+def addRandomPedestrian(QtdPerson):
     allowedEdges = [net.getLane(lane).getEdge() for lane in traci.lane.getIDList() if
                     net.getLane(lane).allows("pedestrian") and ":" not in lane and net.getLane(
                         lane).getEdge().getLaneNumber() > 1]
@@ -417,7 +469,7 @@ def addRandomPedestrian(QtdPerson):  #TODO: melhorar o findroute
             start = random.choice(allowedEdges).getID()
             end = random.choice(allowedEdges).getID()
             #route = traci.simulation.findRoute(start, end)
-            route = traci.simulation.findIntermodalRoute(start, end, pType="walker.pedestrian.0001")
+            route = traci.simulation.findIntermodalRoute(start, end, pType="DEFAULT_PEDTYPE")
             print(route[0].edges)
             if route[0].edges:
                 traci.person.add(person_id, start, pos=0)
@@ -453,7 +505,18 @@ def addRandomBike(QtdBike):
             traci.vehicle.add(vehicle_id, routeID, "vehicle.gazelle.omafiets", depart="now", departSpeed=0,
                               departLane="best", )
 
-def endSimulation():
+def endSimulation(save_history=False):
+    
+    if save_history:
+        for vehicle_id, vehicle_info in all_vehicles.items():
+            vehicle = { "id": vehicle_id, "type": vehicle_info["type"], "depart": vehicle_info["depart"] }
+            route = list(vehicle_info["route"])
+            history_file.add_vehicle(vehicle, route)
+
+        data = {"user_email": current_user, "history": history_file.get_result_string()}
+        print(data)
+        publish.single("/history", payload=json.dumps(data), hostname="localhost", port=1883)
+
     traci.close()
     sys.stdout.flush()
 
@@ -541,16 +604,29 @@ def on_message(client, userdata, msg):
 
     if topic == "/endSimulation":
         print("Ending simulation...")
-        endSimulation()
+        endSimulation(False)
         print("Simulation ended")
+
+    if topic == "/endSimulationAndSave":
+        print("Ending simulation and saving history...")
+        endSimulation(True)
+        print("Simulation ended and history saved")
 
     if topic == "/blockRoundabout":
         payload = json.loads(msg.payload)
         blockRoundabout(int(payload))
 
+    if topic == "/blockRoad":
+        payload = json.loads(msg.payload)
+        blockRoad(int(payload))
+
     if topic == "/unblockRoundabout":
         payload = json.loads(msg.payload)
         unblockRoundabout(int(payload))
+
+    if topic == "/unblockRoad":
+        payload = json.loads(msg.payload)
+        unblockRoad(int(payload))
 
 
 def synchronization_loop_wrapper(arguments):
@@ -586,12 +662,10 @@ if __name__ == "__main__":
     else:
         logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
 
-    print("teste")
     synchronization_thread = threading.Thread(target=synchronization_loop_wrapper, args=[arguments])
     synchronization_thread.start()
 
     
-    print("teste2")
     # Inicia a conexão MQTT
     mqtt_client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1)
     mqtt_client.on_connect = on_connect
@@ -604,11 +678,14 @@ if __name__ == "__main__":
     mqtt_client.subscribe("/addSimulated")
     mqtt_client.subscribe("/addSimulatedPedestrian")
     mqtt_client.subscribe("/endSimulation")
+    mqtt_client.subscribe("/endSimulationAndSave")
     mqtt_client.subscribe("/addRandomMotorcycle")
     mqtt_client.subscribe("/addRandomBike")
     mqtt_client.subscribe("/clearSimulation")
     mqtt_client.subscribe("/blockRoundabout")
+    mqtt_client.subscribe("/blockRoad")
     mqtt_client.subscribe("/unblockRoundabout")
+    mqtt_client.subscribe("/unblockRoad")
 
     
     mqtt_thread = threading.Thread(target=mqtt_client.loop_start)
