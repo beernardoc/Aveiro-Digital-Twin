@@ -149,7 +149,7 @@
     background-color: #f47065;
 }
 
-@media screen and (max-width: 1200px) {
+@media screen and (max-width: 1400px) {
     .time-card, .quantity-card, .vehicles-type-card {
          width: 100%;
      }

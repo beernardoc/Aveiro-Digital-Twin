@@ -70,7 +70,6 @@ function Navbar() {
               )}
             </div>
           )}
-          <Link to="/settings">Settings</Link>
         </div>
       </div>
     </nav>

@@ -108,6 +108,7 @@ const MapAddCarComponent = () => {
                     .then(response => {
                         // Lida com a resposta da solicitação
                         console.log(response.data);
+                        window.location.href = '/simulation';
                     })
                     .catch(error => {
                         // Lida com erros na solicitação

@@ -14,16 +14,18 @@
 
 .run3d-background {
     background-image: url('../asset/carla.jpg');
-    position: absolute;
-    top: 50px;
+    position: fixed;
+    top: 30px;
     left: 0;
     right: 0;
     bottom: 0;
-    background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
-    height: calc(100vh - 50px);
+    height: 100vh;
     width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .overlay-run {
