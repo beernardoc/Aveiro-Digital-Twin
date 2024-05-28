@@ -772,3 +772,54 @@ textarea {
 .btn.btn-round {
   border-radius: 50px;
 }
+
+.deliverables-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px; /* Add some space between the items */
+}
+
+.deliverable {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border: 1px solid #ccc; /* Optional: to see the borders of the divs */
+  padding: 20px;
+  box-sizing: border-box;
+  text-decoration: none;
+  color: inherit;
+  background-color: #f0f0f0; /* Light background color for visibility */
+  border-radius: 15px; /* Rounded corners */
+  height: 200px; /* Fixed height to ensure square shape */
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.deliverable:hover {
+  background-color: #e0e0e0; /* Slightly darker on hover */
+  transform: scale(1.05); /* Slight zoom effect */
+}
+
+.deliverable-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+}
+
+.icon {
+  width: 50px;
+  height: 50px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  margin-bottom: 10px;
+}
+
+.deliverable h3 {
+  margin: 0;
+  font-size: 1.5em;
+  color: #333;
+}
