@@ -311,7 +311,7 @@ def run_2D():
                     results.append(response.json())
                 else:
                     print(f"Falha ao obter dados para {entity}: {response.text}")
-            #print(results)
+            print(results)
             realdata = RealData(start_time, results)
             realdata.iterate_data()
             for x in realdata.known_vehicle.keys():

@@ -10,430 +10,7 @@ import os
 
 radar_file_path = "Adapters/co_simulation/radar.json"
 
-json_data = {
-    "type": "StructuredValue",
-    "value": [
-        {
-            "_id": "664b60403eb16b14b485e640",
-            "entityId": "urn:ngsi-ld:Car:554123756",
-            "entityType": "Car",
-            "attrName": "detectedID",
-            "attrType": "Text",
-            "attrValue": 554123756,
-            "recvTime": "2024-05-20T14:37:53.071Z"
-        },
-        {
-            "_id": "664b60403eb16b14b485e647",
-            "entityId": "urn:ngsi-ld:Car:554123756",
-            "entityType": "Car",
-            "attrName": "hasDevices",
-            "attrType": "Array",
-            "attrValue": [],
-            "recvTime": "2024-05-20T14:37:52.772Z"
-        },
-        {
-            "_id": "664b60403eb16b14b485e642",
-            "entityId": "urn:ngsi-ld:Car:554123756",
-            "entityType": "Car",
-            "attrName": "heading",
-            "attrType": "Float",
-            "attrValue": -162.132,
-            "recvTime": "2024-05-20T14:37:52.772Z"
-        },
-        {
-            "_id": "664b60403eb16b14b485e644",
-            "entityId": "urn:ngsi-ld:Car:554123756",
-            "entityType": "Car",
-            "attrName": "length",
-            "attrType": "Float",
-            "attrValue": 5.6,
-            "recvTime": "2024-05-20T14:37:52.772Z"
-        },
-        {
-            "_id": "664b60403eb16b14b485e645",
-            "entityId": "urn:ngsi-ld:Car:554123756",
-            "entityType": "Car",
-            "attrName": "location",
-            "attrType": "geo:json",
-            "attrValue": {
-                "type": "Point",
-                "coordinates": [
-                    -8.648441571,
-                    40.632023698
-                ]
-            },
-            "recvTime": "2024-05-20T14:37:52.772Z"
-        },
-        {
-            "_id": "664b60403eb16b14b485e641",
-            "entityId": "urn:ngsi-ld:Car:554123756",
-            "entityType": "Car",
-            "attrName": "observedBy",
-            "attrType": "Relationship",
-            "attrValue": "urn:ngsi-ld:SlpRadar:033",
-            "recvTime": "2024-05-20T14:37:52.772Z"
-        },
-        {
-            "_id": "664b60403eb16b14b485e646",
-            "entityId": "urn:ngsi-ld:Car:554123756",
-            "entityType": "Car",
-            "attrName": "speed",
-            "attrType": "Float",
-            "attrValue": 3.4,
-            "recvTime": "2024-05-20T14:37:52.772Z"
-        },
-        {
-            "_id": "664b60401d12d30f3042bd73",
-            "entityId": "urn:ngsi-ld:Car:554123756",
-            "entityType": "Car",
-            "attrName": "acceleration",
-            "attrType": "Float",
-            "attrValue": 1.635046681,
-            "recvTime": "2024-05-20T14:37:52.843Z"
-        },
-        {
-            "_id": "664b60401d12d30f3042bd77",
-            "entityId": "urn:ngsi-ld:Car:554123756",
-            "entityType": "Car",
-            "attrName": "confidence",
-            "attrType": "Float",
-            "attrValue": 100,
-            "recvTime": "2024-05-20T14:37:52.843Z"
-        },
-        {
-            "_id": "664b60401d12d30f3042bd74",
-            "entityId": "urn:ngsi-ld:Car:554123756",
-            "entityType": "Car",
-            "attrName": "detectedID",
-            "attrType": "Text",
-            "attrValue": 554123756,
-            "recvTime": "2024-05-20T14:37:52.843Z"
-        },
-        {
-            "_id": "664b60401d12d30f3042bd7b",
-            "entityId": "urn:ngsi-ld:Car:554123756",
-            "entityType": "Car",
-            "attrName": "hasDevices",
-            "attrType": "Array",
-            "attrValue": [],
-            "recvTime": "2024-05-20T14:37:52.843Z"
-        },
-        {
-            "_id": "664b60401d12d30f3042bd76",
-            "entityId": "urn:ngsi-ld:Car:554123756",
-            "entityType": "Car",
-            "attrName": "heading",
-            "attrType": "Float",
-            "attrValue": -162.132,
-            "recvTime": "2024-05-20T14:37:52.843Z"
-        },
-        {
-            "_id": "664b60401d12d30f3042bd78",
-            "entityId": "urn:ngsi-ld:Car:554123756",
-            "entityType": "Car",
-            "attrName": "length",
-            "attrType": "Float",
-            "attrValue": 5.6,
-            "recvTime": "2024-05-20T14:37:52.843Z"
-        },
-        {
-            "_id": "664b60401d12d30f3042bd79",
-            "entityId": "urn:ngsi-ld:Car:554123756",
-            "entityType": "Car",
-            "attrName": "location",
-            "attrType": "geo:json",
-            "attrValue": {
-                "type": "Point",
-                "coordinates": [
-                    -8.64844127,
-                    40.632020261
-                ]
-            },
-            "recvTime": "2024-05-20T14:37:52.843Z"
-        },
-        {
-            "_id": "664b60401d12d30f3042bd75",
-            "entityId": "urn:ngsi-ld:Car:554123756",
-            "entityType": "Car",
-            "attrName": "observedBy",
-            "attrType": "Relationship",
-            "attrValue": "urn:ngsi-ld:SlpRadar:033",
-            "recvTime": "2024-05-20T14:37:52.843Z"
-        },
-        {
-            "_id": "664b60401d12d30f3042bd7a",
-            "entityId": "urn:ngsi-ld:Car:554123756",
-            "entityType": "Car",
-            "attrName": "speed",
-            "attrType": "Float",
-            "attrValue": 3.7,
-            "recvTime": "2024-05-20T14:37:52.843Z"
-        },
-        {
-            "_id": "664b60401d12d30f3042bd7c",
-            "entityId": "urn:ngsi-ld:Car:554123756",
-            "entityType": "Car",
-            "attrName": "acceleration",
-            "attrType": "Float",
-            "attrValue": -0.381161475,
-            "recvTime": "2024-05-20T14:37:52.914Z"
-        },
-        {
-            "_id": "664b60401d12d30f3042bd80",
-            "entityId": "urn:ngsi-ld:Car:554123756",
-            "entityType": "Car",
-            "attrName": "confidence",
-            "attrType": "Float",
-            "attrValue": 100,
-            "recvTime": "2024-05-20T14:37:52.914Z"
-        },
-        {
-            "_id": "664b60401d12d30f3042bd7d",
-            "entityId": "urn:ngsi-ld:Car:554123756",
-            "entityType": "Car",
-            "attrName": "detectedID",
-            "attrType": "Text",
-            "attrValue": 554123756,
-            "recvTime": "2024-05-20T14:37:52.914Z"
-        },
-        {
-            "_id": "664b60401d12d30f3042bd84",
-            "entityId": "urn:ngsi-ld:Car:554123756",
-            "entityType": "Car",
-            "attrName": "hasDevices",
-            "attrType": "Array",
-            "attrValue": [],
-            "recvTime": "2024-05-20T14:37:52.914Z"
-        },
-        {
-            "_id": "664b60401d12d30f3042bd7f",
-            "entityId": "urn:ngsi-ld:Car:554123756",
-            "entityType": "Car",
-            "attrName": "heading",
-            "attrType": "Float",
-            "attrValue": -157.53,
-            "recvTime": "2024-05-20T14:37:52.914Z"
-        },
-        {
-            "_id": "664b60401d12d30f3042bd81",
-            "entityId": "urn:ngsi-ld:Car:554123756",
-            "entityType": "Car",
-            "attrName": "length",
-            "attrType": "Float",
-            "attrValue": 5.6,
-            "recvTime": "2024-05-20T14:37:52.914Z"
-        },
-        {
-            "_id": "664b60401d12d30f3042bd82",
-            "entityId": "urn:ngsi-ld:Car:554123756",
-            "entityType": "Car",
-            "attrName": "location",
-            "attrType": "geo:json",
-            "attrValue": {
-                "type": "Point",
-                "coordinates": [
-                    -8.648434144,
-                    40.632019704
-                ]
-            },
-            "recvTime": "2024-05-20T14:37:52.914Z"
-        },
-        {
-            "_id": "664b60401d12d30f3042bd7e",
-            "entityId": "urn:ngsi-ld:Car:554123756",
-            "entityType": "Car",
-            "attrName": "observedBy",
-            "attrType": "Relationship",
-            "attrValue": "urn:ngsi-ld:SlpRadar:033",
-            "recvTime": "2024-05-20T14:37:52.914Z"
-        },
-        {
-            "_id": "664b60401d12d30f3042bd83",
-            "entityId": "urn:ngsi-ld:Car:554123756",
-            "entityType": "Car",
-            "attrName": "speed",
-            "attrType": "Float",
-            "attrValue": 3.6,
-            "recvTime": "2024-05-20T14:37:52.914Z"
-        },
-        {
-            "_id": "664b60401d12d30f3042bd85",
-            "entityId": "urn:ngsi-ld:Car:554123756",
-            "entityType": "Car",
-            "attrName": "acceleration",
-            "attrType": "Float",
-            "attrValue": 0.29093956,
-            "recvTime": "2024-05-20T14:37:52.994Z"
-        },
-        {
-            "_id": "664b60401d12d30f3042bd89",
-            "entityId": "urn:ngsi-ld:Car:554123756",
-            "entityType": "Car",
-            "attrName": "confidence",
-            "attrType": "Float",
-            "attrValue": 100,
-            "recvTime": "2024-05-20T14:37:52.994Z"
-        },
-        {
-            "_id": "664b60401d12d30f3042bd86",
-            "entityId": "urn:ngsi-ld:Car:554123756",
-            "entityType": "Car",
-            "attrName": "detectedID",
-            "attrType": "Text",
-            "attrValue": 554123756,
-            "recvTime": "2024-05-20T14:37:52.994Z"
-        },
-        {
-            "_id": "664b60401d12d30f3042bd8d",
-            "entityId": "urn:ngsi-ld:Car:554123756",
-            "entityType": "Car",
-            "attrName": "hasDevices",
-            "attrType": "Array",
-            "attrValue": [],
-            "recvTime": "2024-05-20T14:37:52.994Z"
-        },
-        {
-            "_id": "664b60401d12d30f3042bd88",
-            "entityId": "urn:ngsi-ld:Car:554123756",
-            "entityType": "Car",
-            "attrName": "heading",
-            "attrType": "Float",
-            "attrValue": -158.769,
-            "recvTime": "2024-05-20T14:37:52.994Z"
-        },
-        {
-            "_id": "664b60401d12d30f3042bd8a",
-            "entityId": "urn:ngsi-ld:Car:554123756",
-            "entityType": "Car",
-            "attrName": "length",
-            "attrType": "Float",
-            "attrValue": 5.6,
-            "recvTime": "2024-05-20T14:37:52.994Z"
-        },
-        {
-            "_id": "664b60401d12d30f3042bd8b",
-            "entityId": "urn:ngsi-ld:Car:554123756",
-            "entityType": "Car",
-            "attrName": "location",
-            "attrType": "geo:json",
-            "attrValue": {
-                "type": "Point",
-                "coordinates": [
-                    -8.648435114,
-                    40.632017315
-                ]
-            },
-            "recvTime": "2024-05-20T14:37:52.994Z"
-        },
-        {
-            "_id": "664b60401d12d30f3042bd87",
-            "entityId": "urn:ngsi-ld:Car:554123756",
-            "entityType": "Car",
-            "attrName": "observedBy",
-            "attrType": "Relationship",
-            "attrValue": "urn:ngsi-ld:SlpRadar:033",
-            "recvTime": "2024-05-20T14:37:52.994Z"
-        },
-        {
-            "_id": "664b60401d12d30f3042bd8c",
-            "entityId": "urn:ngsi-ld:Car:554123756",
-            "entityType": "Car",
-            "attrName": "speed",
-            "attrType": "Float",
-            "attrValue": 3.7,
-            "recvTime": "2024-05-20T14:37:52.994Z"
-        },
-        {
-            "_id": "664b60411d12d30f3042bd8e",
-            "entityId": "urn:ngsi-ld:Car:554123756",
-            "entityType": "Car",
-            "attrName": "acceleration",
-            "attrType": "Float",
-            "attrValue": -0.462776567,
-            "recvTime": "2024-05-20T14:37:53.071Z"
-        },
-        {
-            "_id": "664b60411d12d30f3042bd92",
-            "entityId": "urn:ngsi-ld:Car:554123756",
-            "entityType": "Car",
-            "attrName": "confidence",
-            "attrType": "Float",
-            "attrValue": 100,
-            "recvTime": "2024-05-20T14:37:53.071Z"
-        },
-        {
-            "_id": "664b60411d12d30f3042bd8f",
-            "entityId": "urn:ngsi-ld:Car:554123756",
-            "entityType": "Car",
-            "attrName": "detectedID",
-            "attrType": "Text",
-            "attrValue": 554123756,
-            "recvTime": "2024-05-20T14:37:53.071Z"
-        },
-        {
-            "_id": "664b60411d12d30f3042bd96",
-            "entityId": "urn:ngsi-ld:Car:554123756",
-            "entityType": "Car",
-            "attrName": "hasDevices",
-            "attrType": "Array",
-            "attrValue": [],
-            "recvTime": "2024-05-20T14:37:53.071Z"
-        },
-        {
-            "_id": "664b60411d12d30f3042bd91",
-            "entityId": "urn:ngsi-ld:Car:554123756",
-            "entityType": "Car",
-            "attrName": "heading",
-            "attrType": "Float",
-            "attrValue": -155.406,
-            "recvTime": "2024-05-20T14:37:53.071Z"
-        },
-        {
-            "_id": "664b60411d12d30f3042bd93",
-            "entityId": "urn:ngsi-ld:Car:554123756",
-            "entityType": "Car",
-            "attrName": "length",
-            "attrType": "Float",
-            "attrValue": 5.6,
-            "recvTime": "2024-05-20T14:37:53.071Z"
-        },
-        {
-            "_id": "664b60411d12d30f3042bd94",
-            "entityId": "urn:ngsi-ld:Car:554123756",
-            "entityType": "Car",
-            "attrName": "location",
-            "attrType": "geo:json",
-            "attrValue": {
-                "type": "Point",
-                "coordinates": [
-                    -8.64843033,
-                    40.632016562
-                ]
-            },
-            "recvTime": "2024-05-20T14:37:53.071Z"
-        },
-        {
-            "_id": "664b60411d12d30f3042bd90",
-            "entityId": "urn:ngsi-ld:Car:554123756",
-            "entityType": "Car",
-            "attrName": "observedBy",
-            "attrType": "Relationship",
-            "attrValue": "urn:ngsi-ld:SlpRadar:033",
-            "recvTime": "2024-05-20T14:37:53.071Z"
-        },
-        {
-            "_id": "664b60411d12d30f3042bd95",
-            "entityId": "urn:ngsi-ld:Car:554123756",
-            "entityType": "Car",
-            "attrName": "speed",
-            "attrType": "Float",
-            "attrValue": 3.5,
-            "recvTime": "2024-05-20T14:37:53.071Z"
-        }
-    ]
-}
 
-json_data = json.dumps(json_data)
 
 
 class RealData:
@@ -495,52 +72,56 @@ class RealData:
 
 
     def get_route(self, vehicle_id):
-        with open(radar_file_path, "r") as f:
-            data = json.load(f)
-            radar = None
-            for r in data:
-                if r["id"] == self.known_vehicle[vehicle_id]["observedBy"]:
-                    radar = r
+        try:
+            with open(radar_file_path, "r") as f:
+                data = json.load(f)
+                radar = None
+                for r in data:
+                    if r["id"] == self.known_vehicle[vehicle_id]["observedBy"]:
+                        radar = r
 
-            if radar is None:
-                return
+                if radar is None:
+                    return
 
-            radar_location = [radar["coord"]["lat"], radar["coord"]["lng"]]
-            vehicle_location = self.known_vehicle[vehicle_id]["location"]
+                radar_location = [radar["coord"]["lat"], radar["coord"]["lng"]]
+                vehicle_location = self.known_vehicle[vehicle_id]["location"]
 
-            angle = self.calculate_bearing(radar_location, vehicle_location)
-            heading = self.known_vehicle[vehicle_id]["heading"]
+                angle = self.calculate_bearing(radar_location, vehicle_location)
+                heading = self.known_vehicle[vehicle_id]["heading"]
 
-            if radar['angle_type'] == 0:
-                if 0 <= angle <= 90 or 270 <= angle <= 360:
-                    if heading < 0:
-                        route = radar['lanes']['near']
+                if radar['angle_type'] == 0:
+                    if 0 <= angle <= 90 or 270 <= angle <= 360:
+                        if heading < 0:
+                            route = radar['lanes']['near']
+                        else:
+                            route = radar['lanes']['far']
+
                     else:
-                        route = radar['lanes']['far']
+                        if heading < 0:
+                            route = radar['lanes']['far']
+                        else:
+                            route = radar['lanes']['near']
+
+                elif radar['angle_type'] == 1:
+                    if 0 <= angle <= 90 or 270 <= angle <= 360:
+                        if heading < 0:
+                            route = radar['lanes']['far']
+                        else:
+                            route = radar['lanes']['near']
+
+                    else:
+                        if heading < 0:
+                            route = radar['lanes']['near']
+                        else:
+                            route = radar['lanes']['far']
 
                 else:
-                    if heading < 0:
-                        route = radar['lanes']['far']
-                    else:
-                        route = radar['lanes']['near']
+                    return
 
-            elif radar['angle_type'] == 1:
-                if 0 <= angle <= 90 or 270 <= angle <= 360:
-                    if heading < 0:
-                        route = radar['lanes']['far']
-                    else:
-                        route = radar['lanes']['near']
-
-                else:
-                    if heading < 0:
-                        route = radar['lanes']['near']
-                    else:
-                        route = radar['lanes']['far']
-
-            else:
-                return
-
-            return route
+                return route
+        except Exception as e:
+            print(e)
+            return
 
     def create_vehicle(self, vehicle_id):
         route = self.get_route(vehicle_id)
@@ -551,9 +132,9 @@ class RealData:
         vehicle.set("id", "realdata_" + vehicle_id)
         vehicle.set("depart", self.calculate_depart_time(self.known_vehicle[vehicle_id]["recvTime"]))
         vehicle.set("departLane", "best")
-        vehicle.set("departSpeed", str(self.known_vehicle[vehicle_id]["speed"]))
-        vehicle.set("type", "vehicle.dodge.charger_police_2020")
-        vehicle.set("color", "1,0,0")  # red
+        vehicle.set("departSpeed", "1")
+        vehicle.set("type", "vehicle.ford.mustang")
+        vehicle.set("color", "1,0,0") 
 
     def create_vehicle_route(self, vehicle_id):
         route = self.get_route(vehicle_id)

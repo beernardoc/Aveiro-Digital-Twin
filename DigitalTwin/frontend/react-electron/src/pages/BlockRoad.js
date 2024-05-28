@@ -2122,7 +2122,7 @@ export default function BlockRoad() {
 
             {/* Modal component */}
             {showModal && (
-                <div className="modal">
+                <div className="modal modal-block">
                     <div className="modal-content">
                         <span className="close" onClick={handleClose}>&times;</span>
                         <p> Block Road {road}?</p>
@@ -2135,7 +2135,7 @@ export default function BlockRoad() {
 
             {/* Blocked Modal component */}
             {showBlockedModal && (
-                <div className="modal">
+                <div className="modal modal-block">
                     <div className="modal-content">
                         <span className="close" onClick={handleClose}>&times;</span>
                         <p> Unblock Road {road}?</p>
@@ -2148,7 +2148,7 @@ export default function BlockRoad() {
 
             {/* Clear Modal component */}
             {showClearModal && (
-                <div className="modal">
+                <div className="modal modal-block">
                     <div className="modal-content">
                         <span className="close" onClick={handleClose}>&times;</span>
                         <p> In Order to Block a Road, There Should not be any Vehicles in the Simulation. Please Clear the Simulation!</p>

@@ -39,13 +39,29 @@ const Run2D_form = () => {
 
             if (response.status === 200) {
                 console.log('Solicitação enviada com sucesso:', response.data);
+                setShowError(false);  
+                setErrorMessage('');  
                 window.location.href = '/simulation';
             }
         } catch (error) {
             console.error('Erro ao enviar a solicitação:', error);
+            if (error.response && error.response.status >= 500) {
+                if (selectedOption === 'liveData')
+                    setErrorMessage("Live Data not available at the moment. Please try again later. Error 500");
+                if (selectedOption === 'realData')
+                    setErrorMessage("Real Data not available at the moment. Please try again later. Error 500");
+            } else {
+                if (selectedOption === 'liveData')
+                    setErrorMessage("Live Data not available at the moment. Please try again later.");
+                if (selectedOption === 'realData')
+                    setErrorMessage("Real Data not available at the moment. Please try again later.");
+            }
+            setShowError(true);  
         }
     };
 
+    const [errorMessage, setErrorMessage] = useState('');
+    const [showError, setShowError] = useState(false);
     const [selectedOption, setSelectedOption] = useState(null);
     const [selectedDay, setSelectedDay] = useState('');
     const [startTime, setStartTime] = useState('');
@@ -101,6 +117,9 @@ const Run2D_form = () => {
                 <div className="mt-9 max-w-lg bg-white bg-opacity-80 rounded-lg p-8">
                     <form onSubmit={handleSubmit}>
                         <div className="mb-4">
+                            <h1 className="text-2xl font-semibold text-center">2D Simulation</h1>
+                        </div>
+                        {/* <div className="mb-4">
                             <label htmlFor="configFile" className="mb-1">Would you like to add a default
                                 configuration file (.xml)?
                             </label>
@@ -111,7 +130,7 @@ const Run2D_form = () => {
                                 accept=".xml"
                                 className="w-full px-4 py-2 border rounded-md"
                             />
-                        </div>
+                        </div> */}
                         
                         <div className="mb-4 flex">
                             <div className="inline-flex items-center">
@@ -202,6 +221,14 @@ const Run2D_form = () => {
                                 Don't worry if you haven't added any configuration files at this step; during execution, you'll be able to dynamically adjust the simulation.</p>
 
                         </div>
+
+                        {showError && (
+                            <div className="my-4 bg-red-100 border-l-4 border-red-500 text-red-700 p-4" role="alert">
+                                <p className="font-bold">Atention!</p>
+                                <p>{errorMessage}</p>
+                            </div>
+                        )}
+                    
                         <button type="submit" className="btn-2d-3d">Start Simulation</button>
                     </form>
                 </div>

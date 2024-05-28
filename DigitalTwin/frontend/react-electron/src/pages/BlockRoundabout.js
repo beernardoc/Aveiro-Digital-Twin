@@ -127,7 +127,7 @@ export default function BlockRoundabout() {
 
             {/* Modal component */}
             {showModal && (
-                <div className="modal">
+                <div className="modal modal-block">
                     <div className="modal-content">
                         <span className="close" onClick={handleClose}>&times;</span>
                         <p> Block Roundabout {roundabout}?</p>
@@ -140,7 +140,7 @@ export default function BlockRoundabout() {
 
             {/* Blocked Modal component */}
             {showBlockedModal && (
-                <div className="modal">
+                <div className="modal modal-block">
                     <div className="modal-content">
                         <span className="close" onClick={handleClose}>&times;</span>
                         <p> Unblock Roundabout {roundabout}?</p>
@@ -153,7 +153,7 @@ export default function BlockRoundabout() {
 
             {/* Clear Modal component */}
             {showClearModal && (
-                <div className="modal">
+                <div className="modal modal-block">
                     <div className="modal-content">
                         <span className="close" onClick={handleClose}>&times;</span>
                         <p> In Order to Block a Roundabout, There Should not be any Vehicles in the Simulation. Please Clear the Simulation!</p>

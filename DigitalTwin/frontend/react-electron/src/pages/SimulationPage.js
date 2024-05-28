@@ -61,6 +61,8 @@ const SimulationPage = () => {
                         <li><span className="legend-color" style={{ backgroundColor: 'red' }}></span> Real data</li>
                         <li><span className="legend-color" style={{ backgroundColor: 'green' }}></span> Live data</li>
                         <li><span className="legend-color" style={{ backgroundColor: 'yellow' }}></span> Simulated</li>
+                        <li><span className="legend-color" style={{ backgroundColor: 'blue' }}></span> Pedestrian</li>
+
                     </ul>
                 </div>
                 <div className="simulation-methods-info">

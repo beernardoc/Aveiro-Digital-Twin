@@ -185,69 +185,74 @@ def addOrUpdateCar(received):
         print("adicionado")
 
 def addOrUpdateRealCar(received):
-    print("received", received)
-    log, lat, heading = received["longitude"], received["latitude"], received["heading"]
-    print("log: {}, lat: {}, heading: {}".format(log, lat, heading))
+    try:
+        print("received", received)
+        log, lat, heading = received["longitude"], received["latitude"], received["heading"]
+        print("log: {}, lat: {}, heading: {}".format(log, lat, heading))
 
-    vehID = str(received["objectID"])
-    print("vehID", vehID)
-    x, y = net.convertLonLat2XY(log, lat)  # Converte as coordenadas para o sistema de coordenadas do SUMO
-    print("x: {}, y: {}".format(x, y))
-    allCars = traci.vehicle.getIDList()
-    print("allCars", allCars)
-    if vehID in allCars:
-        new_speed = received["speed"]
-        traci.vehicle.setSpeed(vehID, new_speed)
+        vehID = str(received["objectID"])
+        print("vehID", vehID)
+        x, y = net.convertLonLat2XY(log, lat)  # Converte as coordenadas para o sistema de coordenadas do SUMO
+        print("x: {}, y: {}".format(x, y))
+        allCars = traci.vehicle.getIDList()
+        print("allCars", allCars)
+        if vehID in allCars:
+            new_speed = received["speed"]
+            traci.vehicle.setSpeed(vehID, new_speed)
 
 
-    else:  # Adiciona um novo veículo
-        # if the heading is positive it is directed to the sensor, if it is negative it is directed away from the sensor
-        # get the sensor information from radar.json
-        with open(radar_file_path, "r") as f:
-            data = json.load(f)
-            radar = data[0]
-            # get the angle from the sensor to the vehicle
-            angle = calculate_bearing((radar['coord']['lat'], radar['coord']['lng']), (lat, log))
-            if radar['angle_type'] == 0:
-                if 0 <= angle <= 90 or 270 <= angle <= 360:
-                    if heading < 0:
-                        route = radar['lanes']['near']
+        else:  # Adiciona um novo veículo
+            # if the heading is positive it is directed to the sensor, if it is negative it is directed away from the sensor
+            # get the sensor information from radar.json
+            with open(radar_file_path, "r") as f:
+                data = json.load(f)
+                radar = data[0]
+                # get the angle from the sensor to the vehicle
+                angle = calculate_bearing((radar['coord']['lat'], radar['coord']['lng']), (lat, log))
+                if radar['angle_type'] == 0:
+                    if 0 <= angle <= 90 or 270 <= angle <= 360:
+                        if heading < 0:
+                            route = radar['lanes']['near']
+                        else:
+                            route = radar['lanes']['far']
+
                     else:
-                        route = radar['lanes']['far']
+                        if heading < 0:
+                            route = radar['lanes']['far']
+                        else:
+                            route = radar['lanes']['near']
 
-                else:
-                    if heading < 0:
-                        route = radar['lanes']['far']
+                elif radar['angle_type'] == 1:
+                    if 0 <= angle <= 90 or 270 <= angle <= 360:
+                        if heading < 0:
+                            route = radar['lanes']['far']
+                        else:
+                            route = radar['lanes']['near']
+
                     else:
-                        route = radar['lanes']['near']
+                        if heading < 0:
+                            route = radar['lanes']['near']
+                        else:
+                            route = radar['lanes']['far']
+                f.close()
 
-            elif radar['angle_type'] == 1:
-                if 0 <= angle <= 90 or 270 <= angle <= 360:
-                    if heading < 0:
-                        route = radar['lanes']['far']
-                    else:
-                        route = radar['lanes']['near']
+            print("route", route)
+            traci.route.add(routeID=("route_" + vehID), edges=route)  # adiciona uma rota para o veículo
+            print("route", traci.route.getEdges("route_" + vehID))
+            traci.vehicle.add(vehID, routeID=("route_" + vehID), typeID="vehicle.ford.mustang",
+                            depart=traci.simulation.getTime() + 1, departSpeed=0,
+                            departLane="best")
+            traci.vehicle.setColor(vehID, (0, 204, 0))
 
-                else:
-                    if heading < 0:
-                        route = radar['lanes']['near']
-                    else:
-                        route = radar['lanes']['far']
-            f.close()
-
-        print("route", route)
-        traci.route.add(routeID=("route_" + vehID), edges=route)  # adiciona uma rota para o veículo
-        print("route", traci.route.getEdges("route_" + vehID))
-        traci.vehicle.add(vehID, routeID=("route_" + vehID), typeID="vehicle.dodge.charger_police",
-                          depart=traci.simulation.getTime() + 1, departSpeed=0,
-                          departLane="best")
-        print("vehicle added")
-        traci.vehicle.moveToXY(vehID, route[0], 0, x, y,
-                               keepRoute=1)  # se a proxima for a mesma, cluster ou de junção, move com moveTOXY
-        print("vehicle moved")
-        # allVehicle.add(vehID)
-        print(traci.vehicle.getRoute(vehID))
-        print("adicionado")
+            print("vehicle added")
+            traci.vehicle.moveToXY(vehID, route[0], 0, x, y,
+                                keepRoute=1)  # se a proxima for a mesma, cluster ou de junção, move com moveTOXY
+            print("vehicle moved")
+            # allVehicle.add(vehID)
+            print(traci.vehicle.getRoute(vehID))
+            print("adicionado")
+    except Exception as e:
+        print(e)
 
 
 def addSimulated(received):
