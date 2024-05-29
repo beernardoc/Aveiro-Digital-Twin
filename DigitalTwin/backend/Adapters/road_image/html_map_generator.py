@@ -5,11 +5,11 @@ init_tag = '<map name="road">'
 end_tag = '</map>'
 
 # get the roads from the json file
-with open('co_simulation/road.json') as f:
+with open('Adapters/co_simulation/road.json') as f:
     all_roads = json.load(f)
 
 # get the height of the image to adjust the y-coordinate
-image_path = 'road_image/base_road_image.png'
+image_path = 'Adapters/road_image/base_road_image.png'
 image = cv2.imread(image_path)
 
 # Get the height of the image to adjust the y-coordinate
@@ -17,7 +17,7 @@ height, width = image.shape[:2]
 
 
 # output file
-output_file = 'road_image/road_map.txt'
+output_file = 'Adapters/road_image/road_map.txt'
 
 # write the initial tag
 with open(output_file, 'w') as f:

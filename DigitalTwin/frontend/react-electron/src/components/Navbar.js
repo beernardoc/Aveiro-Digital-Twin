@@ -52,7 +52,8 @@ function Navbar() {
     <nav className="navbar">
       <div className="navbar-content">
         <div className="navbar-logo">
-          <Link to="/"><h1>Digital Twin</h1></Link>
+          {/* <Link to="/"><h1>Digital Twin</h1></Link> */}
+          <h1>Digital Twin</h1>
         </div>
         <div className="navbar-links">
           {username === 'Login' ? (
