@@ -1,474 +1,550 @@
 {
-    "swagger": "2.0",
-    "info": {
-      "title": "Access API",
-      "version": "1.0.0"
-    },
-    "paths": {
-        "/users": {
-            "get": {
-                "description": "Returns all users",
-                "produces": [
-                    "application/json"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful operation",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "type": "object",
-                                "properties": {
-                                    "_id": {
-                                    "type": "string"
-                                    },
-                                    "username": {
-                                    "type": "string"
-                                    },
-                                    "password": {
-                                    "type": "string"
-                                    },
-                                    "email": {
-                                    "type": "string"
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            },
-            "post": {
-                "description": "Create a new user",
-                "produces": [
-                    "application/json"
-                ],
-                "parameters": [
-                    {
-                        "name": "User",
-                        "in": "body",
-                        "description": "User object to be created",
-                        "required": true,
-                        "schema": {
-                            "type": "object",
-                            "properties": {
-                            "username": {
-                                "type": "string"
-                            },
-                            "email": {
-                                "type": "string"
-                            },
-                            "password": {
-                                "type": "string"
-                            }
-                            },
-                            "required": ["username", "email", "password"]
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "User created successfully",
-                        "schema": {
-                            "type": "object",
-                            "properties": {
-                                "_id": {
-                                    "type": "string"
-                                },
-                                "username": {
-                                    "type": "string"
-                                },
-                                "password": {
-                                    "type": "string"
-                                },
-                                "email": {
-                                    "type": "string"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                    "description": "Data not found"
-                    }
-                }
-            }
-        },
-        "/users/{id}": {
-            "get": {
-                "description": "Returns a specific user by ID",
-                "produces": [
-                "application/json"
-                ],
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "ID of the user to retrieve",
-                        "required": true,
-                        "type": "string"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful operation",
-                        "schema": {
-                        "type": "object",
-                            "properties": {
-                                "_id": {
-                                "type": "string"
-                                },
-                                "username": {
-                                "type": "string"
-                                },
-                                "password": {
-                                "type": "string"
-                                },
-                                "email": {
-                                "type": "string"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "User not found"
-                    }
-                }
-            },
-            "delete": {
-                "description": "Delete a user by ID",
-                "produces": ["application/json"],
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "ID of the user to delete",
-                        "required": true,
-                        "type": "string"
-                    }
-                ],
-                "responses": {
-                  "200": {
-                    "description": "User deleted successfully",
-                    "schema": {
-                      "type": "object",
-                      "properties": {
-                        "message": {
-                          "type": "string"
-                        }
-                      }
-                    }
-                  },
-                  "404": {
-                    "description": "User not found"
-                  }
-                }
-              },
-              "put": {
-                "description": "Update a user by ID",
-                "produces": ["application/json"],
-                "parameters": [
-                  {
-                    "name": "id",
-                    "in": "path",
-                    "description": "ID of the user to update",
-                    "required": true,
+  "swagger": "2.0",
+  "info": {
+    "title": "Simulation API",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/api/run2D": {
+      "post": {
+        "description": "Run 2D simulation",
+        "parameters": [
+          {
+            "name": "live",
+            "in": "query",
+            "description": "Flag to run live simulation",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "realdata",
+            "in": "query",
+            "description": "Flag to run simulation with real data",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Real data for the simulation",
+            "required": false,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "entities": {
+                  "type": "array",
+                  "items": {
                     "type": "string"
-                  },
-                  {
-                    "name": "User",
-                    "in": "body",
-                    "description": "User object with updated fields",
-                    "required": true,
-                    "schema": {
-                      "type": "object",
-                      "properties": {
-                        "username": {
-                          "type": "string"
-                        },
-                        "email": {
-                          "type": "string"
-                        },
-                        "password": {
-                          "type": "string"
-                        }
-                      }
-                    }
-                  }
-                ],
-                "responses": {
-                    "200": {
-                            "description": "User updated successfully",
-                            "schema": {
-                            "type": "object",
-                            "properties": {
-                                "message": {
-                                "type": "string"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "User not found"
-                    }
-                }
-            }
-        },
-        "/api/login": {
-            "post": {
-              "description": "Login to the system",
-              "produces": ["application/json"],
-              "parameters": [
-                {
-                  "name": "Login",
-                  "in": "body",
-                  "description": "User credentials for login",
-                  "required": true,
-                  "schema": {
-                    "type": "object",
-                    "properties": {
-                      "email": {
-                        "type": "string"
-                      },
-                      "password": {
-                        "type": "string"
-                      }
-                    },
-                    "required": ["email", "password"]
-                  }
-                }
-              ],
-              "responses": {
-                "200": {
-                  "description": "Login successful",
-                  "schema": {
-                    "type": "object",
-                    "properties": {
-                      "message": {
-                        "type": "string"
-                      },
-                      "username": {
-                        "type": "string"
-                      }
-                    }
                   }
                 },
-                "401": {
-                  "description": "Incorrect password"
+                "startTime": {
+                  "type": "string"
                 },
-                "404": {
-                  "description": "User not found"
+                "endTime": {
+                  "type": "string"
                 }
               }
             }
-        },
-        "/api/run3D": {
-            "post": {
-              "description": "Start a 3D simulation",
-              "produces": ["application/json"],
-              "responses": {
-                "200": {
-                  "description": "Command executed successfully",
-                  "schema": {
-                    "type": "object",
-                    "properties": {
-                      "message": {
-                        "type": "string"
-                      }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Simulation started successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/addRandomTraffic": {
+      "post": {
+        "description": "Add random traffic",
+        "parameters": [
+          {
+            "name": "qtd",
+            "in": "query",
+            "description": "Quantity of vehicles to add",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Random traffic added successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/addRandomPedestrian": {
+      "post": {
+        "description": "Add random pedestrians",
+        "parameters": [
+          {
+            "name": "qtd",
+            "in": "query",
+            "description": "Quantity of pedestrians to add",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Random pedestrians added successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/addRandomMotorcycle": {
+      "post": {
+        "description": "Add random motorcycles",
+        "parameters": [
+          {
+            "name": "qtd",
+            "in": "query",
+            "description": "Quantity of motorcycles to add",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Random motorcycles added successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/addRandomBike": {
+      "post": {
+        "description": "Add random bikes",
+        "parameters": [
+          {
+            "name": "qtd",
+            "in": "query",
+            "description": "Quantity of bikes to add",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Random bikes added successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/testaddRealCar": {
+      "post": {
+        "description": "Add a real car",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Real car data",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "objectID": {
+                  "type": "integer"
+                },
+                "acceleration": {
+                  "type": "number"
+                },
+                "classification": {
+                  "type": "integer"
+                },
+                "cloudPersist": {
+                  "type": "boolean"
+                },
+                "confidence": {
+                  "type": "integer"
+                },
+                "heading": {
+                  "type": "number"
+                },
+                "latitude": {
+                  "type": "number"
+                },
+                "length": {
+                  "type": "number"
+                },
+                "longitude": {
+                  "type": "number"
+                },
+                "receiverID": {
+                  "type": "integer"
+                },
+                "speed": {
+                  "type": "number"
+                },
+                "timestamp": {
+                  "type": "number"
+                },
+                "test": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Real car added successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/addSimulated": {
+      "post": {
+        "description": "Add a simulated vehicle",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Simulated vehicle data",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "end": {
+                  "type": "object",
+                  "properties": {
+                    "lng": {
+                      "type": "string"
+                    },
+                    "lat": {
+                      "type": "string"
                     }
                   }
                 },
-                "500": {
-                  "description": "Internal server error",
-                  "schema": {
-                    "type": "object",
-                    "properties": {
-                      "error": {
-                        "type": "string"
-                      }
+                "start": {
+                  "type": "object",
+                  "properties": {
+                    "lng": {
+                      "type": "string"
+                    },
+                    "lat": {
+                      "type": "string"
                     }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Simulated vehicle added successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/addSimulatedPedestrian": {
+      "post": {
+        "description": "Add a simulated pedestrian",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Simulated pedestrian data",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "end": {
+                  "type": "object",
+                  "properties": {
+                    "lng": {
+                      "type": "string"
+                    },
+                    "lat": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "start": {
+                  "type": "object",
+                  "properties": {
+                    "lng": {
+                      "type": "string"
+                    },
+                    "lat": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Simulated pedestrian added successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/getsensordata": {
+      "get": {
+        "description": "Get sensor data",
+        "responses": {
+          "200": {
+            "description": "Sensor data retrieved successfully",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "objectID": {
+                    "type": "integer"
+                  },
+                  "acceleration": {
+                    "type": "number"
+                  },
+                  "classification": {
+                    "type": "integer"
+                  },
+                  "cloudPersist": {
+                    "type": "boolean"
+                  },
+                  "confidence": {
+                    "type": "integer"
+                  },
+                  "heading": {
+                    "type": "number"
+                  },
+                  "latitude": {
+                    "type": "number"
+                  },
+                  "length": {
+                    "type": "number"
+                  },
+                  "longitude": {
+                    "type": "number"
+                  },
+                  "receiverID": {
+                    "type": "integer"
+                  },
+                  "speed": {
+                    "type": "number"
+                  },
+                  "timestamp": {
+                    "type": "number"
+                  },
+                  "test": {
+                    "type": "object"
                   }
                 }
               }
             }
           },
-          "/api/run2D": {
-            "post": {
-              "description": "Start a 2D simulation",
-              "produces": ["application/json"],
-              "responses": {
-                "200": {
-                  "description": "Command started successfully",
-                  "schema": {
-                    "type": "object",
-                    "properties": {
-                      "message": {
-                        "type": "string"
-                      }
-                    }
-                  }
-                },
-                "500": {
-                  "description": "Internal server error",
-                  "schema": {
-                    "type": "object",
-                    "properties": {
-                      "error": {
-                        "type": "string"
-                      }
-                    }
-                  }
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
                 }
               }
             }
-        },
-        "/api/addRandomTraffic": {
-            "post": {
-              "description": "Add random traffic to the simulation",
-              "parameters": [
-                {
-                  "name": "qtd",
-                  "in": "query",
-                  "description": "Number of vehicles to add as random traffic",
-                  "required": true,
-                  "type": "integer",
-                  "minimum": 1
-                }
-              ],
-              "responses": {
-                "200": {
-                  "description": "Random traffic added successfully",
-                  "schema": {
-                    "type": "object",
-                    "properties": {
-                      "message": {
-                        "type": "string"
-                      }
-                    }
-                  }
-                },
-                "400": {
-                  "description": "Bad request, \"qtd\" parameter is required",
-                  "schema": {
-                    "type": "object",
-                    "properties": {
-                      "error": {
-                        "type": "string"
-                      }
-                    }
-                  }
-                },
-                "500": {
-                  "description": "Internal server error",
-                  "schema": {
-                    "type": "object",
-                    "properties": {
-                      "error": {
-                        "type": "string"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-        },
-        "/api/addSimulatedCar": {
-            "post": {
-              "description": "Add a simulated car to the simulation",
-              "parameters": [
-                {
-                  "name": "Car Data",
-                  "in": "body",
-                  "description": "Data of the car to be added to the simulation",
-                  "required": true,
-                  "schema": {
-                    "type": "object",
-                    "properties": {
-                      "start": {
-                        "type": "object",
-                        "properties": {
-                          "lng": {
-                            "type": "string",
-                            "description": "Longitude of the starting point"
-                          },
-                          "lat": {
-                            "type": "string",
-                            "description": "Latitude of the starting point"
-                          }
-                        },
-                        "required": ["lng", "lat"]
-                      },
-                      "end": {
-                        "type": "object",
-                        "properties": {
-                          "lng": {
-                            "type": "string",
-                            "description": "Longitude of the ending point"
-                          },
-                          "lat": {
-                            "type": "string",
-                            "description": "Latitude of the ending point"
-                          }
-                        },
-                        "required": ["lng", "lat"]
-                      }
-                    },
-                    "required": ["start", "end"]
-                  }
-                }
-              ],
-              "responses": {
-                "200": {
-                  "description": "Simulated car added successfully",
-                  "schema": {
-                    "type": "object",
-                    "properties": {
-                      "message": {
-                        "type": "string"
-                      }
-                    }
-                  }
-                },
-                "500": {
-                  "description": "Internal server error",
-                  "schema": {
-                    "type": "object",
-                    "properties": {
-                      "error": {
-                        "type": "string"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-        },
-        "/api/endSimulation": {
-            "post": {
-              "description": "End the simulation",
-              "responses": {
-                "200": {
-                  "description": "Simulation ended successfully",
-                  "schema": {
-                    "type": "object",
-                    "properties": {
-                      "message": {
-                        "type": "string"
-                      }
-                    }
-                  }
-                },
-                "500": {
-                  "description": "Internal server error",
-                  "schema": {
-                    "type": "object",
-                    "properties": {
-                      "error": {
-                        "type": "string"
-                      }
-                    }
-                  }
-                }
-              }
-            }
+          }
         }
+      }
     }
+  }
 }
