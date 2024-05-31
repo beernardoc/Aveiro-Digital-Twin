@@ -5,9 +5,211 @@
     "version": "1.0.0"
   },
   "paths": {
+    "/users": {
+      "post": {
+        "summary": "Create a new user",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "User created successfully",
+            "schema": {
+              "$ref": "#/definitions/UserResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/user": {
+      "get": {
+        "summary": "Get user details",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User details retrieved successfully",
+            "schema": {
+              "$ref": "#/definitions/UserDetails"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a user",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User deleted successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update user details",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UserUpdate"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User updated successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      }
+    },
+    "/api/login": {
+      "post": {
+        "summary": "Log in a user",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/LoginRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "schema": {
+              "$ref": "#/definitions/LoginResponse"
+            }
+          },
+          "401": {
+            "description": "Incorrect password"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      }
+    },
+    "/api/run3D": {
+      "post": {
+        "summary": "Run 3D simulation",
+        "parameters": [
+          {
+            "name": "live",
+            "in": "query",
+            "description": "Flag to run live simulation",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "realdata",
+            "in": "query",
+            "description": "Flag to run simulation with real data",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Real data for the simulation",
+            "required": false,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "entities": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "day": {
+                  "type": "string"
+                },
+                "startTime": {
+                  "type": "string"
+                },
+                "endTime": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Command executed successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/run2D": {
       "post": {
-        "description": "Run 2D simulation",
+        "summary": "Run 2D simulation",
         "parameters": [
           {
             "name": "live",
@@ -49,7 +251,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Simulation started successfully",
+            "description": "Command initiated successfully",
             "schema": {
               "type": "object",
               "properties": {
@@ -75,7 +277,7 @@
     },
     "/api/addRandomTraffic": {
       "post": {
-        "description": "Add random traffic",
+        "summary": "Add random traffic",
         "parameters": [
           {
             "name": "qtd",
@@ -98,15 +300,7 @@
             }
           },
           "400": {
-            "description": "Bad request",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "error": {
-                  "type": "string"
-                }
-              }
-            }
+            "description": "Missing required parameter 'qtd'"
           },
           "500": {
             "description": "Internal server error",
@@ -124,7 +318,7 @@
     },
     "/api/addRandomPedestrian": {
       "post": {
-        "description": "Add random pedestrians",
+        "summary": "Add random pedestrians",
         "parameters": [
           {
             "name": "qtd",
@@ -147,15 +341,7 @@
             }
           },
           "400": {
-            "description": "Bad request",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "error": {
-                  "type": "string"
-                }
-              }
-            }
+            "description": "Missing required parameter 'qtd'"
           },
           "500": {
             "description": "Internal server error",
@@ -173,7 +359,7 @@
     },
     "/api/addRandomMotorcycle": {
       "post": {
-        "description": "Add random motorcycles",
+        "summary": "Add random motorcycles",
         "parameters": [
           {
             "name": "qtd",
@@ -196,15 +382,7 @@
             }
           },
           "400": {
-            "description": "Bad request",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "error": {
-                  "type": "string"
-                }
-              }
-            }
+            "description": "Missing required parameter 'qtd'"
           },
           "500": {
             "description": "Internal server error",
@@ -222,7 +400,7 @@
     },
     "/api/addRandomBike": {
       "post": {
-        "description": "Add random bikes",
+        "summary": "Add random bikes",
         "parameters": [
           {
             "name": "qtd",
@@ -245,96 +423,7 @@
             }
           },
           "400": {
-            "description": "Bad request",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "error": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "error": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/testaddRealCar": {
-      "post": {
-        "description": "Add a real car",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "description": "Real car data",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "properties": {
-                "objectID": {
-                  "type": "integer"
-                },
-                "acceleration": {
-                  "type": "number"
-                },
-                "classification": {
-                  "type": "integer"
-                },
-                "cloudPersist": {
-                  "type": "boolean"
-                },
-                "confidence": {
-                  "type": "integer"
-                },
-                "heading": {
-                  "type": "number"
-                },
-                "latitude": {
-                  "type": "number"
-                },
-                "length": {
-                  "type": "number"
-                },
-                "longitude": {
-                  "type": "number"
-                },
-                "receiverID": {
-                  "type": "integer"
-                },
-                "speed": {
-                  "type": "number"
-                },
-                "timestamp": {
-                  "type": "number"
-                },
-                "test": {
-                  "type": "object"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Real car added successfully",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "message": {
-                  "type": "string"
-                }
-              }
-            }
+            "description": "Missing required parameter 'qtd'"
           },
           "500": {
             "description": "Internal server error",
@@ -352,45 +441,22 @@
     },
     "/api/addSimulated": {
       "post": {
-        "description": "Add a simulated vehicle",
+        "summary": "Add simulated vehicle",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
         "parameters": [
           {
             "name": "body",
             "in": "body",
-            "description": "Simulated vehicle data",
             "required": true,
             "schema": {
-              "type": "object",
-              "properties": {
-                "end": {
-                  "type": "object",
-                  "properties": {
-                    "lng": {
-                      "type": "string"
-                    },
-                    "lat": {
-                      "type": "string"
-                    }
-                  }
-                },
-                "start": {
-                  "type": "object",
-                  "properties": {
-                    "lng": {
-                      "type": "string"
-                    },
-                    "lat": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
+              "$ref": "#/definitions/SimulatedVehicle"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "Simulated vehicle added successfully",
+            "description": "Vehicle added successfully",
             "schema": {
               "type": "object",
               "properties": {
@@ -416,45 +482,22 @@
     },
     "/api/addSimulatedPedestrian": {
       "post": {
-        "description": "Add a simulated pedestrian",
+        "summary": "Add simulated pedestrian",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
         "parameters": [
           {
             "name": "body",
             "in": "body",
-            "description": "Simulated pedestrian data",
             "required": true,
             "schema": {
-              "type": "object",
-              "properties": {
-                "end": {
-                  "type": "object",
-                  "properties": {
-                    "lng": {
-                      "type": "string"
-                    },
-                    "lat": {
-                      "type": "string"
-                    }
-                  }
-                },
-                "start": {
-                  "type": "object",
-                  "properties": {
-                    "lng": {
-                      "type": "string"
-                    },
-                    "lat": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
+              "$ref": "#/definitions/SimulatedPedestrian"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "Simulated pedestrian added successfully",
+            "description": "Pedestrian added successfully",
             "schema": {
               "type": "object",
               "properties": {
@@ -478,55 +521,337 @@
         }
       }
     },
-    "/api/getsensordata": {
-      "get": {
-        "description": "Get sensor data",
+    "/api/endSimulation": {
+      "post": {
+        "summary": "End the simulation",
         "responses": {
           "200": {
-            "description": "Sensor data retrieved successfully",
+            "description": "Simulation ended successfully",
             "schema": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "objectID": {
-                    "type": "integer"
-                  },
-                  "acceleration": {
-                    "type": "number"
-                  },
-                  "classification": {
-                    "type": "integer"
-                  },
-                  "cloudPersist": {
-                    "type": "boolean"
-                  },
-                  "confidence": {
-                    "type": "integer"
-                  },
-                  "heading": {
-                    "type": "number"
-                  },
-                  "latitude": {
-                    "type": "number"
-                  },
-                  "length": {
-                    "type": "number"
-                  },
-                  "longitude": {
-                    "type": "number"
-                  },
-                  "receiverID": {
-                    "type": "integer"
-                  },
-                  "speed": {
-                    "type": "number"
-                  },
-                  "timestamp": {
-                    "type": "number"
-                  },
-                  "test": {
-                    "type": "object"
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/endSimulationAndSave": {
+      "post": {
+        "summary": "End the simulation and save",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "required": true,
+            "type": "string",
+            "description": "Name of the simulation to save"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Simulation ended and saved successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/cars": {
+      "post": {
+        "summary": "Add cars",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Cars added successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clearSimulation": {
+      "get": {
+        "summary": "Clear the simulation",
+        "responses": {
+          "200": {
+            "description": "Simulation cleared successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/blockRoundabout": {
+      "post": {
+        "summary": "Block a roundabout",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": true,
+            "type": "string",
+            "description": "ID of the roundabout to block"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Roundabout blocked successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/blockRoad": {
+      "post": {
+        "summary": "Block a road",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": true,
+            "type": "string",
+            "description": "ID of the road to block"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Road blocked successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/unblockRoundabout": {
+      "post": {
+        "summary": "Unblock a roundabout",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": true,
+            "type": "string",
+            "description": "ID of the roundabout to unblock"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Roundabout unblocked successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/unblockRoad": {
+      "post": {
+        "summary": "Unblock a road",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": true,
+            "type": "string",
+            "description": "ID of the road to unblock"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Road unblocked successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/vehicles": {
+      "get": {
+        "summary": "Get the number of vehicles",
+        "responses": {
+          "200": {
+            "description": "Number of vehicles returned",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "quantity": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/blockedRoundabouts": {
+      "get": {
+        "summary": "Get blocked roundabouts",
+        "responses": {
+          "200": {
+            "description": "List of blocked roundabouts returned",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "blocked_roundabouts": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
                   }
                 }
               }
@@ -545,6 +870,275 @@
           }
         }
       }
+    },
+    "/api/blockedRoads": {
+      "get": {
+        "summary": "Get blocked roads",
+        "responses": {
+          "200": {
+            "description": "List of blocked roads returned",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "blocked_roads": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/history": {
+      "get": {
+        "summary": "Get simulation history for a user",
+        "responses": {
+          "200": {
+            "description": "History returned",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "history": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete simulation history for a user",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": true,
+            "type": "string",
+            "description": "ID of the history entry to delete"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "History entry deleted successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/sim_running": {
+      "get": {
+        "summary": "Check if the simulation is running",
+        "responses": {
+          "200": {
+            "description": "Simulation status returned",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "sim_running": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/resimulation": {
+      "post": {
+        "summary": "Resimulation",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": true,
+            "type": "string",
+            "description": "ID of the simulation to resimulate"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resimulation started successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "User": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        }
+      },
+      "required": ["username", "password"]
+    },
+    "UserDetails": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "UserResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        }
+      }
+    },
+    "LoginRequest": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      },
+      "required": ["username", "password"]
+    },
+    "LoginResponse": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string"
+        }
+      }
+    },
+    "UserUpdate": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        }
+      }
+    },
+    "SimulatedVehicle": {
+      "type": "object",
+      "properties": {
+        "vehicleType": {
+          "type": "string"
+        },
+        "location": {
+          "type": "string"
+        }
+      }
+    },
+    "SimulatedPedestrian": {
+      "type": "object",
+      "properties": {
+        "location": {
+          "type": "string"
+        }
+      }
     }
   }
-}
+  
+}    
+
+

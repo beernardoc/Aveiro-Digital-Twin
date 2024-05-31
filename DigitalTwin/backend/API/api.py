@@ -62,12 +62,6 @@ current_user = None
 simulation_name = None
 sim_running = False
 
-
-@app.route('/api')
-def api():
-    return jsonify({'data': 'Hello, World!'})
-
-
 @app.route('/users', methods=['POST'])
 def create_user():
     # Receiving Data
@@ -413,39 +407,6 @@ def add_random_bike():
         return jsonify({'message': f'Motocicletas aleatórias adicionadas para {qtd} motocicletas'}), 200
     except Exception as e:
         return jsonify({'error': e}), 500
-
-
-@app.route('/api/testaddRealCar', methods=['POST'])
-def test_add_real_car():
-    try:
-        data = request.json  # Acessa o JSON enviado no corpo da solicitação
-        # Aqui você pode manipular os dados como desejar
-        print("Dados recebidos:", data)
-
-        # Exemplo: extrair o ID do veículo do JSON recebido
-        vehicle_id = data.get('objectID')
-        if vehicle_id is not None:
-            # Faça algo com o ID do veículo, como publicá-lo em um tópico MQTT
-            publish.single("/realDatateste", payload=json.dumps(data), hostname="localhost", port=1883)
-
-        return jsonify({'message': 'Veículo adicionado com sucesso'}), 200
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-    # curl - X POST - H "Content-Type: application/json" -d '{
-    #"acceleration": 0.0,
-    #"classification": 5,
-    #"cloudPersist": false,
-    #"confidence": 100,
-    #"heading": -25.311,
-    #"latitude": 40.635327506990194,
-    #"length": 5.6000000000000005,
-    #"longitude": -8.660106693274248,
-    #"objectID": 1015,
-    #"receiverID": 1,
-    #"speed": 10.9,
-    #"test": {},
-    #"timestamp": 1710954013.329629 }'   http://localhost:5000/api/testaddRealCar
 
 
 @app.route('/api/addSimulated', methods=['POST'])
