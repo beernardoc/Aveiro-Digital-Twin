@@ -466,7 +466,7 @@ def end_simulation_and_save():
     global simulation_name
     simulation_name = request.args.get('name')
 
-    publish.single("/endSimulationAndSave", payload="", hostname="localhost", port=1883)
+    publish.single("/endSimulationAndSave", payload=simulation_name, hostname="localhost", port=1883)
 
     global sim_running
     sim_running = False

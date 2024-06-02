@@ -52,7 +52,7 @@ if len(sys.argv) > 1:
 
 randomVehiclesThread = None
 end_addRandomTraffic = False
-
+edges = {}
 pause_to_clear = False
 
 net = sumolib.net.readNet(
@@ -60,13 +60,13 @@ net = sumolib.net.readNet(
     withInternal=True)  # Carrega a rede do SUMO atraves do sumolib para acesso estatico
 
 history_file = FileComposer("Adapters/history/base_file.xml")
-
 def run():
     step = 0
     while True:
         try:
             traci.simulationStep()
             global pause_to_clear
+            global edges
             if not pause_to_clear:
                 for vehicle_id in traci.vehicle.getIDList():
                     vehicle_type = traci.vehicle.getTypeID(vehicle_id)
@@ -79,6 +79,12 @@ def run():
                         if all_vehicles[vehicle_id]["route"] != route:
                             all_vehicles[vehicle_id]["route"] = route
                             # print(f'Vehicle {vehicle_id} changed route to {route}')
+
+
+
+            for edge in traci.edge.getIDList():
+                edges[edge] = traci.edge.getLastStepVehicleNumber(edge)
+
 
             
             step += 1
@@ -487,9 +493,10 @@ def addRandomBike(QtdBike):
             traci.vehicle.add(vehicle_id, routeID, "vehicle.gazelle.omafiets", depart="now", departSpeed=0,
                               departLane="best", )
 
-def endSimulation(save_history=False):
-    
+def endSimulation(save_history=False, name = None):
+    global edges
     if save_history:
+
         for vehicle_id, vehicle_info in all_vehicles.items():
             vehicle = { "id": vehicle_id, "type": vehicle_info["type"], "depart": vehicle_info["depart"] }
             route = list(vehicle_info["route"])
@@ -498,6 +505,17 @@ def endSimulation(save_history=False):
         data = {"user_email": current_user, "history": history_file.get_result_string()}
         print(data)
         publish.single("/history", payload=json.dumps(data), hostname="localhost", port=1883)
+
+        if not os.path.exists('results'):
+            os.makedirs('results')
+
+        file_path = 'results/' + name.decode('utf-8') + '_edges.xml'
+
+        # Escreva o dicionário 'edges' em um arquivo JSON
+        with open(file_path, 'w') as f:
+            json.dump(edges, f)
+
+
 
     traci.close()
     sys.stdout.flush()
@@ -591,7 +609,8 @@ def on_message(client, userdata, msg):
 
     if topic == "/endSimulationAndSave":
         print("Ending simulation and saving history...")
-        endSimulation(True)
+        name = msg.payload
+        endSimulation(True, name)
         print("Simulation ended and history saved")
 
     if topic == "/blockRoundabout":
