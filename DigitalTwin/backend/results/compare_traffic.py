@@ -15,7 +15,7 @@ def generate_RoundaboutGraph(file1, file2):
     data1 = cars_per_edge(file1)
     data2 = cars_per_edge(file2)
 
-    with open('../Adapters/co_simulation/roundabout.json', 'r') as f:
+    with open('Adapters/co_simulation/roundabout.json', 'r') as f:
         roundabout_data = json.load(f)
 
     # Inicializar dicionários de resultados antes e depois
@@ -64,7 +64,7 @@ def generate_RoadGraph(file1, file2):
     data2 = cars_per_edge(file2)
 
 
-    with open('../Adapters/co_simulation/road.json', 'r') as f:
+    with open('Adapters/co_simulation/road.json', 'r') as f:
         road_data = json.load(f)
 
     results_before = {road: 0 for road in road_data}

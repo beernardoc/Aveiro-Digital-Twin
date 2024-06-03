@@ -52,7 +52,14 @@ if len(sys.argv) > 1:
 
 randomVehiclesThread = None
 end_addRandomTraffic = False
-edges = {}
+
+
+edges_max = {}
+edges_total = {}
+edges_co2 = {}
+edges_fuel = {}
+edges_waiting = {}
+
 pause_to_clear = False
 
 net = sumolib.net.readNet(
@@ -66,7 +73,12 @@ def run():
         try:
             traci.simulationStep()
             global pause_to_clear
-            global edges
+            global edges_max
+            global edges_total
+            global edges_co2
+            global edges_fuel
+            global edges_waiting
+
             if not pause_to_clear:
                 for vehicle_id in traci.vehicle.getIDList():
                     vehicle_type = traci.vehicle.getTypeID(vehicle_id)
@@ -81,9 +93,35 @@ def run():
                             # print(f'Vehicle {vehicle_id} changed route to {route}')
 
 
+                    # get the edge the vehicle is currently on
+                    edge = traci.vehicle.getRoadID(vehicle_id)
+                    if edge not in edges_total:
+                        edges_total[edge] = set(vehicle_id)
+                    else:
+                        edges_total[edge].add(vehicle_id)
+
+
 
             for edge in traci.edge.getIDList():
-                edges[edge] = traci.edge.getLastStepVehicleNumber(edge)
+                if edge not in edges_max:
+                    edges_max[edge] = traci.edge.getLastStepVehicleNumber(edge)
+                else: # if puts the max number between the current stored and the new one
+                    edges_max[edge] = max(edges_max[edge], traci.edge.getLastStepVehicleNumber(edge))
+
+                if edge not in edges_co2:
+                    edges_co2[edge] = traci.edge.getCO2Emission(edge)
+                else:
+                    edges_co2[edge] += traci.edge.getCO2Emission(edge)
+
+                if edge not in edges_fuel:
+                    edges_fuel[edge] = traci.edge.getFuelConsumption(edge)
+                else:
+                    edges_fuel[edge] += traci.edge.getFuelConsumption(edge)
+
+                if edge not in edges_waiting:
+                    edges_waiting[edge] = traci.edge.getWaitingTime(edge)
+                else:
+                    edges_waiting[edge] += traci.edge.getWaitingTime(edge)
 
 
             
@@ -494,7 +532,12 @@ def addRandomBike(QtdBike):
                               departLane="best", )
 
 def endSimulation(save_history=False, name = None):
-    global edges
+    global edges_max
+    global edges_total
+    global edges_co2
+    global edges_fuel
+    global edges_waiting
+
     if save_history:
 
         for vehicle_id, vehicle_info in all_vehicles.items():
@@ -509,13 +552,39 @@ def endSimulation(save_history=False, name = None):
         if not os.path.exists('results'):
             os.makedirs('results')
 
-        file_path = 'results/' + name.decode('utf-8') + '_edges.xml'
+        file_path = 'results/' + name.decode('utf-8') + '_edges_max.xml'
 
         # Escreva o dicionário 'edges' em um arquivo JSON
         with open(file_path, 'w') as f:
-            json.dump(edges, f)
+            json.dump(edges_max, f)
 
+        file_path = 'results/' + name.decode('utf-8') + '_edges_total.xml'
 
+        # get the total of vehicles in each edge
+        edges_total_result = {}
+        for edge in traci.edge.getIDList():
+            if edge in edges_total:
+                edges_total_result[edge] = len(edges_total[edge])
+            else:
+                edges_total_result[edge] = 0
+
+        with open(file_path, 'w') as f:
+            json.dump(edges_total_result, f)
+
+        file_path = 'results/' + name.decode('utf-8') + '_edges_co2.xml'
+
+        with open(file_path, 'w') as f:
+            json.dump(edges_co2, f)
+
+        file_path = 'results/' + name.decode('utf-8') + '_edges_fuel.xml'
+
+        with open(file_path, 'w') as f:
+            json.dump(edges_fuel, f)
+
+        file_path = 'results/' + name.decode('utf-8') + '_edges_waiting.xml'
+
+        with open(file_path, 'w') as f:
+            json.dump(edges_waiting, f)
 
     traci.close()
     sys.stdout.flush()
