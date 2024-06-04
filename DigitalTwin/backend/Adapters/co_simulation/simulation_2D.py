@@ -53,6 +53,14 @@ if len(sys.argv) > 1:
 randomVehiclesThread = None
 end_addRandomTraffic = False
 
+
+edges_max = {}
+edges_total = {}
+edges_co2 = {}
+edges_fuel = {}
+edges_waiting = {}
+edges_vehicle_counter = {}
+
 pause_to_clear = False
 
 net = sumolib.net.readNet(
@@ -60,13 +68,19 @@ net = sumolib.net.readNet(
     withInternal=True)  # Carrega a rede do SUMO atraves do sumolib para acesso estatico
 
 history_file = FileComposer("Adapters/history/base_file.xml")
-
 def run():
     step = 0
     while True:
         try:
             traci.simulationStep()
             global pause_to_clear
+            global edges_max
+            global edges_total
+            global edges_co2
+            global edges_fuel
+            global edges_waiting
+            global edges_vehicle_counter
+
             if not pause_to_clear:
                 for vehicle_id in traci.vehicle.getIDList():
                     vehicle_type = traci.vehicle.getTypeID(vehicle_id)
@@ -79,6 +93,44 @@ def run():
                         if all_vehicles[vehicle_id]["route"] != route:
                             all_vehicles[vehicle_id]["route"] = route
                             # print(f'Vehicle {vehicle_id} changed route to {route}')
+
+
+                    # get the edge the vehicle is currently on
+                    edge = traci.vehicle.getRoadID(vehicle_id)
+                    if edge not in edges_total:
+                        edges_total[edge] = set(vehicle_id)
+                    else:
+                        edges_total[edge].add(vehicle_id)
+
+                    if edge not in edges_vehicle_counter:
+                        edges_vehicle_counter[edge] = 1
+                    else:
+                        edges_vehicle_counter[edge] += 1
+
+
+
+            for edge in traci.edge.getIDList():
+                if edge not in edges_max:
+                    edges_max[edge] = traci.edge.getLastStepVehicleNumber(edge)
+                else: # if puts the max number between the current stored and the new one
+                    edges_max[edge] = max(edges_max[edge], traci.edge.getLastStepVehicleNumber(edge))
+
+                if edge not in edges_co2:
+                    edges_co2[edge] = traci.edge.getCO2Emission(edge)
+                else:
+                    edges_co2[edge] += traci.edge.getCO2Emission(edge)
+
+                if edge not in edges_fuel:
+                    edges_fuel[edge] = traci.edge.getFuelConsumption(edge)
+                else:
+                    edges_fuel[edge] += traci.edge.getFuelConsumption(edge)
+
+                if edge not in edges_waiting:
+                    edges_waiting[edge] = traci.edge.getWaitingTime(edge)
+                else:
+                    edges_waiting[edge] += traci.edge.getWaitingTime(edge)
+
+
 
             
             step += 1
@@ -414,10 +466,6 @@ def addSimulatedPedestrian(received):
             return "Não foi possível encontrar uma rota válida"
 
 
-
-
-
-
 def addRandomTraffic(QtdCars):
     allowedEdges = [i.getID() for i in net.getEdges() if "driving" in i.getType()]
     types = traci.vehicletype.getIDList()
@@ -487,9 +535,16 @@ def addRandomBike(QtdBike):
             traci.vehicle.add(vehicle_id, routeID, "vehicle.gazelle.omafiets", depart="now", departSpeed=0,
                               departLane="best", )
 
-def endSimulation(save_history=False):
-    
+def endSimulation(save_history=False, name = None):
+    global edges_max
+    global edges_total
+    global edges_co2
+    global edges_fuel
+    global edges_waiting
+    global edges_vehicle_counter
+
     if save_history:
+
         for vehicle_id, vehicle_info in all_vehicles.items():
             vehicle = { "id": vehicle_id, "type": vehicle_info["type"], "depart": vehicle_info["depart"] }
             route = list(vehicle_info["route"])
@@ -498,6 +553,72 @@ def endSimulation(save_history=False):
         data = {"user_email": current_user, "history": history_file.get_result_string()}
         print(data)
         publish.single("/history", payload=json.dumps(data), hostname="localhost", port=1883)
+
+        if not os.path.exists('results'):
+            os.makedirs('results')
+
+        file_path = 'results/' + name.decode('utf-8') + '_edges_max.json'
+
+        # Escreva o dicionário 'edges' em um arquivo JSON
+        with open(file_path, 'w') as f:
+            json.dump(edges_max, f)
+
+        file_path = 'results/' + name.decode('utf-8') + '_edges_total.json'
+
+        # get the total of vehicles in each edge
+        edges_total_result = {}
+        for edge in traci.edge.getIDList():
+            if edge in edges_total:
+                edges_total_result[edge] = len(edges_total[edge])
+            else:
+                edges_total_result[edge] = 0
+
+        with open(file_path, 'w') as f:
+            json.dump(edges_total_result, f)
+
+
+        file_path = 'results/' + name.decode('utf-8') + '_edges_co2.json'
+
+        edges_co2_result = {}
+        for edge in traci.edge.getIDList():
+            if edge in edges_co2 and edges_co2[edge] > 0 and edges_vehicle_counter[edge] > 0:
+                edges_co2_result[edge] = edges_co2[edge] / edges_vehicle_counter[edge]
+            else:
+                edges_co2_result[edge] = 0
+
+
+        with open(file_path, 'w') as f:
+            json.dump(edges_co2_result, f)
+
+        file_path = 'results/' + name.decode('utf-8') + '_edges_fuel.json'
+
+        edges_fuel_result = {}
+        for edge in traci.edge.getIDList():
+            if edge in edges_fuel and edges_fuel[edge] > 0  and edges_vehicle_counter[edge] > 0:
+                edges_fuel_result[edge] = edges_fuel[edge] / edges_vehicle_counter[edge]
+            else:
+                edges_fuel_result[edge] = 0
+
+        with open(file_path, 'w') as f:
+            json.dump(edges_fuel_result, f)
+
+        file_path = 'results/' + name.decode('utf-8') + '_edges_waiting.json'
+
+        edges_waiting_result = {}
+        for edge in traci.edge.getIDList():
+            if edge in edges_waiting and edges_waiting[edge] > 0  and edges_vehicle_counter[edge] > 0:
+                edges_waiting_result[edge] = edges_waiting[edge] / edges_vehicle_counter[edge]
+            else:
+                edges_waiting_result[edge] = 0
+
+        with open(file_path, 'w') as f:
+            json.dump(edges_waiting_result, f)
+
+        # save the total number of vehicles in the simulation
+        file_path = 'results/' + name.decode('utf-8') + '_total_vehicles.json'
+
+        with open(file_path, 'w') as f:
+            json.dump({"total_vehicles": len(all_vehicles), "total_time": traci.simulation.getTime()}, f)
 
     traci.close()
     sys.stdout.flush()
@@ -591,7 +712,8 @@ def on_message(client, userdata, msg):
 
     if topic == "/endSimulationAndSave":
         print("Ending simulation and saving history...")
-        endSimulation(True)
+        name = msg.payload
+        endSimulation(True, name)
         print("Simulation ended and history saved")
 
     if topic == "/blockRoundabout":
