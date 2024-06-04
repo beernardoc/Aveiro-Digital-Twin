@@ -2,6 +2,7 @@ import sys
 import json
 import matplotlib.pyplot as plt
 from matplotlib.patches import Patch
+import os
 
 def cars_per_edge(file):
     with open(file, 'r') as f:
@@ -86,7 +87,10 @@ def generate_RoundaboutGraph(file1, file2, type):
     plt.tight_layout()  # Prevent labels from overlapping
     plt.subplots_adjust(top=0.85)  # Adjust the top margin to make space for the title
 
-    plt.savefig(f'results/graphs/{fig_name}')
+    dir_name = f'{name1}-{name2}'
+    os.makedirs(f'../generated_graphs/{dir_name}', exist_ok=True)
+
+    plt.savefig(f'../generated_graphs/{name1}-{name2}/{fig_name}')
     plt.close()
 
 def generate_RoadGraph(file1, file2, type):
@@ -162,7 +166,10 @@ def generate_RoadGraph(file1, file2, type):
     plt.tight_layout()  
     plt.subplots_adjust(top=0.85)  # Adjust the top margin to make space for the title
 
-    plt.savefig(f'results/graphs/{fig_name}')
+    dir_name = f'{name1}-{name2}'
+    os.makedirs(f'../generated_graphs/{dir_name}', exist_ok=True)
+
+    plt.savefig(f'../generated_graphs/{name1}-{name2}/{fig_name}')
     plt.close()
 
 def generate_AllGraphs(sim1, sim2):
