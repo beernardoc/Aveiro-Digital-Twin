@@ -21,6 +21,16 @@ Inside the DigitalTwin directory
 
 > While running, the API documentation is available on the endpoint: http://localhost:5000/swagger
 
+## Obtain Graphs
+
+To obtain graphs comparing 2 simulations that have been saved, go to the directory `DigitalTwin/backend`
+and run:
+
+```bash
+python3 results/compare_traffic.py {saved_sim_name1} {saved_sim_name2}
+```
+
+The graphs will appear in the `DigitalTwin/generated_graphs` directory 
 
 ## Export a new map
 
