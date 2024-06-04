@@ -13,34 +13,16 @@ Project for the Project in Informatics class
 
 ## How to run
 
-- Install requirements
+Inside the DigitalTwin directory
+
 ```bash
-pip install -r requirements.txt
+./run.sh
 ```
 
-- Run carla server and load map
-```bash
-./runCarla.sh
-```
+> While running, the API documentation is available on the endpoint: http://localhost:5000/swagger
 
 
-- Run carla server
-```bash
-./CarlaUE4.sh
-```
-
-- Load map
-```bash
-python3 config.py -x ~/Desktop/PI_Digital_Twin/Adapters/co_simulation/sumo_configuration/simple-map/map-clean.xodr
-```
-
-- Run co-simulation
-```bash
- python3 simulation_3D.py sumo_configuration/ruadapega.sumocfg --tls-manager carla --sumo-gui
-```
-
-
-## Export map
+## Export a new map
 
 - Generated the .osm file through https://www.openstreetmap.org/
 
