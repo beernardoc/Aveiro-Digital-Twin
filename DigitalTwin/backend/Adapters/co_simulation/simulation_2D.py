@@ -59,6 +59,7 @@ edges_total = {}
 edges_co2 = {}
 edges_fuel = {}
 edges_waiting = {}
+edges_vehicle_counter = {}
 
 pause_to_clear = False
 
@@ -78,6 +79,7 @@ def run():
             global edges_co2
             global edges_fuel
             global edges_waiting
+            global edges_vehicle_counter
 
             if not pause_to_clear:
                 for vehicle_id in traci.vehicle.getIDList():
@@ -99,6 +101,11 @@ def run():
                         edges_total[edge] = set(vehicle_id)
                     else:
                         edges_total[edge].add(vehicle_id)
+
+                    if edge not in edges_vehicle_counter:
+                        edges_vehicle_counter[edge] = 1
+                    else:
+                        edges_vehicle_counter[edge] += 1
 
 
 
@@ -122,6 +129,7 @@ def run():
                     edges_waiting[edge] = traci.edge.getWaitingTime(edge)
                 else:
                     edges_waiting[edge] += traci.edge.getWaitingTime(edge)
+
 
 
             
@@ -458,10 +466,6 @@ def addSimulatedPedestrian(received):
             return "Não foi possível encontrar uma rota válida"
 
 
-
-
-
-
 def addRandomTraffic(QtdCars):
     allowedEdges = [i.getID() for i in net.getEdges() if "driving" in i.getType()]
     types = traci.vehicletype.getIDList()
@@ -537,6 +541,7 @@ def endSimulation(save_history=False, name = None):
     global edges_co2
     global edges_fuel
     global edges_waiting
+    global edges_vehicle_counter
 
     if save_history:
 
@@ -552,13 +557,13 @@ def endSimulation(save_history=False, name = None):
         if not os.path.exists('results'):
             os.makedirs('results')
 
-        file_path = 'results/' + name.decode('utf-8') + '_edges_max.xml'
+        file_path = 'results/' + name.decode('utf-8') + '_edges_max.json'
 
         # Escreva o dicionário 'edges' em um arquivo JSON
         with open(file_path, 'w') as f:
             json.dump(edges_max, f)
 
-        file_path = 'results/' + name.decode('utf-8') + '_edges_total.xml'
+        file_path = 'results/' + name.decode('utf-8') + '_edges_total.json'
 
         # get the total of vehicles in each edge
         edges_total_result = {}
@@ -571,20 +576,49 @@ def endSimulation(save_history=False, name = None):
         with open(file_path, 'w') as f:
             json.dump(edges_total_result, f)
 
-        file_path = 'results/' + name.decode('utf-8') + '_edges_co2.xml'
+
+        file_path = 'results/' + name.decode('utf-8') + '_edges_co2.json'
+
+        edges_co2_result = {}
+        for edge in traci.edge.getIDList():
+            if edge in edges_co2 and edges_co2[edge] > 0 and edges_vehicle_counter[edge] > 0:
+                edges_co2_result[edge] = edges_co2[edge] / edges_vehicle_counter[edge]
+            else:
+                edges_co2_result[edge] = 0
+
 
         with open(file_path, 'w') as f:
-            json.dump(edges_co2, f)
+            json.dump(edges_co2_result, f)
 
-        file_path = 'results/' + name.decode('utf-8') + '_edges_fuel.xml'
+        file_path = 'results/' + name.decode('utf-8') + '_edges_fuel.json'
+
+        edges_fuel_result = {}
+        for edge in traci.edge.getIDList():
+            if edge in edges_fuel and edges_fuel[edge] > 0  and edges_vehicle_counter[edge] > 0:
+                edges_fuel_result[edge] = edges_fuel[edge] / edges_vehicle_counter[edge]
+            else:
+                edges_fuel_result[edge] = 0
 
         with open(file_path, 'w') as f:
-            json.dump(edges_fuel, f)
+            json.dump(edges_fuel_result, f)
 
-        file_path = 'results/' + name.decode('utf-8') + '_edges_waiting.xml'
+        file_path = 'results/' + name.decode('utf-8') + '_edges_waiting.json'
+
+        edges_waiting_result = {}
+        for edge in traci.edge.getIDList():
+            if edge in edges_waiting and edges_waiting[edge] > 0  and edges_vehicle_counter[edge] > 0:
+                edges_waiting_result[edge] = edges_waiting[edge] / edges_vehicle_counter[edge]
+            else:
+                edges_waiting_result[edge] = 0
 
         with open(file_path, 'w') as f:
-            json.dump(edges_waiting, f)
+            json.dump(edges_waiting_result, f)
+
+        # save the total number of vehicles in the simulation
+        file_path = 'results/' + name.decode('utf-8') + '_total_vehicles.json'
+
+        with open(file_path, 'w') as f:
+            json.dump({"total_vehicles": len(all_vehicles), "total_time": traci.simulation.getTime()}, f)
 
     traci.close()
     sys.stdout.flush()
